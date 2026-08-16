@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://api.frankfurter.app;">
+    <title>Payroll Nexus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="light-mode">
+
+    <div class="page-wrap">
+
+        <!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+        <header class="top-header">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-chart-line"></i></div>
+                <div>
+                    <div class="brand-title">Payroll Nexus</div>
+                    <div class="brand-sub">HR Intelligence Platform</div>
+                </div>
+            </div>
+            <div class="live-clock" id="liveClock">
+                <div class="live-clock-date" id="liveClockDate">—</div>
+                <div class="live-clock-time" id="liveClockTime">--:--:--</div>
+            </div>
+            <div class="header-actions">
+                <input type="file" id="importFile" class="hidden" accept=".json" aria-label="Import backup file">
+                <div class="currency-select-wrap" title="Display currency">
+                    <i class="fas fa-coins currency-select-icon"></i>
+                    <select id="currencySelect" class="currency-select" aria-label="Display currency"></select>
+                </div>
+                <button id="converterBtn" class="btn btn-primary"><i class="fas fa-right-left"></i> Convert</button>
+                <button id="animToggle" class="btn btn-neutral" aria-label="Toggle animations" aria-pressed="false" title="Enable/disable all animations">
+                    <i class="fas fa-magic-wand-sparkles" id="animIcon"></i>
+                </button>
+                <button id="themeToggle" class="btn btn-neutral" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════════════════════════════ TABS ═══════════════════════════════ -->
+        <nav class="tab-bar" role="tablist">
+            <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true"><i
+                    class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" data-tab="employees" role="tab"><i class="fas fa-users"></i> Employees</button>
+            <button class="tab-btn" data-tab="attendance" role="tab"><i class="fas fa-calendar-check"></i>
+                Attendance</button>
+            <button class="tab-btn" data-tab="leaves" role="tab"><i class="fas fa-plane-departure"></i> Leaves</button>
+            <button class="tab-btn" data-tab="payroll" role="tab"><i class="fas fa-wallet"></i> Payroll</button>
+            <button class="tab-btn" data-tab="reports" role="tab"><i class="fas fa-chart-bar"></i> Reports</button>
+        </nav>
+
+        <!-- ═══════════════════════════════ DASHBOARD ═════════════════════════ -->
+        <section id="dashboardSection" class="tab-content" role="tabpanel">
+
+            <!-- ── Hero greeting ── -->
+            <div class="dash-hero glass" id="dashGreeting">
+                <div class="dash-hero-left">
+                    <div class="dash-hero-avatar" id="heroAvatar"><i class="fas fa-user-tie"></i></div>
+                    <div>
+                        <div class="dash-hello" id="dashHello">Good day, Admin</div>
+                        <div class="dash-sub" id="dashSub">Here's what's happening at Payroll Nexus today.</div>
+                    </div>
+                </div>
+                <div class="dash-hero-right">
+                    <div class="hero-chips">
+                        <div class="hero-chip chip-blue"><i class="fas fa-user-check"></i><span
+                                id="chipPresentDash">0</span> present</div>
+                        <div class="hero-chip chip-amber"><i class="fas fa-hourglass-half"></i><span
+                                id="chipPendingDash">0</span> pending</div>
+                        <div class="hero-chip chip-purple"><i class="fas fa-users"></i><span id="chipStaffDash">0</span>
+                            staff</div>
+                    </div>
+                    <button class="btn btn-primary hero-cta" id="heroGoReports"><i class="fas fa-chart-pie"></i> View
+                        Reports</button>
+                </div>
+                <div class="dash-hero-orb"></div>
+            </div>
+
+            <!-- ── KPI row ── -->
+            <div class="kpi-row" id="kpiRow">
+
+                <div class="kpi-card kpi-blue glass tilt-card">
+                    <div class="kpi-shine"></div>
+                    <div class="kpi-top"><span class="kpi-label">Total Staff</span>
+                        <div class="kpi-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i
+                                class="fas fa-users"></i></div>
+                    </div>
+                    <div class="kpi-val" id="totalEmployees">0</div>
+                    <div class="kpi-sub" id="ks-staff"></div>
+                    <div class="kpi-spark-wrap"><svg id="sp-staff" viewBox="0 0 120 28" preserveAspectRatio="none"
+                            style="width:100%;height:28px;display:block;"></svg></div>
+                    <div class="kpi-foot"><i class="fas fa-arrow-trend-up kpi-foot-icon"></i> All systems
+                        operational</div>
+                </div>
+
+                <div class="kpi-card kpi-green glass tilt-card">
+                    <div class="kpi-shine"></div>
+                    <div class="kpi-top"><span class="kpi-label">Present Today</span>
+                        <div class="kpi-icon" style="background:rgba(16,185,129,.12);color:#10b981;"><i
+                                class="fas fa-user-check"></i></div>
+                    </div>
+                    <div class="kpi-val" id="presentToday">0</div>
+                    <div class="kpi-sub" id="ks-present"></div>
+                    <div class="kpi-spark-wrap"
+                        style="display:flex;align-items:center;justify-content:flex-end;height:28px;margin-top:8px;">
+                        <div style="position:relative;width:36px;height:36px;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" style="transform:rotate(-90deg)">
+                                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(16,185,129,.15)"
+                                    stroke-width="4" />
+                                <circle id="ring-arc" cx="18" cy="18" r="14" fill="none" stroke="#10b981"
+                                    stroke-width="4" stroke-dasharray="0 88" stroke-linecap="round"
+                                    style="transition:stroke-dasharray 1.1s cubic-bezier(.34,1.56,.64,1)" />
+                            </svg>
+                            <div id="ring-pct"
+                                style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--text-primary);">
+                                0%</div>
+                        </div>
+                    </div>
+                    <div class="kpi-foot"><i class="fas fa-stopwatch kpi-foot-icon"></i> Updated live</div>
+                </div>
+
+                <div class="kpi-card kpi-amber glass tilt-card">
+                    <div class="kpi-shine"></div>
+                    <div class="kpi-top"><span class="kpi-label">Pending Leaves</span>
+                        <div class="kpi-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;"><i
+                                class="fas fa-hourglass-half"></i></div>
+                    </div>
+                    <div class="kpi-val pending-pulse" id="pendingLeaves">0</div>
+                    <div class="kpi-sub" id="ks-leaves"></div>
+                    <div class="kpi-spark-wrap"><svg id="sp-leaves" viewBox="0 0 120 28" preserveAspectRatio="none"
+                            style="width:100%;height:28px;display:block;"></svg></div>
+                    <div class="kpi-foot"><i class="fas fa-bell kpi-foot-icon"></i> Needs attention</div>
+                </div>
+
+                <div class="kpi-card kpi-purple glass tilt-card">
+                    <div class="kpi-shine"></div>
+                    <div class="kpi-top"><span class="kpi-label">Projected Payroll</span>
+                        <div class="kpi-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;"><i
+                                class="fas fa-coins"></i></div>
+                    </div>
+                    <div class="kpi-val" id="projectedCost">$0</div>
+                    <div class="kpi-sub" id="ks-payroll"></div>
+                    <div class="kpi-spark-wrap"><svg id="sp-payroll" viewBox="0 0 120 28" preserveAspectRatio="none"
+                            style="width:100%;height:28px;display:block;"></svg></div>
+                    <div class="kpi-foot"><i class="fas fa-calculator kpi-foot-icon"></i> Gross estimate</div>
+                </div>
+
+            </div>
+
+            <!-- ── Insights strip ── -->
+            <div class="att-summary-row" id="dashInsightsRow"></div>
+
+            <!-- ── Quick actions (grouped) ── -->
+            <div class="quick-actions-wrapper">
+                <!-- Core HR Actions -->
+                <div class="qa-group">
+                    <div class="qa-group-header qa-collapsible" data-toggle="qa-core-actions">
+                        <i class="fas fa-users"></i>
+                        <span>Core Actions</span>
+                        <i class="fas fa-chevron-down qa-toggle-icon"></i>
+                    </div>
+                    <div class="qa-group-grid qa-grid-collapsed" id="qa-core-actions">
+                        <button class="qa-card" data-tab-target="employees">
+                            <div class="qa-card-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Add Employee</div>
+                                <div class="qa-card-desc">Create new staff record</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" data-tab-target="attendance">
+                            <div class="qa-card-icon" style="background:rgba(16,185,129,.12);color:#10b981;">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Take Attendance</div>
+                                <div class="qa-card-desc">Mark present/absent</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" data-tab-target="leaves">
+                            <div class="qa-card-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;">
+                                <i class="fas fa-envelope-open-text"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">New Leave Request</div>
+                                <div class="qa-card-desc">Submit leave application</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" data-tab-target="reports">
+                            <div class="qa-card-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">View Reports</div>
+                                <div class="qa-card-desc">Analytics & insights</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" data-tab-target="payroll">
+                            <div class="qa-card-icon" style="background:rgba(16,185,129,.12);color:#10b981;">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Run Payroll</div>
+                                <div class="qa-card-desc">Process salary calculations</div>
+                            </div>
+                            <button class="qa-card-action" id="qaRefresh" title="Refresh data">
+                                <i class="fas fa-rotate"></i>
+                            </button>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Management Actions -->
+                <div class="qa-group">
+                    <div class="qa-group-header qa-collapsible" data-toggle="qa-data-mgmt">
+                        <i class="fas fa-database"></i>
+                        <span>Data Management</span>
+                        <i class="fas fa-chevron-down qa-toggle-icon"></i>
+                    </div>
+                    <div class="qa-group-grid qa-grid-collapsed" id="qa-data-mgmt">
+                        <button class="qa-card" id="exportExcelBtn">
+                            <div class="qa-card-icon" style="background:rgba(34,197,94,.12);color:#22c55e;">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Export Data</div>
+                                <div class="qa-card-desc">Download as Excel</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" id="backupBtn">
+                            <div class="qa-card-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Backup</div>
+                                <div class="qa-card-desc">Save all data locally</div>
+                            </div>
+                        </button>
+                        <button class="qa-card" onclick="document.getElementById('importFile').click()">
+                            <div class="qa-card-icon" style="background:rgba(168,85,247,.12);color:#a855f7;">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="qa-card-text">
+                                <div class="qa-card-title">Restore</div>
+                                <div class="qa-card-desc">Load backup file</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Bottom 3-col grid ── -->
+            <div class="dash-bottom-grid" id="dashGrid">
+
+                <!-- 6-month bar chart -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><i class="fas fa-chart-bar" style="color:#3b82f6;"></i> Payroll trend — 6
+                        months <span class="live-badge"><span class="live-dot"></span> live</span></div>
+                    <div class="trend-bars" id="trend-bars"></div>
+                </div>
+
+                <!-- Attendance donut -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><i class="fas fa-chart-pie" style="color:#10b981;"></i> Attendance this
+                        month</div>
+                    <div class="donut-wrap">
+                        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
+                            <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
+                                <circle cx="36" cy="36" r="27" fill="none" stroke="rgba(99,115,129,.12)"
+                                    stroke-width="9" />
+                                <circle id="don-present" cx="36" cy="36" r="27" fill="none" stroke="#10b981"
+                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
+                                    style="transition:stroke-dasharray 1s ease .2s" />
+                                <circle id="don-late" cx="36" cy="36" r="27" fill="none" stroke="#f59e0b"
+                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
+                                    style="transition:stroke-dasharray 1s ease .35s" />
+                                <circle id="don-half" cx="36" cy="36" r="27" fill="none" stroke="#8b5cf6"
+                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
+                                    style="transition:stroke-dasharray 1s ease .5s" />
+                            </svg>
+                            <div
+                                style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                <span id="don-pct"
+                                    style="font-size:15px;font-weight:800;color:var(--text-primary);line-height:1;">0%</span>
+                                <span style="font-size:9px;color:var(--text-muted);">present</span>
+                            </div>
+                        </div>
+                        <div id="att-legend" class="att-legend"
+                            style="display:flex;flex-direction:column;gap:5px;flex:1;font-size:11px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dept salary bars -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><i class="fas fa-building" style="color:#8b5cf6;"></i> Salary by department
+                    </div>
+                    <div id="dept-list" style="display:flex;flex-direction:column;gap:9px;"></div>
+                </div>
+
+                <!-- Live activity feed -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><span class="live-dot"></span> Live activity <span class="live-badge"><span
+                                class="live-dot"></span> realtime</span></div>
+                    <div id="activity-feed" class="activity-scroll"></div>
+                </div>
+
+                <!-- Top earners -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Top earners this
+                        period</div>
+                    <div id="top-earners-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+
+                <!-- Live FX snapshot -->
+                <div class="glass chart-card reveal-card">
+                    <div class="chart-title"><i class="fas fa-right-left" style="color:#10b981;"></i> Exchange rates
+                        <span style="font-weight:500;text-transform:none;letter-spacing:0;">(base USD)</span>
+                    </div>
+                    <div id="fx-snapshot-list" style="display:flex;flex-direction:column;gap:7px;"></div>
+                    <div id="fx-snapshot-meta" class="fx-meta"></div>
+                </div>
+
+            </div>
+
+            <!-- hidden compat elements for old renderDashboard() calls -->
+            <canvas id="payrollTrendChart" style="display:none;"></canvas>
+            <canvas id="attendancePieChart" style="display:none;"></canvas>
+            <div id="dashboardAlertFeed" style="display:none;"></div>
+
+        </section>
+
+        <!-- ═══════════════════════════════ EMPLOYEES ═════════════════════════ -->
+        <section id="employeesSection" class="tab-content hidden" role="tabpanel">
+            <div class="section-head">
+                <h2 class="section-title"><i class="fas fa-users-viewfinder"></i> Employee Directory</h2>
+                <div style="display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap;">
+                    <select id="deptFilter" class="report-select" aria-label="Filter by department">
+                        <option value="">All Departments</option>
+                    </select>
+                    <div class="search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="empSearch" class="search-input" placeholder="Search name or ID…"
+                            aria-label="Search employees">
+                    </div>
+                    <button id="addEmpBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Employee</button>
+                </div>
+            </div>
+            <div class="glass table-wrap">
+                <table id="employeesTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="employeeId" class="sortable">ID<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="name" class="sortable">Name<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="department" class="sortable">Department<i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="position" class="sortable">Position<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="salary" class="sortable">Salary<i class="fas fa-sort sort-icon"></i></th>
+                            <th class="text-right px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ ATTENDANCE ════════════════════════ -->
+        <section id="attendanceSection" class="tab-content hidden" role="tabpanel">
+            <div class="section-head">
+                <h2 class="section-title"><i class="fas fa-calendar-days"></i> Attendance <span id="attDate"
+                        style="font-size:0.875rem;font-weight:500;color:var(--text-muted);"></span></h2>
+                <div style="display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap;">
+                    <div class="date-nav">
+                        <button id="attPrevDay" class="date-nav-btn" aria-label="Previous day"><i
+                                class="fas fa-chevron-left"></i></button>
+                        <input type="date" id="attDatePicker" class="date-nav-input" aria-label="Attendance date">
+                        <button id="attNextDay" class="date-nav-btn" aria-label="Next day"><i
+                                class="fas fa-chevron-right"></i></button>
+                        <button id="attTodayBtn" class="btn btn-neutral" style="padding:0.4rem 0.75rem;"><i
+                                class="fas fa-calendar-day"></i> Today</button>
+                    </div>
+                    <button id="exportAttCSVBtn" class="btn btn-neutral"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button id="markAllPresentBtn" class="btn btn-neutral"><i class="fas fa-bolt"></i> Mark All
+                        Present</button>
+                </div>
+            </div>
+
+            <div class="att-summary-row" id="attSummaryRow"></div>
+
+            <div class="glass" style="padding:1.25rem;">
+                <div class="att-card-grid" id="attendanceList"></div>
+                <div style="margin-top:1.25rem;">
+                    <button id="saveAttendanceBtn" class="btn btn-emerald"><i class="fas fa-save"></i> Save
+                        Attendance</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ LEAVES ════════════════════════════ -->
+        <section id="leavesSection" class="tab-content hidden" role="tabpanel">
+            <div class="section-head">
+                <h2 class="section-title"><i class="fas fa-envelope-open-text"></i> Leave Requests</h2>
+                <div style="display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap;">
+                    <div class="search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="leaveSearch" class="search-input" placeholder="Search leaves…"
+                            aria-label="Search leave requests">
+                    </div>
+                    <button id="newLeaveBtn" class="btn btn-primary"><i class="fas fa-plus"></i> New Request</button>
+                </div>
+            </div>
+            <div class="leave-summary" id="leaveSummaryBar"></div>
+            <div class="glass table-wrap">
+                <table id="leavesTable">
+                    <thead>
+                        <tr>
+                            <th style="width:22%" data-sort="employee" class="sortable">Employee<i
+                                    class="fas fa-sort sort-icon"></i></th>
+                            <th style="width:15%" data-sort="type" class="sortable">Type<i
+                                    class="fas fa-sort sort-icon"></i></th>
+                            <th style="width:22%" data-sort="dates" class="sortable">Dates<i
+                                    class="fas fa-sort sort-icon"></i></th>
+                            <th style="width:8%" data-sort="days" class="sortable">Days<i
+                                    class="fas fa-sort sort-icon"></i></th>
+                            <th style="width:12%" data-sort="status" class="sortable">Status<i
+                                    class="fas fa-sort sort-icon"></i></th>
+                            <th style="width:21%;text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leavesTbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ PAYROLL ═══════════════════════════ -->
+        <section id="payrollSection" class="tab-content hidden" role="tabpanel">
+            <div class="section-head">
+                <h2 class="section-title"><i class="fas fa-sliders-h"></i> Payroll Processor</h2>
+                <div class="month-year-display" id="payPeriodTag"><i class="fas fa-calendar-check"></i> <span></span>
+                </div>
+            </div>
+
+            <div class="glass processor-panel">
+                <div class="field">
+                    <label for="payMonth">Month</label>
+                    <select id="payMonth" class="field-input" style="width:auto;"></select>
+                </div>
+                <div class="field">
+                    <label for="payYear">Year</label>
+                    <input type="number" id="payYear" value="2026" class="field-input" style="width:6.5rem;" min="2000"
+                        max="2100">
+                </div>
+                <button id="runPayrollBtn" class="btn btn-primary"><i class="fas fa-calculator"></i> Process
+                    Payroll</button>
+                <button id="payrollHistoryBtn" class="btn btn-neutral"><i class="fas fa-history"></i> History</button>
+                <div class="search-wrap" style="margin-left:auto;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="paySearch" class="search-input" placeholder="Search payroll…"
+                        aria-label="Search payroll records">
+                </div>
+            </div>
+
+            <div class="pay-summary-row" id="paySummaryRow"></div>
+
+            <div class="glass table-wrap">
+                <table id="payrollTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="employee" class="sortable">Employee<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="basic" class="sortable">Basic<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="allowances" class="sortable">Allowances<i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="tax" class="sortable">Tax<i class="fas fa-sort sort-icon"></i></th>
+                            <th data-sort="net" class="sortable">Net Salary<i class="fas fa-sort sort-icon"></i></th>
+                            <th class="text-right px-4">Payslip</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payrollTbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ REPORTS ═══════════════════════════ -->
+        <section id="reportsSection" class="tab-content hidden" role="tabpanel">
+            <div class="section-head">
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Reports & Analytics</h2>
+                <div style="display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap;">
+                    <select id="chartTypeSelector" class="report-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="doughnut">Doughnut Chart</option>
+                        <option value="line">Line Chart</option>
+                    </select>
+                    <select id="reportYearFilter" class="report-select" aria-label="Filter report period">
+                        <option value="all">All periods</option>
+                    </select>
+                    <button id="exportReportPdfBtn" class="btn btn-violet"><i class="fas fa-file-pdf"></i> Export
+                        PDF</button>
+                </div>
+            </div>
+
+            <!-- Animated KPI billboard -->
+            <div id="reportKpis" class="report-kpis" aria-live="polite"></div>
+
+            <!-- Rotating insights ticker -->
+            <div class="report-ticker-wrap">
+                <div class="report-ticker-label"><i class="fas fa-bolt"></i> INSIGHTS</div>
+                <div class="report-ticker" id="reportTicker" aria-live="off"></div>
+            </div>
+
+            <div class="report-grid" id="reportChartGrid">
+                <div class="glass chart-card" data-expand-chart="deptBarChart">
+                    <div class="chart-title"><i class="fas fa-building" style="color:#8b5cf6;"></i> Salary by department
+                        <button class="chart-expand-btn" data-expand-target="deptBarChart" aria-label="Expand chart"><i
+                                class="fas fa-expand"></i></button>
+                    </div>
+                    <div class="report-canvas-wrap"><canvas id="deptBarChart"></canvas></div>
+                </div>
+                <div class="glass chart-card" data-expand-chart="payrollBreakdownChart">
+                    <div class="chart-title"><i class="fas fa-layer-group" style="color:#3b82f6;"></i> Payroll cost
+                        breakdown — current period
+                        <button class="chart-expand-btn" data-expand-target="payrollBreakdownChart"
+                            aria-label="Expand chart"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <div class="report-canvas-wrap"><canvas id="payrollBreakdownChart"></canvas></div>
+                </div>
+                <div class="glass chart-card" data-expand-chart="attendanceTrendChart">
+                    <div class="chart-title"><i class="fas fa-chart-line" style="color:#10b981;"></i> Attendance trend —
+                        6 months
+                        <button class="chart-expand-btn" data-expand-target="attendanceTrendChart"
+                            aria-label="Expand chart"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <div class="report-canvas-wrap"><canvas id="attendanceTrendChart"></canvas></div>
+                </div>
+                <div class="glass chart-card" data-expand-chart="leaveDistChart">
+                    <div class="chart-title"><i class="fas fa-plane-departure" style="color:#f59e0b;"></i> Leave type
+                        distribution
+                        <button class="chart-expand-btn" data-expand-target="leaveDistChart"
+                            aria-label="Expand chart"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <div class="report-canvas-wrap"><canvas id="leaveDistChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="report-bottom-grid">
+                <div class="glass report-lb-card">
+                    <div class="chart-title"><i class="fas fa-city" style="color:#3b82f6;"></i> Payroll share by
+                        department <span class="report-chart-hint"><i class="fas fa-circle-info"></i> click bar to
+                            highlight</span></div>
+                    <div id="reportDeptBars" class="report-dept-bars"></div>
+                </div>
+                <div class="glass report-podium-card">
+                    <div class="chart-title"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Top 5 earners —
+                        current period <span class="report-podium-live"><i class="fas fa-circle"></i> live</span></div>
+                    <div id="reportTopEarners" class="report-podium"></div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ══════════════════════════════ MODALS ════════════════════════════════ -->
+
+    <div id="empModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="empModalTitle">
+        <div class="modal-card" style="max-width:38rem;">
+            <div class="modal-header">
+                <h3 id="empModalTitle">Add Employee</h3>
+                <button class="modal-close" id="closeEmpModal" aria-label="Close modal"><i
+                        class="fas fa-xmark"></i></button>
+            </div>
+            <form id="empForm">
+                <div class="modal-body">
+                    <input type="hidden" id="empId">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="empEmployeeId">Employee ID</label>
+                            <input type="text" id="empEmployeeId" placeholder="e.g. EMP1001" required
+                                class="field-input" autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empEmail">Email Address</label>
+                            <input type="email" id="empEmail" placeholder="name@company.com" class="field-input"
+                                autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empFirstName">First Name</label>
+                            <input type="text" id="empFirstName" placeholder="First Name" required class="field-input"
+                                autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empLastName">Last Name</label>
+                            <input type="text" id="empLastName" placeholder="Last Name" required class="field-input"
+                                autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empDepartment">Department</label>
+                            <input type="text" id="empDepartment" placeholder="e.g. Engineering" class="field-input"
+                                autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empPosition">Position</label>
+                            <input type="text" id="empPosition" placeholder="e.g. Lead Developer" class="field-input"
+                                autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="empBasicSalary">Basic Salary ($)</label>
+                            <input type="number" step="0.01" min="0" id="empBasicSalary" placeholder="0.00" required
+                                class="field-input">
+                        </div>
+                        <div class="field">
+                            <label for="empPhone">Phone Number</label>
+                            <input type="text" id="empPhone" placeholder="555-0100" class="field-input"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeEmpModalBtn" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="leaveModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="leaveModalTitle">
+        <div class="modal-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 id="leaveModalTitle">Request Leave Absence</h3>
+                <button class="modal-close" id="closeLeaveModal" aria-label="Close modal"><i
+                        class="fas fa-xmark"></i></button>
+            </div>
+            <form id="leaveForm">
+                <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                    <div class="field">
+                        <label for="leaveEmpId">Select Employee</label>
+                        <select id="leaveEmpId" required class="field-input"></select>
+                    </div>
+                    <div class="field">
+                        <label for="leaveType">Leave Type</label>
+                        <select id="leaveType" required class="field-input">
+                            <option>Annual Leave</option>
+                            <option>Sick Leave</option>
+                            <option>Unpaid Leave</option>
+                        </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div class="field">
+                            <label for="leaveStart">Start Date</label>
+                            <input type="date" id="leaveStart" required class="field-input">
+                        </div>
+                        <div class="field">
+                            <label for="leaveEnd">End Date</label>
+                            <input type="date" id="leaveEnd" required class="field-input">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="leaveReason">Reason</label>
+                        <textarea id="leaveReason" placeholder="State reason clearly…" rows="3" class="field-input"
+                            style="resize:vertical;"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="leaveAttachment">Attachment <span
+                                style="text-transform:none;font-weight:500;color:var(--text-muted);">(optional, max 1.5
+                                MB — PDF, image, or doc)</span></label>
+                        <input type="file" id="leaveAttachment" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        <div id="leaveAttachDropzone" class="file-drop"
+                            onclick="document.getElementById('leaveAttachment').click()">
+                            <i class="fas fa-paperclip"></i>
+                            <span>Click to attach a file (medical note, ticket, etc.)</span>
+                        </div>
+                        <div id="leaveAttachChip" class="file-chip hidden">
+                            <i class="fas fa-file-circle-check"></i>
+                            <span id="leaveAttachChipName" class="file-chip-name"></span>
+                            <span id="leaveAttachChipSize" class="file-chip-size"></span>
+                            <button type="button" id="leaveAttachRemoveBtn" class="file-chip-remove"
+                                aria-label="Remove attachment"><i class="fas fa-xmark"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeLeaveModalBtn" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        <div class="modal-card" style="max-width:26rem;text-align:center;">
+            <div class="modal-body" style="padding:2rem 1.75rem;">
+                <div
+                    style="width:3rem;height:3rem;border-radius:999px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+                    <i class="fas fa-triangle-exclamation" style="color:var(--danger);font-size:1.125rem;"></i>
+                </div>
+                <h3 id="confirmModalTitle" style="font-size:1.05rem;font-weight:800;margin-bottom:0.5rem;">Delete
+                    Employee?</h3>
+                <p style="font-size:0.8125rem;color:var(--text-secondary);line-height:1.7;">This action is permanent.
+                    All linked attendance records, leave requests, and payroll data will be erased.</p>
+                <div style="display:flex;justify-content:center;gap:0.75rem;margin-top:1.75rem;">
+                    <button id="cancelConfirmBtn" class="btn btn-ghost">Cancel</button>
+                    <button id="executeConfirmBtn" class="btn btn-danger">Delete Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+        <div class="modal-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 id="historyModalTitle"><i class="fas fa-history"
+                        style="color:var(--accent);margin-right:0.5rem;"></i> Payroll Ledger</h3>
+                <button class="modal-close" onclick="closeModal('historyModal')" aria-label="Close modal"><i
+                        class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="historyModalContent" style="display:flex;flex-direction:column;gap:0;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-neutral" onclick="closeModal('historyModal')">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="currencyModalTitle">
+        <div class="modal-card" style="max-width:28rem;">
+            <div class="modal-header">
+                <h3 id="currencyModalTitle"><i class="fas fa-right-left"
+                        style="color:var(--accent);margin-right:0.5rem;"></i> Currency Converter</h3>
+                <button class="modal-close" onclick="closeModal('currencyModal')" aria-label="Close modal"><i
+                        class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div class="field">
+                    <label for="convAmount">Amount</label>
+                    <input type="number" id="convAmount" class="field-input" value="1000" min="0" step="0.01">
+                </div>
+                <div class="conv-row">
+                    <div class="field">
+                        <label for="convFrom">From</label>
+                        <select id="convFrom" class="field-input"></select>
+                    </div>
+                    <button id="convSwapBtn" class="conv-swap-btn" type="button" aria-label="Swap currencies"><i
+                            class="fas fa-arrows-rotate"></i></button>
+                    <div class="field">
+                        <label for="convTo">To</label>
+                        <select id="convTo" class="field-input"></select>
+                    </div>
+                </div>
+                <div class="conv-result" id="convResult">—</div>
+                <div class="conv-rate-line" id="convRateLine"></div>
+                <div>
+                    <div class="conv-table-title">Quick reference <span id="convTableMeta" class="fx-meta"
+                            style="margin-left:6px;"></span></div>
+                    <div id="convQuickTable" class="conv-quick-table"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="convRefreshBtn" class="btn btn-neutral"><i class="fas fa-rotate"></i> Refresh rates</button>
+                <button class="btn btn-primary" onclick="closeModal('currencyModal')">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" role="alert" aria-live="polite"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

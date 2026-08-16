@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Metrics — Toggleable Financial Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════════ HEADER ═══════════════════ -->
+    <header class="top-header">
+        <div class="brand">
+            <div class="brand-icon">◆</div>
+            <div>
+                <div class="brand-title">Nexus Metrics</div>
+                <div class="brand-sub">Focus-Mode Financial Dashboard</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="live-pill"><span class="live-dot"></span> LIVE</span>
+            <span class="clock" id="globalClock">--:--:--</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════════ TOGGLE NAV BAR ═══════════════════ -->
+    <nav class="toggle-bar" id="toggleBar" role="tablist" aria-label="Dashboard views">
+        <button class="toggle-btn active" data-view="overview" role="tab" aria-selected="true"
+            aria-controls="view-overview" id="tab-overview"><span class="tg-ico">◉</span>Overview</button>
+        <button class="toggle-btn" data-view="payroll" role="tab" aria-selected="false" aria-controls="view-payroll"
+            id="tab-payroll"><span class="tg-ico">▥</span>Payroll Trends</button>
+        <button class="toggle-btn" data-view="attendance" role="tab" aria-selected="false"
+            aria-controls="view-attendance" id="tab-attendance"><span class="tg-ico">▤</span>Attendance</button>
+        <button class="toggle-btn" data-view="salary" role="tab" aria-selected="false" aria-controls="view-salary"
+            id="tab-salary"><span class="tg-ico">▦</span>Salary by Dept</button>
+        <button class="toggle-btn" data-view="activity" role="tab" aria-selected="false" aria-controls="view-activity"
+            id="tab-activity"><span class="tg-ico">⚡</span>Live Activity</button>
+        <button class="toggle-btn" data-view="earners" role="tab" aria-selected="false" aria-controls="view-earners"
+            id="tab-earners"><span class="tg-ico">♛</span>Top Earners</button>
+        <button class="toggle-btn" data-view="fx" role="tab" aria-selected="false" aria-controls="view-fx"
+            id="tab-fx"><span class="tg-ico">⇄</span>Exchange Rates</button>
+        <span class="toggle-pill" id="togglePill" aria-hidden="true"></span>
+    </nav>
+
+    <!-- ═══════════════════ CANVAS ═══════════════════ -->
+    <main class="canvas" id="canvas">
+
+        <!-- ─── Overview view ─── -->
+        <section class="view active" id="view-overview" role="tabpanel" aria-labelledby="tab-overview">
+            <div class="view-head reveal">
+                <div>
+                    <div class="view-title">Command Center</div>
+                    <div class="view-sub">All six metrics live at a glance. Click any widget to enter focus mode.</div>
+                </div>
+            </div>
+            <div class="ov-grid" id="ovGrid"></div>
+        </section>
+
+        <!-- ─── Payroll Trends view ─── -->
+        <section class="view" id="view-payroll" role="tabpanel" aria-labelledby="tab-payroll">
+            <div class="toolbar reveal">
+                <div class="chips" id="pr-range-chips">
+                    <button class="chip active" data-range="3">3M</button>
+                    <button class="chip" data-range="6">6M</button>
+                    <button class="chip" data-range="12">12M</button>
+                </div>
+                <select class="sel" id="pr-metric">
+                    <option value="gross">Gross</option>
+                    <option value="net">Net</option>
+                    <option value="tax">Tax</option>
+                </select>
+                <span class="toolbar-hint">Click a bar for the monthly drill-down</span>
+            </div>
+            <div class="stat-strip reveal" id="pr-stats"></div>
+            <div class="panel glass reveal">
+                <div id="pr-chart" class="chart-stage"></div>
+            </div>
+            <div class="drill glass" id="pr-drill"></div>
+        </section>
+
+        <!-- ─── Monthly Attendance view ─── -->
+        <section class="view" id="view-attendance" role="tabpanel" aria-labelledby="tab-attendance">
+            <div class="toolbar reveal">
+                <div class="chips">
+                    <button class="chip icon" id="att-prev" aria-label="Previous month">◀</button>
+                    <button class="chip period" id="att-month-label">—</button>
+                    <button class="chip icon" id="att-next" aria-label="Next month">▶</button>
+                </div>
+                <div class="chips" id="att-status-chips">
+                    <button class="chip active" data-status="present">Present</button>
+                    <button class="chip active" data-status="late">Late</button>
+                    <button class="chip active" data-status="half">Half-day</button>
+                    <button class="chip active" data-status="absent">Absent</button>
+                </div>
+                <span class="toolbar-hint">Click a day bar for the staff drill-down</span>
+            </div>
+            <div class="stat-strip reveal" id="att-stats"></div>
+            <div class="panel glass reveal">
+                <div id="att-chart" class="chart-stage"></div>
+            </div>
+            <div class="drill glass" id="att-drill"></div>
+        </section>
+
+        <!-- ─── Salary by Department view ─── -->
+        <section class="view" id="view-salary" role="tabpanel" aria-labelledby="tab-salary">
+            <div class="toolbar reveal">
+                <div class="chips" id="sal-dept-chips"></div>
+                <div class="chips" id="sal-sort-chips">
+                    <button class="chip active" data-sort="total">Total</button>
+                    <button class="chip" data-sort="headcount">Headcount</button>
+                    <button class="chip" data-sort="avg">Avg Salary</button>
+                </div>
+                <span class="toolbar-hint">Click a department bar for the staff drill-down</span>
+            </div>
+            <div class="stat-strip reveal" id="sal-stats"></div>
+            <div class="panel glass reveal">
+                <div id="sal-chart" class="chart-stage"></div>
+            </div>
+            <div class="drill glass" id="sal-drill"></div>
+        </section>
+
+        <!-- ─── Live Activity view ─── -->
+        <section class="view" id="view-activity" role="tabpanel" aria-labelledby="tab-activity">
+            <div class="toolbar reveal">
+                <div class="chips" id="act-type-chips">
+                    <button class="chip active" data-type="all">All</button>
+                    <button class="chip active" data-type="payroll">Payroll</button>
+                    <button class="chip active" data-type="attendance">Attendance</button>
+                    <button class="chip active" data-type="leave">Leave</button>
+                    <button class="chip active" data-type="system">System</button>
+                </div>
+                <button class="chip" id="act-pause">❚❚ Pause</button>
+                <div class="search-box">
+                    <input type="text" id="act-search" class="search-input" placeholder="Search activity…"
+                        aria-label="Search activity">
+                </div>
+                <span class="toolbar-hint">Click an event to expand details</span>
+            </div>
+            <div class="panel glass reveal">
+                <div id="act-feed" class="feed-scroll"></div>
+            </div>
+        </section>
+
+        <!-- ─── Top Earners view ─── -->
+        <section class="view" id="view-earners" role="tabpanel" aria-labelledby="tab-earners">
+            <div class="toolbar reveal">
+                <div class="chips" id="ea-period-chips">
+                    <button class="chip active" data-period="month">Month</button>
+                    <button class="chip" data-period="quarter">Quarter</button>
+                    <button class="chip" data-period="year">Year</button>
+                </div>
+                <span class="toolbar-hint">Click a row for the compensation breakdown</span>
+            </div>
+            <div class="stat-strip reveal" id="ea-stats"></div>
+            <div class="podium glass reveal" id="ea-podium"></div>
+            <div class="panel glass reveal">
+                <div id="ea-table-wrap" class="table-wrap"></div>
+            </div>
+            <div class="drill glass" id="ea-drill"></div>
+        </section>
+
+        <!-- ─── Exchange Rates view ─── -->
+        <section class="view" id="view-fx" role="tabpanel" aria-labelledby="tab-fx">
+            <div class="toolbar reveal">
+                <div class="chips">
+                    <select class="sel" id="fx-base">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="JPY">JPY</option>
+                        <option value="NPR">NPR</option>
+                    </select>
+                </div>
+                <button class="chip" id="fx-refresh">⟳ Refresh now</button>
+                <div class="countdown" id="fx-countdown" title="Seconds until auto-refresh">2</div>
+                <span class="toolbar-hint">Click a row for the 24&nbsp;h chart + converter</span>
+            </div>
+            <div class="disc-row" id="disc-row" style="display:none;">
+                <div class="panel glass reveal">
+                    <div id="fx-discount" class="chart-stage"></div>
+                </div>
+                <div class="panel glass reveal">
+                    <div class="conv-title">Quick Converter</div>
+                    <div class="conv-row">
+                        <input type="number" id="conv-amount" class="search-input" value="1000" min="0" step="1">
+                        <select id="conv-from" class="sel"></select>
+                        <button class="chip icon" id="conv-swap" title="Swap currencies">⇄</button>
+                        <select id="conv-to" class="sel"></select>
+                    </div>
+                    <div class="conv-result" id="conv-result">—</div>
+                </div>
+            </div>
+            <div class="panel glass reveal">
+                <div id="fx-table" class="table-wrap"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════ TOOLTIP ═══════════════════ -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+<task_progress>
+    - [x] Analyze existing project context
+    - [x] Write design specification document (DASHBOARD_UX_CONCEPT.md)
+    - [x] Build HTML structure for prototype (index.html)
+    - [ ] Style prototype (styles.css)
+    - [ ] Implement toggle bar + all 6 interactive views + live sims (script.js)
+    - [ ] Verify prototype opens and works
+</task_progress>
+</write_to_file>
