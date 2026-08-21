@@ -1,0 +1,71 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance6.css
+   Sixth additive layer: header "Live Clock" refinement.
+   The clock used to float in the dead-center of the header. This layer:
+     1. Relocates it (via enhance6.js) into the right-hand action cluster.
+     2. Restyles it from a tall vertical block into a sleek horizontal pill
+        that lines up with the action buttons.
+   Theme via existing CSS variables; honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── relocated horizontal pill ─────────────── */
+.live-clock.lc6 {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.13), rgba(139, 92, 246, 0.08));
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.live-clock.lc6:hover {
+    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.42);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+body.no-anim .live-clock.lc6 { transition: none; }
+body.no-anim .live-clock.lc6:hover { transform: none; }
+
+/* LIVE label + pulsing dot, kept compact on the left */
+.live-clock.lc6 .live-status {
+    order: 1;
+    margin-bottom: 0;
+    gap: 5px;
+    font-size: 0.5rem;
+}
+
+/* time is the hero */
+.live-clock.lc6 .live-clock-time {
+    order: 2;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+/* date sits to the right of the time, separated by a hairline */
+.live-clock.lc6 .live-clock-date {
+    order: 3;
+    padding-left: 10px;
+    margin-left: 1px;
+    border-left: 1px solid var(--bg-card-border);
+    font-size: 0.62rem;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+/* vertical divider that separates the clock from the action buttons */
+.lc6-divider {
+    width: 1px;
+    height: 26px;
+    align-self: center;
+    background: var(--bg-card-border);
+    margin: 0 4px 0 2px;
+    flex-shrink: 0;
+}
+
+/* on narrow / mobile the base already hides .live-clock; keep the divider hidden too */
+@media (max-width: 640px) {
+    .lc6-divider { display: none; }
+}

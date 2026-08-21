@@ -133,28 +133,68 @@
             act: 'Open directory', run: () => goTab('employees')
         });
 
+        const rank = { crit: 0, warn: 1, info: 2, ok: 3 };
+        out.forEach(a => { a.key = a.ic; a.sig = a.sev + '|' + a.title; });
+        out.sort((a, b) => (rank[a.sev] - rank[b.sev]));
         return out;
     }
+    function dismissedSet() {
+        try { const a = JSON.parse(localStorage.getItem('nexus_noti_dismissed')); return new Set(Array.isArray(a) ? a : []); }
+        catch (_) { return new Set(); }
+    }
+    function saveDismissed(set) { try { localStorage.setItem('nexus_noti_dismissed', JSON.stringify([...set])); } catch (_) {} }
 
-    const Noti = { el: {}, filter: 'all', items: [] };
+    const Noti = { el: {}, filter: 'all', items: [], dismissedCount: 0 };
     function renderNoti() {
         const body = Noti.el.body; if (!body) return;
         const items = Noti.items;
+        const counts = { all: items.length, crit: 0, warn: 0, info: 0 };
+        items.forEach(i => { counts[i.sev] = (counts[i.sev] || 0) + 1; });
         const shown = Noti.filter === 'all' ? items : items.filter(i => i.sev === Noti.filter);
+        const label = { all: 'All', crit: 'Urgent', warn: 'Action', info: 'Info' };
         const chips = ['all', 'crit', 'warn', 'info'].map(f =>
             '<button class="' + (Noti.filter === f ? 'active' : '') + '" data-f="' + f + '">' +
-            (f === 'all' ? 'All' : f === 'crit' ? 'Urgent' : f === 'warn' ? 'Action' : 'Info') + '</button>').join('');
-        let html = '<div class="hx-filter">' + chips + '</div>';
+            label[f] + (counts[f] ? ' <span class="cnt">' + counts[f] + '</span>' : '') + '</button>').join('');
+        // ── hero banner: turns the plain list into a live status surface ──
+        let html = '';
+        const restoreLink = Noti.dismissedCount
+            ? ' · <button class="noti-restore" type="button">restore ' + Noti.dismissedCount + '</button>'
+            : '';
+        if (items.length) {
+            const topSev = items[0].sev;
+            const parts = [];
+            if (counts.crit) parts.push('<b>' + counts.crit + '</b> urgent');
+            if (counts.warn) parts.push('<b>' + counts.warn + '</b> action');
+            if (counts.info) parts.push('<b>' + counts.info + '</b> info');
+            html += '<div class="noti-hero ' + topSev + (topSev === 'crit' ? ' pulse' : '') + '">' +
+                '<div class="noti-hero-ring">' + items.length + '</div>' +
+                '<div class="noti-hero-txt">' +
+                '<div class="noti-hero-title">' + items.length + (items.length > 1 ? ' items need' : ' item needs') + ' attention</div>' +
+                '<div class="noti-hero-sub">' + parts.join('&nbsp;·&nbsp;') + restoreLink + '</div>' +
+                '</div></div>';
+        } else {
+            html += '<div class="noti-hero ok">' +
+                '<div class="noti-hero-ring"><i class="fas fa-check"></i></div>' +
+                '<div class="noti-hero-txt">' +
+                '<div class="noti-hero-title">All clear</div>' +
+                '<div class="noti-hero-sub">Everything looks up to date' + restoreLink + '</div>' +
+                '</div></div>';
+        }
+        html += '<div class="hx-filter">' + chips + '</div>';
         if (!shown.length) {
-            html += '<div class="hx-empty"><i class="fas fa-circle-check"></i>You\'re all caught up — nothing needs attention.</div>';
+            html += '<div class="hx-empty"><i class="fas fa-circle-check"></i>' +
+                (items.length ? 'Nothing in this filter.' : 'You\'re all caught up — nothing needs attention.') +
+                '</div>';
         } else {
             shown.forEach((it, i) => {
-                html += '<div class="noti" data-i="' + i + '">' +
+                html += '<div class="noti dismissable sev-' + it.sev + ' ' + (anim() ? 'noti-enter' : '') + '" data-i="' + i + '" style="animation-delay:' + Math.min(i * 45, 400) + 'ms">' +
                     '<div class="noti-ic ' + it.sev + '"><i class="fas ' + it.ic + '"></i></div>' +
                     '<div class="noti-main"><div class="noti-title">' + esc(it.title) + '</div>' +
                     '<div class="noti-sub">' + it.sub + '</div>' +
                     (it.act ? '<button class="noti-act" data-i="' + i + '">' + esc(it.act) + '</button>' : '') +
-                    '</div></div>';
+                    '</div>' +
+                    '<button class="noti-dismiss" data-i="' + i + '" title="Dismiss" aria-label="Dismiss alert"><i class="fas fa-xmark"></i></button>' +
+                    '</div>';
             });
         }
         body.innerHTML = html;
@@ -162,12 +202,27 @@
         $$('.noti-act', body).forEach(b => b.addEventListener('click', () => {
             const it = shown[+b.dataset.i]; Noti.el.api.close(); if (it && it.run) setTimeout(it.run, 60);
         }));
+        $$('.noti-dismiss', body).forEach(b => b.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const it = shown[+b.dataset.i]; if (!it) return;
+            const d = dismissedSet(); d.add(it.sig); saveDismissed(d);
+            refreshNotiBadge();
+        }));
+        $$('.noti-restore', body).forEach(r => r.addEventListener('click', () => {
+            try { localStorage.removeItem('nexus_noti_dismissed'); } catch (_) {}
+            refreshNotiBadge();
+        }));
     }
     function refreshNotiBadge() {
-        Noti.items = computeAlerts();
+        const all = computeAlerts();
+        const d = dismissedSet();
+        Noti.items = all.filter(a => !d.has(a.sig));
+        Noti.dismissedCount = all.length - Noti.items.length;
         const badge = Noti.el.badge; if (!badge) return;
         const n = Noti.items.length;
         badge.textContent = n > 9 ? '9+' : String(n);
+        badge.classList.remove('sev-crit', 'sev-warn', 'sev-info');
+        if (n > 0) badge.classList.add('sev-' + Noti.items[0].sev);
         badge.classList.toggle('show', n > 0);
         if (Noti.el.api && Noti.el.api.over.classList.contains('open')) renderNoti();
     }
@@ -212,11 +267,9 @@
         const pct = Math.min(100, (bytes / budget) * 100);
         const kb = (bytes / 1024).toFixed(bytes > 1024 * 100 ? 0 : 1);
         const isDark = document.body.classList.contains('dark-mode');
-        const animOn = !document.body.classList.contains('no-anim');
         body.innerHTML =
             '<div class="set-group"><div class="set-group-h">Appearance</div>' +
-              row('fa-moon', 'Dark mode', 'Switch between light and dark themes', btn('set-theme', isDark ? 'On' : 'Off')) +
-              row('fa-wand-magic-sparkles', 'Animations', 'Motion, tilt & count-up effects', btn('set-anim', animOn ? 'On' : 'Off')) +
+              row('fa-moon', 'Dark mode', 'Switch between light and dark themes', switchCtl('set-theme', isDark)) +
               row('fa-coins', 'Display currency', 'Applies across the whole app', '<span class="sc" id="setCurrencyMount"></span>') +
             '</div>' +
             '<div class="set-group"><div class="set-group-h">Data</div>' +
@@ -232,8 +285,13 @@
             '<div class="set-group"><div class="set-group-h">Danger zone</div>' +
               row('fa-triangle-exclamation', 'Reset all data', 'Permanently clears every record in this browser', btn('set-reset', 'Reset', 'danger')) +
             '</div>';
-        // animate the meter after paint
-        setTimeout(() => { const f = $('.storage-fill', body); if (f) f.style.width = pct.toFixed(1) + '%'; }, anim() ? 40 : 0);
+        // animate the meter after paint, colour by usage
+        setTimeout(() => {
+            const f = $('.storage-fill', body); if (!f) return;
+            f.style.width = pct.toFixed(1) + '%';
+            if (pct > 85) f.style.background = 'linear-gradient(90deg,#f59e0b,#ef4444)';
+            else if (pct > 60) f.style.background = 'linear-gradient(90deg,#10b981,#f59e0b)';
+        }, anim() ? 40 : 0);
         // mount a mirror of the real currency <select>
         mountCurrencyMirror($('#setCurrencyMount', body));
         wireSettings(body);
@@ -244,13 +302,27 @@
             (control && control.indexOf('class="sc"') === -1 ? '<span class="sc">' + control + '</span>' : (control || '')) + '</div>';
     }
     function btn(id, label, extra) { return '<button class="set-btn ' + (extra || '') + '" id="' + id + '">' + esc(label) + '</button>'; }
+    function switchCtl(id, checked) {
+        return '<label class="set-switch"><input type="checkbox" id="' + id + '"' + (checked ? ' checked' : '') + '>' +
+            '<span class="track"></span><span class="thumb"></span></label>';
+    }
 
     function mountCurrencyMirror(mount) {
         if (!mount) return;
         const real = $('#currencySelect'); if (!real) { mount.textContent = '—'; return; }
         const sel = document.createElement('select');
-        sel.className = 'set-btn'; sel.style.padding = '7px 10px';
-        sel.innerHTML = real.innerHTML; sel.value = real.value;
+        sel.className = 'set-currency-sel';
+        sel.setAttribute('aria-label', 'Display currency');
+        // compact labels: keep the currency code (before an em/en dash) so the
+        // control fits the settings row instead of overflowing it.
+        Array.from(real.options).forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o.value;
+            const code = (o.text || o.value).split(/[—–-]/)[0].trim();
+            opt.textContent = code || o.value;
+            sel.appendChild(opt);
+        });
+        sel.value = real.value;
         sel.addEventListener('change', () => {
             real.value = sel.value;
             real.dispatchEvent(new Event('change', { bubbles: true }));
@@ -259,19 +331,17 @@
     }
     function wireSettings(body) {
         const proxy = (id, targetId) => { const b = $('#' + id, body); if (b) b.addEventListener('click', () => { const t = document.getElementById(targetId); if (t) t.click(); }); };
-        proxy('set-theme', 'themeToggle');
-        proxy('set-anim', 'animToggle');
+        const toggle = (id, targetId) => { const el = $('#' + id, body); if (el) el.addEventListener('change', () => { const t = document.getElementById(targetId); if (t) t.click(); }); };
+        toggle('set-theme', 'themeToggle');
         proxy('set-export', 'exportExcelBtn');
         proxy('set-backup', 'backupBtn');
         proxy('set-restore', 'importFile');
-        // re-render labels shortly after appearance toggles
-        ['set-theme', 'set-anim'].forEach(id => { const b = $('#' + id, body); if (b) b.addEventListener('click', () => setTimeout(renderSettings, 60)); });
         const reset = $('#set-reset', body);
         if (reset) reset.addEventListener('click', () => {
             if (!confirm('Reset ALL data?\n\nThis permanently deletes every employee, attendance, leave and payroll record stored in this browser. This cannot be undone.')) return;
             if (!confirm('Are you absolutely sure? Consider taking a Backup first.')) return;
             try {
-                ['nexus_employees', 'nexus_attendance', 'nexus_leaves', 'nexus_payroll'].forEach(k => localStorage.removeItem(k));
+                ['nexus_employees', 'nexus_attendance', 'nexus_leaves', 'nexus_payroll', 'nexus_noti_dismissed'].forEach(k => localStorage.removeItem(k));
                 toast('All data has been reset.', 'info');
                 setTimeout(() => location.reload(), 400);
             } catch (_) { toast('Could not reset data.', 'error'); }

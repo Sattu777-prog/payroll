@@ -149,3 +149,88 @@ body.no-anim .storage-fill { transition: none; }
 .hx-over.center.open .hx-panel { transform: none; }
 .hx-head .wf-reset { margin-left: auto; }
 .hx-head .hx-close { margin-left: 8px; }
+
+/* ─────────────── v2: toggle switch (Settings) ─────────────── */
+.set-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer; }
+.set-switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 2; }
+.set-switch .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(127,127,127,0.32); transition: background 0.2s ease; }
+.set-switch .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.22s cubic-bezier(.34,1.56,.64,1); }
+.set-switch input:checked ~ .track { background: var(--accent, #3b82f6); }
+.set-switch input:checked ~ .thumb { transform: translateX(20px); }
+.set-switch input:focus-visible ~ .track { box-shadow: 0 0 0 3px rgba(59,130,246,0.35); }
+body.no-anim .set-switch .track, body.no-anim .set-switch .thumb { transition: none; }
+
+/* ─────────────── v2: notification center polish ─────────────── */
+.noti-summary { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; padding: 2px 2px 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.noti-summary .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.noti-restore { border: none; background: none; color: var(--accent, #3b82f6); font-size: 0.73rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; }
+.hx-filter button .cnt { display: inline-block; margin-left: 4px; font-weight: 800; opacity: 0.85; }
+.hx-filter button.active .cnt { opacity: 1; }
+.noti.dismissable .noti-main { padding-right: 22px; }
+.noti-dismiss { position: absolute; top: 9px; right: 9px; width: 24px; height: 24px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 7px; font-size: 0.78rem; opacity: 0.55; transition: opacity 0.14s ease, background 0.14s ease; display: flex; align-items: center; justify-content: center; }
+.noti-dismiss:hover { background: rgba(127,127,127,0.16); color: var(--text-primary); opacity: 1; }
+body.no-anim .noti-dismiss { transition: none; }
+.noti-enter { animation: notiIn 0.32s cubic-bezier(.22,1,.36,1) both; }
+@keyframes notiIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+body.no-anim .noti-enter { animation: none; }
+.hx-badge.sev-crit { background: #ef4444; }
+.hx-badge.sev-warn { background: #f59e0b; }
+.hx-badge.sev-info { background: #3b82f6; }
+
+/* ─────────────── v3: currency row + settings row hardening ─────────────── */
+.set-row { min-width: 0; }
+.set-row .st { flex: 1 1 auto; min-width: 0; }
+.set-row .st .t,
+.set-row .st .d { overflow: hidden; text-overflow: ellipsis; }
+.set-row .sc { flex-shrink: 0; margin-left: auto; }
+#setCurrencyMount { flex-shrink: 0; }
+.set-currency-sel {
+    max-width: 120px; padding: 7px 10px; border-radius: 9px;
+    border: 1px solid var(--bg-card-border); background: var(--bg-card);
+    color: var(--text-primary); font-size: 0.78rem; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; cursor: pointer;
+    text-overflow: ellipsis;
+}
+.set-currency-sel:hover { border-color: var(--accent, #3b82f6); }
+.set-currency-sel:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.32); }
+
+/* ─────────────── v3: notification hero banner ─────────────── */
+.noti-hero {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 16px; border-radius: 16px; color: #fff;
+    position: relative; overflow: hidden;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+}
+.noti-hero::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); pointer-events: none;
+}
+.noti-hero.ok   { background: linear-gradient(135deg, #10b981, #059669); }
+.noti-hero.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.noti-hero.warn { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.noti-hero.crit { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.noti-hero-ring {
+    width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,0.22); display: flex; align-items: center;
+    justify-content: center; font-size: 1.35rem; font-weight: 800;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+}
+.noti-hero-txt { min-width: 0; }
+.noti-hero-title { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+.noti-hero-sub { font-size: 0.76rem; opacity: 0.92; margin-top: 3px; }
+.noti-hero-sub b { font-weight: 800; }
+.noti-hero .noti-restore { color: #fff; opacity: 0.95; text-decoration: underline; }
+.noti-hero.pulse .noti-hero-ring { animation: notiPulse 1.6s ease-in-out infinite; }
+@keyframes notiPulse {
+    0%, 100% { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 0 rgba(255,255,255,0.4); }
+    50% { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 10px rgba(255,255,255,0); }
+}
+body.no-anim .noti-hero.pulse .noti-hero-ring { animation: none; }
+
+/* severity accent on each alert card */
+.noti.sev-crit { border-left: 3px solid #ef4444; }
+.noti.sev-warn { border-left: 3px solid #f59e0b; }
+.noti.sev-info { border-left: 3px solid #3b82f6; }
+.noti.sev-ok   { border-left: 3px solid #10b981; }
+
