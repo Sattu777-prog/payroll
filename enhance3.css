@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance3.css
+   Third additive layer (loaded after enhance2.css). Makes the Dashboard and
+   Reports sections interactive & dynamic:
+     • "Payroll Pulse" canvas chart with a range switcher + hover crosshair
+     • Floating value tooltips on the dashboard trend/department bars
+     • Reports "Metric Explorer" — clickable chips → animated readout + sparkline
+     • A live ticking clock in the header
+   Uses the app's existing CSS custom properties so it themes automatically and
+   honours the global `body.no-anim` animation toggle.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────── PAYROLL PULSE PANEL ─────────────────── */
+.px-panel {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 18px;
+    padding: 18px 18px 10px;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0, 0, 0, 0.14));
+    position: relative;
+    overflow: hidden;
+}
+.px-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+.px-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.px-title i { color: #3b82f6; }
+.px-title .px-live {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #10b981;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.px-live .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pxPulse 1.6s ease-in-out infinite; }
+body.no-anim .px-live .dot { animation: none; }
+@keyframes pxPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+
+.px-range { margin-left: auto; display: inline-flex; background: rgba(127,127,127,0.1); border-radius: 11px; padding: 3px; gap: 2px; }
+.px-seg {
+    border: none; background: transparent; cursor: pointer;
+    font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+    padding: 6px 12px; border-radius: 9px; transition: color 0.16s ease, background 0.16s ease;
+}
+.px-seg:hover { color: var(--text-primary); }
+.px-seg.active { background: var(--bg-card); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+.px-metricbar { display: flex; gap: 18px; flex-wrap: wrap; margin: 4px 0 10px; }
+.px-metric { display: flex; flex-direction: column; }
+.px-metric .lbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; }
+.px-metric .val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.px-metric .val small { font-size: 0.7rem; font-weight: 700; }
+.px-up { color: #10b981; }
+.px-down { color: #ef4444; }
+
+.px-canvas-wrap { position: relative; width: 100%; height: 210px; }
+.px-canvas-wrap canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+.px-tooltip {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: var(--text-primary); color: var(--bg-card);
+    padding: 6px 9px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+    white-space: nowrap; transform: translate(-50%, -130%); opacity: 0;
+    transition: opacity 0.12s ease; box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+}
+.px-tooltip.show { opacity: 1; }
+.px-tooltip .t-month { display: block; font-size: 0.6rem; opacity: 0.7; font-weight: 600; }
+@media (max-width: 640px) { .px-canvas-wrap { height: 180px; } .px-metricbar { gap: 12px; } }
+
+/* ─────────────────── FLOATING VALUE TOOLTIP (dashboard bars) ─────────────── */
+.viz-tip {
+    position: fixed; z-index: 400; pointer-events: none;
+    background: var(--text-primary); color: var(--bg-card);
+    padding: 6px 10px; border-radius: 8px;
+    font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    transform: translate(-50%, -140%); opacity: 0;
+    transition: opacity 0.12s ease; box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+.viz-tip.show { opacity: 1; }
+.viz-tip .vt-sub { display: block; font-size: 0.6rem; font-weight: 600; opacity: 0.72; }
+/* invite interaction on the existing static bars */
+#trend-bars > *, #dept-list > *, #reportDeptBars > * { transition: filter 0.15s ease, transform 0.15s ease; }
+#trend-bars > *:hover, #dept-list > *:hover, #reportDeptBars > *:hover { filter: brightness(1.12); cursor: pointer; }
+
+/* ─────────────────── REPORTS: METRIC EXPLORER ─────────────────── */
+.mx-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0,0,0,0.14));
+    margin-bottom: 1.25rem;
+}
+.mx-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.mx-chip {
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.05);
+    border-radius: 12px; padding: 8px 14px; cursor: pointer;
+    font-size: 0.76rem; font-weight: 700; color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.mx-chip:hover { transform: translateY(-2px); color: var(--text-primary); }
+.mx-chip i { font-size: 0.72rem; }
+.mx-chip.active { color: #fff; border-color: transparent; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.mx-chip.active[data-metric="headcount"] { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+.mx-chip.active[data-metric="avgpay"] { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
+.mx-chip.active[data-metric="attendance"] { background: linear-gradient(135deg,#10b981,#059669); }
+.mx-chip.active[data-metric="leaveload"] { background: linear-gradient(135deg,#f59e0b,#d97706); }
+body.no-anim .mx-chip:hover { transform: none; }
+
+.mx-stage { display: grid; grid-template-columns: minmax(0,0.9fr) minmax(0,1.6fr); gap: 22px; align-items: center; }
+@media (max-width: 720px) { .mx-stage { grid-template-columns: 1fr; gap: 16px; } }
+.mx-readout .mx-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; }
+.mx-big { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; line-height: 1.05; margin: 4px 0 8px; }
+.mx-delta { font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.mx-delta.up { color: #10b981; } .mx-delta.down { color: #ef4444; } .mx-delta.flat { color: var(--text-muted); }
+.mx-desc { font-size: 0.76rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+.mx-spark-wrap { position: relative; height: 130px; }
+.mx-spark-wrap canvas { display: block; width: 100%; height: 100%; }
+
+/* ─────────────────── HEADER LIVE CLOCK ─────────────────── */
+.live-clock {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.74rem; font-weight: 700; color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 5px 11px; border-radius: 10px;
+    background: rgba(127,127,127,0.08); border: 1px solid var(--bg-card-border);
+    white-space: nowrap;
+}
+.live-clock i { color: #3b82f6; font-size: 0.7rem; }
+.live-clock .lc-time { color: var(--text-primary); }
+@media (max-width: 900px) { .live-clock { display: none; } }

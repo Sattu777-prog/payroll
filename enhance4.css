@@ -1,0 +1,151 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance4.css
+   Fourth additive layer. Brings four "management" surfaces that tie the app's
+   scattered features together, all themed via existing CSS variables and
+   honouring body.no-anim:
+     1. Notification & Insights Center   (header bell → slide-over)
+     2. Payroll What-If Simulator        (modal with live sliders + canvas)
+     3. Settings & Data Hub              (header gear → slide-over)
+     4. Spotlight augmentation           (employee + math results in ⌘K)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── shared header icon button ─────────────── */
+.hx-iconbtn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.hx-badge {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 17px; height: 17px; padding: 0 4px;
+    border-radius: 9px; background: #ef4444; color: #fff;
+    font-size: 0.62rem; font-weight: 800; line-height: 17px; text-align: center;
+    box-shadow: 0 0 0 2px var(--bg-card, #fff);
+    transform: scale(0); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+}
+.hx-badge.show { transform: scale(1); }
+body.no-anim .hx-badge { transition: none; }
+
+/* ─────────────── generic right-side slide-over ─────────────── */
+.hx-over {
+    position: fixed; inset: 0; z-index: 240; display: none;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.hx-over.open { display: block; animation: hxFade 0.16s ease; }
+@keyframes hxFade { from { opacity: 0; } to { opacity: 1; } }
+.hx-panel {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: min(440px, 94vw);
+    background: var(--bg-card); border-left: 1px solid var(--bg-card-border);
+    box-shadow: -30px 0 80px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(.34,1.3,.5,1);
+}
+.hx-over.open .hx-panel { transform: none; }
+body.no-anim .hx-panel { transition: none; }
+.hx-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 20px 16px; border-bottom: 1px solid var(--bg-card-border);
+    position: sticky; top: 0; background: var(--bg-card); z-index: 2;
+}
+.hx-head h3 { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px; }
+.hx-head h3 i { color: var(--accent, #3b82f6); }
+.hx-close {
+    margin-left: auto; background: transparent; border: none; color: var(--text-muted);
+    font-size: 1.1rem; cursor: pointer; width: 36px; height: 36px; border-radius: 9px;
+}
+.hx-close:hover { background: rgba(127,127,127,0.14); color: var(--text-primary); }
+.hx-body { padding: 16px 18px 26px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─────────────── Notification Center items ─────────────── */
+.hx-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.hx-filter button {
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.05);
+    color: var(--text-secondary); border-radius: 999px; padding: 5px 12px;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer;
+}
+.hx-filter button.active { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+.noti {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 13px 14px; border-radius: 13px;
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.04);
+    transition: transform 0.14s ease, border-color 0.14s ease;
+}
+.noti:hover { transform: translateX(-3px); border-color: var(--accent, #3b82f6); }
+body.no-anim .noti:hover { transform: none; }
+.noti-ic { width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.noti-ic.crit { background: rgba(239,68,68,.14); color: #ef4444; }
+.noti-ic.warn { background: rgba(245,158,11,.14); color: #f59e0b; }
+.noti-ic.info { background: rgba(59,130,246,.14); color: #3b82f6; }
+.noti-ic.ok   { background: rgba(16,185,129,.14); color: #10b981; }
+.noti-main { flex: 1; min-width: 0; }
+.noti-title { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.noti-sub { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+.noti-act {
+    margin-top: 8px; border: none; background: var(--accent, #3b82f6); color: #fff;
+    border-radius: 8px; padding: 5px 11px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+}
+.noti-act:hover { filter: brightness(1.08); }
+.hx-empty { text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 40px 10px; }
+.hx-empty i { font-size: 2rem; color: #10b981; display: block; margin-bottom: 12px; }
+
+/* ─────────────── Settings Hub ─────────────── */
+.set-group { border: 1px solid var(--bg-card-border); border-radius: 14px; overflow: hidden; }
+.set-group-h { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 800; color: var(--text-muted); padding: 12px 14px 6px; }
+.set-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--bg-card-border); }
+.set-row:first-of-type { border-top: none; }
+.set-row .si { width: 30px; height: 30px; border-radius: 9px; background: rgba(127,127,127,.08); display: flex; align-items: center; justify-content: center; color: var(--accent,#3b82f6); font-size: 0.82rem; }
+.set-row .st { flex: 1; min-width: 0; }
+.set-row .st .t { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.set-row .st .d { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
+.set-row .sc { margin-left: auto; }
+.set-btn { border: 1px solid var(--bg-card-border); background: rgba(127,127,127,.05); color: var(--text-primary); border-radius: 9px; padding: 7px 13px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+.set-btn:hover { border-color: var(--accent,#3b82f6); }
+.set-btn.danger { color: #ef4444; border-color: rgba(239,68,68,.4); }
+.set-btn.danger:hover { background: #ef4444; color: #fff; border-color: transparent; }
+.storage-meter { height: 8px; border-radius: 6px; background: rgba(127,127,127,.15); overflow: hidden; margin-top: 8px; }
+.storage-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#10b981,#3b82f6); transition: width 0.6s cubic-bezier(.34,1.3,.5,1); }
+body.no-anim .storage-fill { transition: none; }
+
+/* ─────────────── What-If Simulator ─────────────── */
+.wf-modal .modal-card, .wf-card { max-width: 720px; }
+.wf-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: 22px; }
+@media (max-width: 720px) { .wf-grid { grid-template-columns: 1fr; } }
+.wf-control { margin-bottom: 18px; }
+.wf-control label { display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; }
+.wf-control label .wf-v { color: var(--accent,#3b82f6); font-family: 'JetBrains Mono', monospace; }
+.wf-control input[type=range] { width: 100%; accent-color: #3b82f6; cursor: pointer; }
+.wf-control input[type=number] { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--text-primary); }
+.wf-out { display: flex; flex-direction: column; gap: 12px; }
+.wf-big-row { display: flex; gap: 12px; }
+.wf-big { flex: 1; background: rgba(127,127,127,.06); border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 13px; }
+.wf-big .l { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 700; }
+.wf-big .v { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+.wf-delta { font-size: 0.9rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
+.wf-delta.up { color: #ef4444; } /* higher cost = red */
+.wf-delta.down { color: #10b981; }
+.wf-delta.flat { color: var(--text-muted); }
+.wf-canvas-wrap { height: 150px; position: relative; }
+.wf-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+.wf-reset { font-size: 0.72rem; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+/* ─────────────── Spotlight augmentation ─────────────── */
+.cmdk-aug-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--text-muted); padding: 8px 14px 4px; }
+.cmdk-item .cmdk-sub { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.cmdk-math { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.cmdk-math .eq { color: var(--text-muted); font-size: 0.8rem; }
+.cmdk-math .res { font-size: 1.1rem; font-weight: 800; color: var(--accent,#3b82f6); font-family: 'JetBrains Mono', monospace; }
+
+/* centered variant of the overlay (What-If simulator) */
+.hx-over.center { display: none; }
+.hx-over.center.open { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.hx-over.center .hx-panel {
+    position: relative; top: auto; right: auto; bottom: auto;
+    width: min(760px, 96vw); max-height: 92vh; border-radius: 18px;
+    border: 1px solid var(--bg-card-border); border-left: 1px solid var(--bg-card-border);
+    transform: translateY(24px) scale(0.97); box-shadow: 0 40px 100px rgba(0,0,0,0.45);
+}
+.hx-over.center.open .hx-panel { transform: none; }
+.hx-head .wf-reset { margin-left: auto; }
+.hx-head .hx-close { margin-left: 8px; }
