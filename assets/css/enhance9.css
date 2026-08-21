@@ -64,3 +64,12 @@ body.no-anim .att9-quick button { transition: none; }
 
 /* ─────────────── view switching ─────────────── */
 body.att9-board-view .att9-listwrap { display: none; }
+
+/* ─────────────── remove all "LIVE"/"live" status badges site-wide ───────────────
+   Keeps the header clock (date + time); only the LIVE label/pills are dropped. */
+.live-status,            /* header clock "● LIVE" */
+.live-badge,             /* card-title "live" pills (dashboard + Insights hub) */
+.px-live,                /* Metric Explorer "live" pill */
+.report-podium-live {    /* Reports podium "live" pill */
+  display: none !important;
+}
