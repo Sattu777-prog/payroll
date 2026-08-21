@@ -1,0 +1,176 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance2.css
+   Second additive layer (loaded after mobile-enhance.css). Adds: accessibility
+   affordances (skip link, focus rings, sr-only), a scroll-to-top control,
+   inline form-validation styling, and the employee profile quick-view drawer.
+   Uses the app's existing CSS custom properties so it themes automatically.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────── ACCESSIBILITY PRIMITIVES ─────────────────── */
+.sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.skip-link {
+    position: fixed;
+    top: -60px;
+    left: 12px;
+    z-index: 9999;
+    padding: 10px 18px;
+    border-radius: 0 0 12px 12px;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    box-shadow: 0 10px 26px rgba(59, 130, 246, 0.5);
+    transition: top 0.2s ease;
+}
+.skip-link:focus { top: 0; outline: 2px solid #fff; outline-offset: 2px; }
+
+/* A single, consistent keyboard focus ring app-wide (only for keyboard users) */
+.btn:focus-visible,
+.tab-btn:focus-visible,
+.action-link:focus-visible,
+.qa-card:focus-visible,
+.field-input:focus-visible,
+.search-input:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--accent, #3b82f6);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* ─────────────────── SCROLL-TO-TOP BUTTON ─────────────────── */
+.scroll-top-btn {
+    position: fixed;
+    left: 16px;
+    bottom: 24px;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--bg-card-border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0, 0, 0, 0.18));
+    opacity: 0;
+    transform: translateY(14px) scale(0.9);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, background 0.2s ease;
+    z-index: 54;
+}
+.scroll-top-btn.show { opacity: 1; transform: none; pointer-events: auto; }
+.scroll-top-btn:hover { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+/* Lift it above the fixed mobile bottom-nav */
+@media (max-width: 640px) {
+    .scroll-top-btn { bottom: calc(var(--mob-nav-h, 66px) + var(--safe-b, 0px) + 14px); }
+}
+
+/* ─────────────────── INLINE FORM VALIDATION ─────────────────── */
+.field-input.field-invalid {
+    border-color: var(--danger, #ef4444) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+}
+.field-input.field-valid { border-color: rgba(16, 185, 129, 0.55) !important; }
+.field-error {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--danger, #ef4444);
+}
+.field-error.show { display: flex; animation: fieldErrIn 0.18s ease; }
+.field-error i { font-size: 0.7rem; }
+@keyframes fieldErrIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* ─────────────────── EMPLOYEE PROFILE DRAWER ─────────────────── */
+#employeesTbody tr[role="button"] { cursor: pointer; }
+#employeesTbody tr[role="button"]:hover { background: rgba(59, 130, 246, 0.06); }
+
+.drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 210;
+    display: none;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.drawer-backdrop.open { display: block; animation: cmdkFade 0.16s ease; }
+
+.drawer-panel {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: min(420px, 92vw);
+    background: var(--bg-card);
+    border-left: 1px solid var(--bg-card-border);
+    box-shadow: -30px 0 80px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.34, 1.3, 0.5, 1);
+    overflow-y: auto;
+}
+.drawer-backdrop.open .drawer-panel { transform: none; }
+body.no-anim .drawer-panel { transition: none; }
+
+.drawer-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--bg-card-border);
+    position: sticky; top: 0;
+    background: var(--bg-card);
+    z-index: 2;
+}
+.drawer-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 36px; height: 36px;
+    border-radius: 9px;
+}
+.drawer-close:hover { background: rgba(127, 127, 127, 0.14); color: var(--text-primary); }
+.drawer-name { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+.drawer-role { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.drawer-body { padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+.drawer-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.drawer-stat {
+    background: rgba(127, 127, 127, 0.06);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 13px;
+    padding: 12px 13px;
+}
+.drawer-stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; }
+.drawer-stat-val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+.drawer-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
+
+.drawer-att { display: flex; align-items: center; gap: 16px; }
+.drawer-att-legend { display: flex; flex-direction: column; gap: 5px; font-size: 0.74rem; color: var(--text-secondary); flex: 1; }
+.drawer-att-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+.drawer-att-legend .val { float: right; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
+
+.drawer-info-row { display: flex; align-items: center; gap: 11px; font-size: 0.82rem; color: var(--text-secondary); padding: 7px 0; }
+.drawer-info-row i { width: 18px; text-align: center; color: var(--accent, #3b82f6); }
+.drawer-info-row .lbl { color: var(--text-muted); min-width: 74px; }
+.drawer-info-row .val { color: var(--text-primary); font-weight: 600; word-break: break-word; }
+
+.drawer-actions { display: flex; gap: 10px; margin-top: 4px; }
+.drawer-actions .btn { flex: 1; justify-content: center; }
+

@@ -39,6 +39,45 @@ function validateSalary(val) {
     return !isNaN(n) && n >= 0 && n <= 10_000_000;
 }
 
+/* Only allow attachment data-URLs whose MIME type matches the upload
+   allow-list. Blocks javascript:, data:text/html, data:image/svg+xml and
+   any other scheme a crafted JSON import might smuggle into an href. */
+const SAFE_ATTACHMENT_RE = /^data:(application\/pdf|image\/(png|jpeg|jpg|gif|webp)|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|application\/octet-stream);base64,[a-z0-9+/=\r\n]+$/i;
+function safeAttachmentHref(url) {
+    if (typeof url !== 'string') return '';
+    return SAFE_ATTACHMENT_RE.test(url.trim()) ? url.trim() : '';
+}
+
+/* Import sanitizer — drops prototype-pollution keys and coerces the
+   security-relevant fields so a hand-crafted backup file can't inject
+   objects, functions, or hostile attachment URLs into app state. */
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+function sanitizeImported(rec, coercions) {
+    if (!rec || typeof rec !== 'object' || Array.isArray(rec)) return null;
+    const out = {};
+    for (const [k, v] of Object.entries(rec)) {
+        if (DANGEROUS_KEYS.has(k)) continue;   // block prototype pollution
+        out[k] = v;
+    }
+    for (const [k, kind] of Object.entries(coercions)) {
+        if (!(k in out)) continue;
+        if (kind === 'str') out[k] = sanitizeText(out[k], 500);
+        else if (kind === 'num') { const n = Number(out[k]); out[k] = Number.isFinite(n) ? n : 0; }
+        else if (kind === 'attachment') { out[k] = safeAttachmentHref(out[k]); if (!out[k]) delete out[k]; }
+    }
+    return out;
+}
+const IMPORT_SPECS = {
+    employees: { id: 'str', employeeId: 'str', firstName: 'str', lastName: 'str', email: 'str', department: 'str', position: 'str', phone: 'str', basicSalary: 'num' },
+    attendances: { id: 'str', employeeId: 'str', date: 'str', status: 'str' },
+    leaveReqs: { id: 'str', employeeId: 'str', leaveType: 'str', startDate: 'str', endDate: 'str', status: 'str', reason: 'str', attachmentName: 'str', attachmentType: 'str', attachmentSize: 'num', attachmentData: 'attachment' },
+    payrolls: { id: 'str', employeeId: 'str', month: 'num', year: 'num', basic: 'num', allowances: 'num', tax: 'num', netSalary: 'num' },
+};
+function sanitizeImportedArray(arr, spec) {
+    if (!Array.isArray(arr)) return null;
+    return arr.map(r => sanitizeImported(r, spec)).filter(Boolean);
+}
+
 /* ════════════════════════ CURRENCY SYSTEM ════════════════════════
    All amounts are stored internally in USD (basicSalary, payroll figures).
    appCurrency controls how figures are *displayed* across the app.
@@ -664,6 +703,7 @@ let _animFrames = {};
 function animateNumber(id, target) {
     const el = document.getElementById(id);
     if (!el) return;
+    if (document.body.classList.contains('no-anim')) { cancelAnimationFrame(_animFrames[id]); el.textContent = target; return; }
     const start = parseInt(el.textContent) || 0;
     const diff = target - start;
     const duration = 700;
@@ -684,6 +724,11 @@ function animateDollar(id, usdTarget) {
     const target = toDisplayCurrency(usdTarget);
     const symbol = currencySymbol(appCurrency);
     const decimals = appCurrency === 'JPY' ? 0 : 0; // whole numbers for the big KPI figure
+    if (document.body.classList.contains('no-anim')) {
+        cancelAnimationFrame(_animFrames[id]);
+        el.textContent = symbol + Math.round(target).toLocaleString(undefined, { maximumFractionDigits: decimals });
+        return;
+    }
     const startTime = performance.now();
     const duration = 800;
     cancelAnimationFrame(_animFrames[id]);
@@ -733,8 +778,8 @@ function renderEmployees() {
             <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">${esc(e.position || 'Staff')}</td>
             <td class="py-3 px-4 text-sm font-mono font-semibold text-slate-900 dark:text-white">${fmtCurrency(e.basicSalary || 0)}</td>
             <td class="py-3 px-4 text-sm text-right whitespace-nowrap">
-                <button class="action-link blue" onclick="openEditEmpModal('${esc(e.id)}')" style="margin-right:0.75rem;"><i class="fas fa-pen-to-square"></i> Edit</button>
-                <button class="action-link red"  onclick="deleteEmployee('${esc(e.id)}')"><i class="fas fa-trash-can"></i> Delete</button>
+                <button class="action-link blue" data-action="edit-emp" data-id="${esc(e.id)}" style="margin-right:0.75rem;"><i class="fas fa-pen-to-square"></i> Edit</button>
+                <button class="action-link red"  data-action="del-emp" data-id="${esc(e.id)}"><i class="fas fa-trash-can"></i> Delete</button>
             </td>
         </tr>`).join('');
 
@@ -791,7 +836,7 @@ function renderAttendance() {
         const rec = attendances.find(a => a.employeeId === emp.id && a.date === today);
         const s = rec?.status || 'present';
         const pills = statusDefs.map(d => `
-            <div class="att-pill ${d.key} ${s === d.key ? 'active' : ''}" data-emp="${esc(emp.id)}" data-status="${d.key}" onclick="setAttendanceStatus('${esc(emp.id)}','${d.key}')">
+            <div class="att-pill ${d.key} ${s === d.key ? 'active' : ''}" data-emp="${esc(emp.id)}" data-status="${d.key}" role="button" tabindex="0">
                 <i class="fas ${d.icon}"></i><span>${d.label}</span>
             </div>`).join('');
         return `<div class="att-card">
@@ -852,11 +897,12 @@ function renderLeaves() {
             const statusBadge = lv.status === 'approved' ? 'badge-emerald' : lv.status === 'rejected' ? 'badge-rose' : 'badge-amber badge-pulse';
             const typeBadge = lv.leaveType === 'Annual Leave' ? 'badge-blue' : lv.leaveType === 'Sick Leave' ? 'badge-rose' : 'badge-gray';
             const actions = lv.status === 'pending'
-                ? `<button class="action-link green" onclick="updateLeaveStatus('${esc(lv.id)}','approved')"><i class="fas fa-check"></i> Approve</button>
-                   <button class="action-link red" onclick="updateLeaveStatus('${esc(lv.id)}','rejected')" style="margin-left:0.875rem;"><i class="fas fa-xmark"></i> Reject</button>`
+                ? `<button class="action-link green" data-action="leave-status" data-id="${esc(lv.id)}" data-status="approved"><i class="fas fa-check"></i> Approve</button>
+                   <button class="action-link red" data-action="leave-status" data-id="${esc(lv.id)}" data-status="rejected" style="margin-left:0.875rem;"><i class="fas fa-xmark"></i> Reject</button>`
                 : `<span style="font-size:0.72rem;color:var(--text-secondary);">Processed</span>`;
-            const attachmentLink = lv.attachmentData
-                ? `<a href="${esc(lv.attachmentData)}" download="${esc(lv.attachmentName || 'attachment')}" class="attachment-link" title="Download ${esc(lv.attachmentName || 'attachment')} (${formatFileSize(lv.attachmentSize || 0)})"><i class="fas fa-paperclip"></i> File</a>`
+            const safeHref = safeAttachmentHref(lv.attachmentData);
+            const attachmentLink = safeHref
+                ? `<a href="${esc(safeHref)}" download="${esc(lv.attachmentName || 'attachment')}" rel="noopener noreferrer" class="attachment-link" title="Download ${esc(lv.attachmentName || 'attachment')} (${formatFileSize(lv.attachmentSize || 0)})"><i class="fas fa-paperclip"></i> File</a>`
                 : '';
             return `<tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/30 transition-colors">
                 <td class="py-3 px-4 text-sm"><div class="td-name">${avatarChip(emp.firstName, emp.lastName)}<span class="font-semibold text-slate-900 dark:text-white">${esc(emp.firstName)} ${esc(emp.lastName)}</span></div></td>
@@ -917,7 +963,7 @@ function renderPayroll() {
             <td class="py-3 px-4 text-sm font-mono text-blue-600 dark:text-blue-400">${fmtCurrency(p.allowances)}</td>
             <td class="py-3 px-4 text-sm font-mono text-rose-500 dark:text-rose-400">−${fmtCurrency(p.tax)}</td>
             <td class="py-3 px-4 text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400">${fmtCurrency(p.netSalary)}</td>
-            <td class="py-3 px-4 text-sm text-right whitespace-nowrap"><button class="action-link blue" onclick="downloadPayslip('${esc(p.id)}')"><i class="fas fa-download"></i> PDF</button></td>
+            <td class="py-3 px-4 text-sm text-right whitespace-nowrap"><button class="action-link blue" data-action="payslip" data-id="${esc(p.id)}"><i class="fas fa-download"></i> PDF</button></td>
         </tr>`;
     }).join('');
 
@@ -1372,6 +1418,7 @@ function initTabs() {
             btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
             const section = document.getElementById(tab + 'Section');
             if (section) section.classList.remove('hidden');
+            updateTabIndicator();
             if (tab === 'dashboard') renderDashboard();
             if (tab === 'employees') renderEmployees();
             if (tab === 'attendance') renderAttendance();
@@ -1657,6 +1704,14 @@ document.querySelectorAll('.chart-expand-btn').forEach(btn => {
 let globalAnimsEnabled = localStorage.getItem('globalAnimsEnabled') !== 'false'; // default true
 function applyGlobalAnimState() {
     document.body.classList.toggle('no-anim', !globalAnimsEnabled);
+    // Clear any residual JS-driven transforms so cards don't stay stuck mid-tilt
+    // when animations are switched off while the pointer is hovering them.
+    if (!globalAnimsEnabled) {
+        document.querySelectorAll('.tilt-card').forEach(c => {
+            c.style.transform = '';
+            c.classList.remove('tilting');
+        });
+    }
     const animBtn = document.getElementById('animToggle');
     const animIcon = document.getElementById('animIcon');
     if (animBtn) {
@@ -1714,11 +1769,16 @@ document.getElementById('importFile').addEventListener('change', function (e) {
     const reader = new FileReader();
     reader.onload = function (ev) {
         const parsed = safeParse(ev.target.result);
-        if (!parsed || typeof parsed !== 'object') { showToast('❌ Invalid backup file.', 'error'); return; }
-        if (Array.isArray(parsed.employees)) employees = parsed.employees;
-        if (Array.isArray(parsed.attendances)) attendances = parsed.attendances;
-        if (Array.isArray(parsed.leaveReqs)) leaveReqs = parsed.leaveReqs;
-        if (Array.isArray(parsed.payrolls)) payrolls = parsed.payrolls;
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) { showToast('❌ Invalid backup file.', 'error'); return; }
+        const sEmp = sanitizeImportedArray(parsed.employees, IMPORT_SPECS.employees);
+        const sAtt = sanitizeImportedArray(parsed.attendances, IMPORT_SPECS.attendances);
+        const sLv = sanitizeImportedArray(parsed.leaveReqs, IMPORT_SPECS.leaveReqs);
+        const sPay = sanitizeImportedArray(parsed.payrolls, IMPORT_SPECS.payrolls);
+        if (!sEmp && !sAtt && !sLv && !sPay) { showToast('❌ Backup contains no recognizable data.', 'error'); return; }
+        if (sEmp) employees = sEmp;
+        if (sAtt) attendances = sAtt;
+        if (sLv) leaveReqs = sLv;
+        if (sPay) payrolls = sPay;
         saveAll();
         renderDashboard(); renderEmployees(); renderAttendance(); renderLeaves(); renderPayroll(); renderReports();
         showToast('✅ Data restored successfully', 'success');
@@ -2077,6 +2137,7 @@ function populateMonths() {
 
     const savedTheme = localStorage.getItem('nexus_theme') || 'light';
     setTheme(savedTheme);
+    requestAnimationFrame(updateTabIndicator);
 
     const renders = [renderDashboard, renderEmployees, renderAttendance, renderLeaves, renderPayroll, renderReports];
     renders.forEach(fn => {
@@ -2092,6 +2153,41 @@ function populateMonths() {
             catch (err) { console.error(`FX re-render failed: ${fn.name}`, err); }
         });
     });
+})();
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ ACTION DELEGATION — replaces inline onclick handlers.
+   Row action buttons now carry data-action/data-id attributes instead of
+   inline JS, so a hostile id (e.g. from a crafted JSON import) can never break
+   out of an attribute and execute. Listeners are attached once to persistent
+   containers and survive innerHTML re-renders.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function initActionDelegation() {
+    document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        switch (btn.dataset.action) {
+            case 'edit-emp': window.openEditEmpModal(id); break;
+            case 'del-emp': window.deleteEmployee(id); break;
+            case 'leave-status': window.updateLeaveStatus(id, btn.dataset.status); break;
+            case 'payslip': window.downloadPayslip(id); break;
+        }
+    });
+
+    // Attendance status pills (click + keyboard).
+    const attList = document.getElementById('attendanceList');
+    if (attList) {
+        const trigger = (pill) => {
+            if (pill) window.setAttendanceStatus(pill.dataset.emp, pill.dataset.status);
+        };
+        attList.addEventListener('click', (ev) => trigger(ev.target.closest('.att-pill')));
+        attList.addEventListener('keydown', (ev) => {
+            if (ev.key !== 'Enter' && ev.key !== ' ') return;
+            const pill = ev.target.closest('.att-pill');
+            if (pill) { ev.preventDefault(); trigger(pill); }
+        });
+    }
 })();
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2223,8 +2319,13 @@ if (heroReportsBtn) {
 }
 
 // ── 3D tilt interaction on KPI cards ──
+const _tiltReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+function tiltDisabled() {
+    return document.body.classList.contains('no-anim') || _tiltReduce.matches;
+}
 document.querySelectorAll('.tilt-card').forEach(card => {
     card.addEventListener('mousemove', (e) => {
+        if (tiltDisabled()) { if (card.style.transform) card.style.transform = ''; return; }
         const r = card.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width - 0.5;
         const py = (e.clientY - r.top) / r.height - 0.5;
@@ -2238,3 +2339,39 @@ document.querySelectorAll('.tilt-card').forEach(card => {
         card.style.transform = '';
     });
 });
+
+function updateTabIndicator() {
+    const bar = document.querySelector('.tab-bar');
+    const indicator = document.getElementById('tabIndicator');
+    const active = bar && bar.querySelector('.tab-btn.active');
+    if (!bar || !indicator || !active) return;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = active.getBoundingClientRect();
+    indicator.style.width = btnRect.width + 'px';
+    indicator.style.height = btnRect.height + 'px';
+    indicator.style.transform = 'translate(' + (btnRect.left - barRect.left) + 'px, ' + (btnRect.top - barRect.top) + 'px)';
+}
+
+(function initAtmosphere() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const spotlight = document.getElementById('fxSpotlight');
+    let spotRaf = 0;
+
+    if (!reduce && spotlight) {
+        document.addEventListener('pointermove', (e) => {
+            if (document.body.classList.contains('no-anim')) return;
+            if (spotRaf) return;
+            const x = e.clientX;
+            const y = e.clientY;
+            spotRaf = requestAnimationFrame(() => {
+                spotlight.style.setProperty('--spot-x', x + 'px');
+                spotlight.style.setProperty('--spot-y', y + 'px');
+                spotRaf = 0;
+            });
+        }, { passive: true });
+    }
+
+    updateTabIndicator();
+    window.addEventListener('resize', updateTabIndicator);
+    window.addEventListener('load', updateTabIndicator);
+})();

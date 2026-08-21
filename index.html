@@ -5,21 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://api.frankfurter.app;">
+        content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.frankfurter.app; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Payroll Nexus</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Bind Tailwind's dark: variant to the app's own theme class instead of
+        // the OS prefers-color-scheme, so `dark:` utilities never fight the
+        // in-app light/dark toggle (was: white text on a light background).
+        tailwind.config = { darkMode: ['selector', '.dark-mode'] };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260821">
+    <link rel="stylesheet" href="mobile-enhance.css?v=20260821">
+    <link rel="stylesheet" href="enhance2.css?v=20260821">
 </head>
 
 <body class="light-mode">
+
+    <div class="fx-aurora" aria-hidden="true">
+        <span class="fx-blob fx-blob-a"></span>
+        <span class="fx-blob fx-blob-b"></span>
+        <span class="fx-blob fx-blob-c"></span>
+    </div>
+    <div class="fx-grain" aria-hidden="true"></div>
+    <div class="fx-spotlight" id="fxSpotlight" aria-hidden="true"></div>
 
     <div class="page-wrap">
 
@@ -33,6 +49,7 @@
                 </div>
             </div>
             <div class="live-clock" id="liveClock">
+                <div class="live-status"><span class="live-status-dot"></span> LIVE</div>
                 <div class="live-clock-date" id="liveClockDate">—</div>
                 <div class="live-clock-time" id="liveClockTime">--:--:--</div>
             </div>
@@ -43,6 +60,9 @@
                     <select id="currencySelect" class="currency-select" aria-label="Display currency"></select>
                 </div>
                 <button id="converterBtn" class="btn btn-primary"><i class="fas fa-right-left"></i> Convert</button>
+                <button id="cmdkBtn" class="btn btn-neutral" aria-label="Open command palette" title="Command palette (Ctrl/⌘ K)">
+                    <i class="fas fa-magnifying-glass"></i>
+                </button>
                 <button id="animToggle" class="btn btn-neutral" aria-label="Toggle animations" aria-pressed="false" title="Enable/disable all animations">
                     <i class="fas fa-magic-wand-sparkles" id="animIcon"></i>
                 </button>
@@ -54,6 +74,7 @@
 
         <!-- ═══════════════════════════════ TABS ═══════════════════════════════ -->
         <nav class="tab-bar" role="tablist">
+            <span class="tab-indicator" id="tabIndicator" aria-hidden="true"></span>
             <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true"><i
                     class="fas fa-chart-pie"></i> Dashboard</button>
             <button class="tab-btn" data-tab="employees" role="tab"><i class="fas fa-users"></i> Employees</button>
@@ -89,6 +110,7 @@
                         Reports</button>
                 </div>
                 <div class="dash-hero-orb"></div>
+                <div class="dash-hero-orb dash-hero-orb-2"></div>
             </div>
 
             <!-- ── KPI row ── -->
@@ -777,7 +799,9 @@
 
     <div id="toast" role="alert" aria-live="polite"></div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260821"></script>
+    <script src="enhance.js?v=20260821"></script>
+    <script src="enhance2.js?v=20260821"></script>
 </body>
 
 </html>

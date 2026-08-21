@@ -1,0 +1,350 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — Mobile Overhaul + Interactivity layer
+   Loaded AFTER styles.css so equal-specificity rules override the base sheet.
+   Scope: responsive card-tables, mobile bottom-nav, sheet modals, command
+   palette, FAB, keyboard-shortcut help, and touch-target polish.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --mob-nav-h: 66px;
+    --tap: 44px;
+    /* honour the notch / home-indicator on iOS */
+    --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+/* Never let a stray wide element cause horizontal scroll on phones */
+@media (max-width: 640px) {
+    html, body { max-width: 100%; overflow-x: hidden; }
+}
+
+/* ═══════════════════════════ 1. CARD-STYLE TABLES ═══════════════════════════
+   On phones, every data table becomes a stack of labelled cards instead of a
+   horizontally-scrolling grid. Labels come from enhance.js (data-label). */
+@media (max-width: 640px) {
+    .table-wrap { overflow-x: visible; }
+
+    #employeesTable, #leavesTable, #payrollTable,
+    #employeesTable tbody, #leavesTable tbody, #payrollTable tbody,
+    #employeesTable tr, #leavesTable tr, #payrollTable tr,
+    #employeesTable td, #leavesTable td, #payrollTable td {
+        display: block;
+        width: 100%;
+    }
+
+    #employeesTable thead, #leavesTable thead, #payrollTable thead {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0);
+    }
+
+    #employeesTable tbody tr, #leavesTable tbody tr, #payrollTable tbody tr {
+        background: var(--bg-card);
+        border: 1px solid var(--bg-card-border);
+        border-radius: 16px;
+        margin-bottom: 12px;
+        padding: 4px 2px;
+        box-shadow: var(--shadow-card);
+        animation: cardPop 0.4s ease both;
+    }
+
+    #employeesTable tbody td, #leavesTable tbody td, #payrollTable tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        text-align: right;
+        padding: 11px 15px;
+        border-bottom: 1px solid var(--bg-card-border);
+        font-size: 0.9rem;
+        min-height: var(--tap);
+    }
+
+    #employeesTable tbody tr td:last-child,
+    #leavesTable tbody tr td:last-child,
+    #payrollTable tbody tr td:last-child { border-bottom: none; }
+
+    /* the label chip generated from the column header */
+    #employeesTable tbody td::before, #leavesTable tbody td::before, #payrollTable tbody td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        text-align: left;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+    }
+
+    /* action / payslip cells: buttons right-aligned, no label needed */
+    #employeesTable td[data-label="Actions"], #payrollTable td[data-label="Payslip"] {
+        justify-content: flex-end;
+        gap: 8px;
+    }
+    #employeesTable td[data-label="Actions"]::before,
+    #payrollTable td[data-label="Payslip"]::before { display: none; }
+
+    /* empty-state rows (colspan) stay centred, no label */
+    #employeesTable td[colspan], #leavesTable td[colspan], #payrollTable td[colspan] {
+        justify-content: center;
+        text-align: center;
+    }
+    #employeesTable td[colspan]::before, #leavesTable td[colspan]::before,
+    #payrollTable td[colspan]::before { display: none; }
+}
+
+/* ═══════════════════════════ 2. MOBILE BOTTOM NAV ═══════════════════════════
+   The wrapping desktop tab bar becomes a fixed, thumb-reachable bottom nav. */
+@media (max-width: 640px) {
+    .tab-bar {
+        position: fixed;
+        left: 0; right: 0; bottom: 0; top: auto;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        z-index: 60;
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        gap: 2px;
+        padding: 8px 6px calc(8px + var(--safe-b));
+        box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.16);
+        backdrop-filter: blur(22px) saturate(180%);
+        -webkit-backdrop-filter: blur(22px) saturate(180%);
+    }
+
+    .tab-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+        padding: 6px 2px;
+        font-size: 0.58rem;
+        letter-spacing: 0.01em;
+        border-radius: 13px;
+        transform: none !important;
+    }
+
+    .tab-btn i { font-size: 1.15rem; }
+
+    /* The JS pill indicator can't follow a vertical layout — hide it and
+       give the active button a real background so it stays visible. */
+    .tab-indicator { display: none !important; }
+    .tab-btn.active {
+        background: linear-gradient(135deg, #3b82f6, #7c3aed);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    /* leave room for the fixed bar (+ FAB) at the bottom of every view */
+    .page-wrap { padding-bottom: calc(var(--mob-nav-h) + var(--safe-b) + 12px); }
+}
+
+/* ═══════════════════════════ 3. COMPACT HEADER ═══════════════════════════ */
+@media (max-width: 640px) {
+    .top-header {
+        padding: 0.6rem 0.85rem;
+        gap: 0.55rem;
+        border-radius: 18px;
+        top: 0.4rem;
+    }
+    .brand-sub { display: none; }
+    .brand-title { font-size: 1.15rem; }
+    .brand-icon { width: 2.3rem; height: 2.3rem; }
+    .live-clock { display: none; }
+    .header-actions { gap: 0.4rem; margin-left: auto; }
+    .header-actions .btn {
+        padding: 0.5rem 0.7rem;
+        min-height: var(--tap);
+        min-width: var(--tap);
+    }
+    /* keep the Convert label but let it shrink gracefully */
+    #converterBtn { padding: 0.5rem 0.75rem; }
+}
+@media (max-width: 420px) {
+    /* icon-only Convert button on the narrowest screens */
+    #converterBtn span, #converterBtn { font-size: 0; }
+    #converterBtn i { font-size: 0.9rem; }
+}
+
+/* ═══════════════════════════ 4. SHEET-STYLE MODALS ═══════════════════════════
+   Modals slide up from the bottom as full-width sheets on phones. */
+@media (max-width: 640px) {
+    .modal-backdrop { align-items: flex-end; padding: 0; }
+    .modal-card {
+        max-width: 100% !important;
+        width: 100%;
+        max-height: 92vh;
+        border-radius: 22px 22px 0 0;
+        margin: 0;
+    }
+    .modal-backdrop.open .modal-card { animation: sheetUp 0.32s cubic-bezier(0.34, 1.4, 0.5, 1) both; }
+    .modal-header { position: sticky; top: 0; z-index: 2; }
+    /* grab-handle affordance */
+    .modal-card::before {
+        content: '';
+        position: absolute;
+        top: 8px; left: 50%;
+        width: 40px; height: 4px;
+        transform: translateX(-50%);
+        border-radius: 99px;
+        background: var(--text-muted);
+        opacity: 0.35;
+    }
+    .form-grid { grid-template-columns: 1fr !important; }
+}
+@keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* ═══════════════════════════ 5. TOUCH-TARGET POLISH ═══════════════════════════ */
+@media (max-width: 640px) {
+    .btn { min-height: var(--tap); }
+    .field-input, .search-input, .report-select, .currency-select, .date-nav-input {
+        min-height: var(--tap);
+        font-size: 16px; /* prevents iOS zoom-on-focus */
+    }
+    .section-head { gap: 0.6rem; }
+    .section-title { font-size: 1.15rem; }
+    /* full-width action buttons in section heads read better on phones */
+    .section-head > div { width: 100%; }
+    .section-head .btn-primary { flex: 1 1 auto; justify-content: center; }
+}
+
+/* ═══════════════════════════ 6. COMMAND PALETTE (⌘K / Ctrl-K) ═══════════════ */
+.cmdk-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 12vh;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.cmdk-backdrop.open { display: flex; animation: cmdkFade 0.16s ease; }
+@keyframes cmdkFade { from { opacity: 0; } to { opacity: 1; } }
+
+.cmdk-panel {
+    width: min(92vw, 620px);
+    max-height: 66vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 18px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    animation: cmdkPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes cmdkPop { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.cmdk-input-wrap { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--bg-card-border); }
+.cmdk-input-wrap i { color: var(--text-muted); font-size: 1rem; }
+.cmdk-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    font-family: inherit;
+}
+.cmdk-hint-kbd {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+}
+.cmdk-list { overflow-y: auto; padding: 8px; }
+.cmdk-group-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 12px 4px; font-weight: 700; }
+.cmdk-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    border-radius: 11px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.cmdk-item .cmdk-ic {
+    width: 32px; height: 32px;
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 9px;
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--accent);
+    font-size: 0.85rem;
+}
+.cmdk-item .cmdk-sub { color: var(--text-muted); font-size: 0.72rem; font-weight: 400; margin-left: 2px; }
+.cmdk-item.active, .cmdk-item:hover { background: rgba(59, 130, 246, 0.12); color: var(--text-primary); }
+.cmdk-item.active { outline: 1px solid rgba(59, 130, 246, 0.35); }
+.cmdk-empty { padding: 28px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+/* ═══════════════════════════ 7. FLOATING ACTION BUTTON (mobile) ═══════════════ */
+.fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(var(--mob-nav-h) + var(--safe-b) + 14px);
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: none;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.3rem;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    box-shadow: 0 10px 26px rgba(59, 130, 246, 0.5);
+    z-index: 55;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.fab:active { transform: scale(0.9); }
+@media (max-width: 640px) { .fab.show { display: flex; animation: fabIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; } }
+@keyframes fabIn { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
+
+/* ═══════════════════════════ 8. SHORTCUT HELP OVERLAY ═══════════════════════════ */
+.kbd-help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; }
+@media (max-width: 560px) { .kbd-help-grid { grid-template-columns: 1fr; } }
+.kbd-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 0.85rem; color: var(--text-secondary); }
+.kbd-keys { display: inline-flex; gap: 4px; flex: 0 0 auto; }
+.kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    min-width: 22px;
+    text-align: center;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    box-shadow: 0 1px 0 var(--bg-card-border);
+    color: var(--text-primary);
+}
+
+/* ═══════════════════════════ 9. BUTTON RIPPLE + REVEAL ═══════════════════════════ */
+.btn { position: relative; overflow: hidden; }
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+    animation: rippleOut 0.55s ease-out;
+}
+@keyframes rippleOut { to { transform: scale(2.6); opacity: 0; } }
+body.no-anim .ripple { display: none; }
+
+/* respect reduced-motion / global anim toggle */
+body.no-anim .cmdk-panel,
+body.no-anim .cmdk-backdrop.open,
+body.no-anim .modal-backdrop.open .modal-card,
+body.no-anim .fab.show { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+    .cmdk-panel, .fab.show, .ripple { animation: none !important; }
+}
