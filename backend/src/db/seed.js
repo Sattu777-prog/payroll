@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { pool } from './pool.js';
 
 const SEED_USERS = [
-    { email: 'admin@nexus.dev', full_name: 'Alex Admin', role: 'admin', employeeNo: 'EMP1001', firstName: 'Aarav', lastName: 'Sharma', position: 'Lead Developer', dept: 'Engineering', salary: 7200 },
+    { email: 'admin@nexus.dev', full_name: 'Alex Admin', role: 'admin', employeeNo: 'EMP1001', firstName: 'sattu', lastName: 'Sharma', position: 'Lead Developer', dept: 'Engineering', salary: 7200 },
     { email: 'manager@nexus.dev', full_name: 'Maria Manager', role: 'manager', employeeNo: 'EMP1002', firstName: 'Bianca', lastName: 'Lopez', position: 'HR Generalist', dept: 'Human Resources', salary: 5400 },
     { email: 'employee@nexus.dev', full_name: 'Owen Employee', role: 'employee', employeeNo: 'EMP1003', firstName: 'Chen', lastName: 'Wei', position: 'Sales Manager', dept: 'Sales', salary: 6800 },
 ];

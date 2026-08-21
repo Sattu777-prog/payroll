@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance8.css
+   Eighth additive layer: the "Insights hub". The three flat dashboard panels
+   (Live activity / Top earners / Exchange rates) are merged into ONE full-width
+   card with an animated segmented control and swappable panels. Also removes the
+   duplicate "Live activity" header the base + enhance7 feeds produced together.
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* the merged card spans the whole bottom row */
+.ins8-card { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─────────────── header: title + segmented control ─────────────── */
+.ins8-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ins8-head .chart-title { margin: 0; }
+.ins8-seg { position: relative; display: inline-flex; margin-left: auto; background: rgba(127, 127, 127, 0.09); border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 4px; gap: 2px; }
+.ins8-seg-ind { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 10px; background: var(--bg-card); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 0; }
+.ins8-tab { position: relative; z-index: 1; border: none; background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.76rem; font-weight: 700; padding: 7px 15px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: color 0.18s ease; }
+.ins8-tab i { font-size: 0.8rem; }
+.ins8-tab.active { color: var(--text-primary); }
+.ins8-tab:hover:not(.active) { color: var(--text-primary); }
+body.no-anim .ins8-seg-ind { transition: none; }
+
+/* ─────────────── body / panels ─────────────── */
+.ins8-body { position: relative; min-height: 156px; }
+.ins8-panel { display: none; }
+.ins8-panel.active { display: block; animation: ins8Swap 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ins8Swap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+body.no-anim .ins8-panel.active { animation: none; }
+
+/* ─────────────── activity panel: kill the duplicate header + base feed ─────────────── */
+.ins8-panel[data-panel="activity"] #activity-feed { display: none !important; }
+.ins8-panel[data-panel="activity"] .lc7-feed-head { display: none; }
+.ins8-panel[data-panel="activity"] #lc7-activity { max-height: 268px; overflow-y: auto; padding-right: 4px; }
+.ins8-panel[data-panel="activity"] #lc7-activity::-webkit-scrollbar { width: 5px; }
+.ins8-panel[data-panel="activity"] #lc7-activity::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+/* shared little segmented toggle used inside panels (Top 3 / Top 5) */
+.ins8-minitoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 9px; overflow: hidden; }
+.ins8-minitoggle button { border: none; background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.68rem; font-weight: 700; padding: 5px 11px; cursor: pointer; }
+.ins8-minitoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+
+/* ─────────────── leaders panel ─────────────── */
+.ins8-panel[data-panel="leaders"] .ins8-tools { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ins8-panel[data-panel="leaders"] .ins8-tools .ins8-hint { font-size: 0.7rem; color: var(--text-muted); margin-left: auto; }
+/* two-column leaderboard on wide screens (beats the inline display:flex) */
+#top-earners-list.ins8-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px 20px !important; }
+@media (max-width: 760px) { #top-earners-list.ins8-grid { grid-template-columns: 1fr !important; } }
+/* Top-3 mode hides ranks 4+ */
+#top-earners-list.ins8-top3 .earner-row:nth-child(n+4) { display: none; }
+.earner-row { cursor: default; }
+
+/* ─────────────── currency panel ─────────────── */
+.ins8-conv-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.ins8-conv-field { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--bg-card-border); border-radius: 11px; padding: 6px 12px; background: rgba(127, 127, 127, 0.05); }
+.ins8-conv-field input { border: none; background: transparent; outline: none; font: inherit; font-weight: 800; font-size: 1rem; color: var(--text-primary); width: 108px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.ins8-conv-field .cur { font-size: 0.72rem; font-weight: 800; color: var(--accent, #3b82f6); letter-spacing: 0.04em; }
+/* base-currency picker inside the amount field */
+.ins8-cur-sel { border: none; border-left: 1px solid var(--bg-card-border); background: transparent; outline: none; font: inherit; font-weight: 800; font-size: 0.78rem; color: var(--accent, #3b82f6); letter-spacing: 0.04em; padding: 2px 4px 2px 10px; cursor: pointer; }
+.ins8-cur-sel option { color: var(--text-primary); background: var(--bg-card); font-weight: 700; }
+/* manual refresh button */
+.ins8-fxrefresh { border: 1px solid var(--bg-card-border); background: rgba(127, 127, 127, 0.05); color: var(--text-secondary); border-radius: 10px; width: 34px; height: 34px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.15s ease, border-color 0.15s ease, transform 0.4s ease; }
+.ins8-fxrefresh:hover { color: var(--accent, #3b82f6); border-color: var(--accent, #3b82f6); }
+.ins8-fxrefresh:active { transform: rotate(180deg); }
+body.no-anim .ins8-fxrefresh { transition: none; }
+.ins8-conv-eq { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; }
+.ins8-fxgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; }
+.ins8-fx-card { border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 11px 13px; background: rgba(127, 127, 127, 0.04); transition: transform 0.14s ease, border-color 0.14s ease; }
+.ins8-fx-card:hover { transform: translateY(-2px); border-color: var(--accent, #3b82f6); }
+body.no-anim .ins8-fx-card { transition: none; }
+.ins8-fx-pair { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.ins8-fx-pair .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent, #3b82f6); }
+.ins8-fx-conv { font-size: 1.18rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; margin-top: 6px; }
+.ins8-fx-rate { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.ins8-fx-empty { grid-column: 1 / -1; font-size: 0.78rem; color: var(--text-muted); }
+/* offline-estimate styling + status note */
+.ins8-fx-card.ins8-fx-est .ins8-fx-rate { color: #f59e0b; }
+.ins8-conv-note { margin-top: 12px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+.ins8-conv-note:empty { display: none; }
+.ins8-conv-note.live { color: #10b981; }
+.ins8-conv-note.est { color: #f59e0b; }
+/* keep the raw base list around as a hidden data source */
+.ins8-panel[data-panel="currency"] #fx-snapshot-list { display: none !important; }
+/* the base meta ("Rates unavailable offline") would contradict our own note */
+.ins8-panel[data-panel="currency"] #fx-snapshot-meta { display: none !important; }
+
+/* ─────────────── hide the three original source cards once merged ─────────────── */
+.ins8-merged-src { display: none !important; }
+
+@media (max-width: 640px) {
+    .ins8-seg { margin-left: 0; width: 100%; justify-content: space-between; }
+    .ins8-tab { flex: 1 1 0; justify-content: center; padding: 8px 6px; }
+}
+

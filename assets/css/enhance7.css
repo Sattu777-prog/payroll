@@ -1,0 +1,112 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance7.css
+   Seventh additive layer: interactive / dynamic surfaces.
+     1. Kanban leave board       (drag between Pending / Approved / Rejected)
+     2. Inline-edit table cells  (dbl-click Dept / Position / Salary)
+     3. Live activity feed        (real logged actions, streaming)
+     4. Reactive filter counts    (live "X of Y" on search)
+     5. Interactive chart callouts(click a segment → detail popover)
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── 1. Kanban leave board ─────────────── */
+.lc7-viewtoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 10px; overflow: hidden; }
+.lc7-viewtoggle button { border: none; background: transparent; color: var(--text-secondary); padding: 7px 13px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.lc7-viewtoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+.lc7-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+@media (max-width: 820px) { .lc7-board { grid-template-columns: 1fr; } }
+.lc7-col { background: rgba(127,127,127,0.05); border: 1px solid var(--bg-card-border); border-radius: 14px; padding: 12px; min-height: 120px; display: flex; flex-direction: column; transition: background 0.16s ease, border-color 0.16s ease; }
+.lc7-col.drag-over { border-color: var(--accent, #3b82f6); background: rgba(59,130,246,0.09); }
+.lc7-col-h { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; color: var(--text-secondary); }
+.lc7-col-h .dot { width: 9px; height: 9px; border-radius: 50%; }
+.lc7-col-h .cnt { margin-left: auto; background: rgba(127,127,127,0.16); border-radius: 999px; padding: 1px 8px; font-size: 0.7rem; }
+.lc7-col.pending .dot { background: #f59e0b; }
+.lc7-col.approved .dot { background: #10b981; }
+.lc7-col.rejected .dot { background: #ef4444; }
+.lc7-card { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-left: 3px solid var(--accent, #3b82f6); border-radius: 11px; padding: 11px 12px; margin-bottom: 10px; cursor: grab; transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease; }
+.lc7-card:active { cursor: grabbing; }
+.lc7-card.dragging { opacity: 0.5; transform: scale(0.98); }
+.lc7-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.14); }
+.lc7-card.pending { border-left-color: #f59e0b; }
+.lc7-card.approved { border-left-color: #10b981; }
+.lc7-card.rejected { border-left-color: #ef4444; }
+.lc7-card .nm { font-weight: 700; font-size: 0.82rem; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
+.lc7-card .meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+.lc7-card .type { display: inline-block; margin-top: 7px; font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(127,127,127,0.1); color: var(--text-secondary); }
+.lc7-card.enter { animation: lc7In 0.3s cubic-bezier(.22,1,.36,1) both; }
+@keyframes lc7In { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lc7-col-empty { font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 18px 6px; border: 1px dashed var(--bg-card-border); border-radius: 10px; }
+body.no-anim .lc7-card, body.no-anim .lc7-col { transition: none; }
+body.no-anim .lc7-card.enter { animation: none; }
+.lc7-card-actions { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+.lc7-card-actions button { border: 1px solid var(--bg-card-border); background: var(--bg-card); border-radius: 8px; padding: 5px 10px; font-size: 0.66rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease; }
+.lc7-card-actions button:hover { border-color: var(--accent, #3b82f6); }
+.lc7-card-actions button.approve:hover { background: #10b981; color: #fff; border-color: #10b981; }
+.lc7-card-actions button.reject:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+.lc7-card-actions button.reopen:hover { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+body.no-anim .lc7-card-actions button { transition: none; }
+
+/* ── scale: cap column height so the board never stretches the page ── */
+.lc7-col-body { display: flex; flex-direction: column; flex: 1; overflow-y: auto; max-height: clamp(240px, 56vh, 520px); padding-right: 3px; }
+.lc7-col-body::-webkit-scrollbar { width: 6px; }
+.lc7-col-body::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+.lc7-col-body::-webkit-scrollbar-track { background: transparent; }
+/* ── card details (replaced the approve/reject/reopen buttons) ── */
+.lc7-det { font-size: 0.68rem; color: var(--text-muted); margin-top: 7px; display: flex; align-items: flex-start; gap: 6px; line-height: 1.35; }
+.lc7-det i { margin-top: 2px; opacity: 0.7; font-size: 0.62rem; flex-shrink: 0; }
+.lc7-det-reason { font-style: italic; }
+/* ─────────────── 2. Inline-edit table cells ─────────────── */
+.lc7-editable { cursor: pointer; }
+.lc7-editable:hover { text-decoration: underline dotted; text-underline-offset: 3px; text-decoration-color: var(--accent, #3b82f6); }
+.lc7-cell-input { width: 100%; box-sizing: border-box; padding: 5px 7px; border: 1px solid var(--accent, #3b82f6); border-radius: 7px; background: var(--bg-card); color: var(--text-primary); font: inherit; }
+.lc7-flash { animation: lc7Flash 1s ease; }
+@keyframes lc7Flash { 0% { background: rgba(16,185,129,0.35); } 100% { background: transparent; } }
+body.no-anim .lc7-flash { animation: none; }
+body.lc7-suppressmodal #empModal { display: none !important; }
+
+/* ─────────────── 3. Live activity feed ─────────────── */
+#lc7-activity { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+.lc7-feed-head { display: flex; align-items: center; gap: 7px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+.lc7-feed-head .live-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+.lc7-feed-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border: 1px solid var(--bg-card-border); border-radius: 11px; background: rgba(127,127,127,0.04); }
+.lc7-feed-item.new { animation: lc7FeedIn 0.4s cubic-bezier(.22,1,.36,1) both; }
+@keyframes lc7FeedIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+.lc7-feed-ic { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; }
+.lc7-feed-b { flex: 1; min-width: 0; }
+.lc7-feed-t { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
+.lc7-feed-time { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+.lc7-feed-empty { font-size: 0.74rem; color: var(--text-muted); padding: 6px 2px; }
+body.no-anim .lc7-feed-item.new { animation: none; }
+
+/* ─────────────── 4. Reactive filter counts ─────────────── */
+.lc7-count { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); background: rgba(127,127,127,0.08); border: 1px solid var(--bg-card-border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; margin-left: 8px; vertical-align: middle; }
+.lc7-count b { color: var(--accent, #3b82f6); }
+.lc7-count.filtering { border-color: var(--accent, #3b82f6); }
+
+/* ─────────────── 5. Interactive chart callouts ─────────────── */
+.lc7-chart-pop { position: fixed; z-index: 400; pointer-events: none; background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: 11px; box-shadow: 0 14px 40px rgba(0,0,0,0.28); padding: 11px 13px; min-width: 150px; transform: translateY(6px); opacity: 0; transition: opacity 0.14s ease, transform 0.14s ease; }
+.lc7-chart-pop.show { opacity: 1; transform: none; }
+.lc7-chart-pop .lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 800; }
+.lc7-chart-pop .val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; margin-top: 3px; }
+.lc7-chart-pop .pct { font-size: 0.72rem; color: var(--accent, #3b82f6); font-weight: 700; margin-top: 2px; }
+canvas#deptBarChart, canvas#payrollBreakdownChart, canvas#attendanceTrendChart, canvas#leaveDistChart { cursor: pointer; }
+body.no-anim .lc7-chart-pop { transition: none; }
+
+/* ─────────────── 6. mobile floating-button click clearance ───────────────
+   On phones the fixed "New leave" FAB (mobile-enhance.css .fab) floats in the
+   bottom-right corner. It lives in the root stacking context (z-index:55) while
+   all page content sits inside #mainContent.page-wrap (z-index:3) — so the FAB
+   always paints on top and z-index on the buttons themselves can't win. The
+   reliable fix is spatial: left-align in-card action buttons so Reject/delete/
+   payslip never sit under the bottom-right FAB, plus extra scroll clearance. */
+@media (max-width: 640px) {
+    #leavesTable tbody td[data-label="Actions"],
+    #employeesTable tbody td[data-label="Actions"],
+    #payrollTable tbody td[data-label="Payslip"] {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    /* extra scroll room so the last card can clear the floating buttons */
+    .page-wrap { padding-bottom: calc(var(--mob-nav-h) + var(--safe-b) + 96px) !important; }
+}

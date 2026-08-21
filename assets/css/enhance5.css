@@ -39,15 +39,15 @@ body.no-anim .mx5-ripple { display: none; }
 body.no-anim .tab-content.mx5-enter > * { animation: none; opacity: 1; transform: none; }
 
 /* ─────────────── 4. FAB speed-dial ─────────────── */
-.fab5 { position: fixed; right: 22px; bottom: 22px; z-index: 232; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.fab5-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.fab5 { position: fixed; right: 22px; bottom: 22px; z-index: 232; display: flex; flex-direction: column; align-items: center; gap: 12px; pointer-events: none; }
+.fab5-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none; }
 .fab5-item { display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(14px) scale(0.8); pointer-events: none; transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab5.open .fab5-item { opacity: 1; transform: none; pointer-events: auto; }
 body.no-anim .fab5-item { transition: none; }
 .fab5-item .lbl { background: var(--text-primary); color: var(--bg-card); font-size: 0.72rem; font-weight: 700; padding: 5px 10px; border-radius: 8px; white-space: nowrap; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
 .fab5-btn { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--accent, #3b82f6); font-size: 1rem; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; transition: background 0.16s ease, color 0.16s ease; }
 .fab5-btn:hover { color: #fff; background: var(--accent, #3b82f6); }
-.fab5-main { width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer; color: #fff; font-size: 1.35rem; background: linear-gradient(135deg, #3b82f6, #6d28d9); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+.fab5-main { width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer; color: #fff; font-size: 1.35rem; background: linear-gradient(135deg, #3b82f6, #6d28d9); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; pointer-events: auto; }
 .fab5-main i { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab5.open .fab5-main { transform: rotate(135deg); }
 .fab5-main:hover { box-shadow: 0 14px 38px rgba(59, 130, 246, 0.65); }

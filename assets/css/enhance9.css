@@ -1,0 +1,66 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance9.css
+   Ninth additive layer: the Attendance "roster board". A drag-and-drop board
+   (like the Leaves Kanban, but for 4 states) where you drag employees between
+   Present / Late / Half-day / Absent columns for the selected date. Changes
+   persist instantly through the base Save path. Tap fallback for touch.
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── toolbar: view toggle + rate meter + quick action ─────────────── */
+#att9-wrap { margin-bottom: 16px; }
+.att9-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.att9-viewtoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 10px; overflow: hidden; }
+.att9-viewtoggle button { border: none; background: transparent; color: var(--text-secondary); padding: 7px 13px; font: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.att9-viewtoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+.att9-rate { display: inline-flex; align-items: center; gap: 10px; font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); }
+.att9-rate-bar { width: 120px; height: 8px; border-radius: 999px; background: rgba(127, 127, 127, 0.16); overflow: hidden; }
+.att9-rate-bar > span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+body.no-anim .att9-rate-bar > span { transition: none; }
+.att9-rate-pct { color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.att9-allpresent { margin-left: auto; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--text-secondary); border-radius: 10px; padding: 7px 13px; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: color 0.15s ease, border-color 0.15s ease; }
+.att9-allpresent:hover { color: #10b981; border-color: #10b981; }
+body.no-anim .att9-allpresent { transition: none; }
+
+/* ─────────────── the board ─────────────── */
+.att9-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 1000px) { .att9-board { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .att9-board { grid-template-columns: 1fr; } }
+.att9-col { background: rgba(127, 127, 127, 0.05); border: 1px solid var(--bg-card-border); border-radius: 14px; padding: 12px; min-height: 130px; display: flex; flex-direction: column; transition: background 0.16s ease, border-color 0.16s ease; }
+.att9-col.drag-over { border-color: var(--c, #3b82f6); background: color-mix(in srgb, var(--c, #3b82f6) 12%, transparent); }
+.att9-col-h { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: var(--text-secondary); }
+.att9-col-h .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c, #3b82f6); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c, #3b82f6) 18%, transparent); }
+.att9-col-h .cnt { margin-left: auto; background: rgba(127, 127, 127, 0.16); border-radius: 999px; padding: 1px 9px; font-size: 0.72rem; color: var(--text-primary); }
+.att9-col-body { display: flex; flex-direction: column; gap: 9px; flex: 1; overflow-y: auto; max-height: clamp(240px, 56vh, 520px); padding-right: 3px; }
+.att9-col-body::-webkit-scrollbar { width: 6px; }
+.att9-col-body::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+.att9-col-body::-webkit-scrollbar-track { background: transparent; }
+.att9-col-empty { font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 16px 6px; border: 1px dashed var(--bg-card-border); border-radius: 10px; }
+/* ── scale: quick filter to find employees when the roster is large ── */
+.att9-filter { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--bg-card-border); border-radius: 10px; padding: 6px 11px; background: rgba(127, 127, 127, 0.05); color: var(--text-muted); }
+.att9-filter i { font-size: 0.72rem; }
+.att9-filter input { border: none; background: transparent; outline: none; font: inherit; font-size: 0.75rem; color: var(--text-primary); width: 130px; }
+.att9-card.att9-hidden { display: none; }
+.att9-col-body.att9-nomatch::after { content: 'No matches'; display: block; font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 14px 6px; }
+
+/* ─────────────── employee cards ─────────────── */
+.att9-card { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-left: 3px solid var(--c, #3b82f6); border-radius: 11px; padding: 10px 11px; cursor: grab; display: flex; align-items: center; gap: 10px; transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease; }
+.att9-card:active { cursor: grabbing; }
+.att9-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14); }
+.att9-card.dragging { opacity: 0.5; transform: scale(0.98); }
+.att9-card.enter { animation: att9In 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes att9In { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+body.no-anim .att9-card { transition: none; }
+body.no-anim .att9-card.enter { animation: none; }
+.att9-ava { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: #fff; letter-spacing: 0.02em; }
+.att9-b { flex: 1; min-width: 0; }
+.att9-nm { font-weight: 700; font-size: 0.82rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.att9-id { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+/* touch fallback: quick "move to" buttons (the other three states) */
+.att9-quick { display: flex; gap: 5px; flex-shrink: 0; }
+.att9-quick button { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--bg-card-border); background: transparent; color: var(--qc, #3b82f6); font-size: 0.68rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease; }
+.att9-quick button:hover { background: var(--qc, #3b82f6); color: #fff; border-color: var(--qc, #3b82f6); }
+body.no-anim .att9-quick button { transition: none; }
+
+/* ─────────────── view switching ─────────────── */
+body.att9-board-view .att9-listwrap { display: none; }

@@ -341,7 +341,7 @@ function loadAll() {
 
 function seedData() {
     employees = [
-        { id: 'emp_1001', employeeId: 'EMP1001', firstName: 'Aarav', lastName: 'Sharma', department: 'Engineering', position: 'Lead Dev', basicSalary: 7200, email: 'aarav@company.com', phone: '555-0101' },
+        { id: 'emp_1001', employeeId: 'EMP1001', firstName: 'sattu', lastName: 'Sharma', department: 'Engineering', position: 'Lead Dev', basicSalary: 7200, email: 'sattu@company.com', phone: '555-0101' },
         { id: 'emp_1002', employeeId: 'EMP1002', firstName: 'Bianca', lastName: 'Lopez', department: 'HR', position: 'Generalist', basicSalary: 5400, email: 'bianca@company.com', phone: '555-0102' },
         { id: 'emp_1003', employeeId: 'EMP1003', firstName: 'Chen', lastName: 'Wei', department: 'Sales', position: 'Manager', basicSalary: 6800, email: 'chen@company.com', phone: '555-0103' }
     ];
