@@ -19,9 +19,12 @@
         tailwind.config = { darkMode: ['selector', '.dark-mode'] };
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Libraries load in parallel and no longer block first paint (defer). Order
+         with the app scripts below is preserved because defer runs in document order. -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script defer src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="assets/js/perf.js?v=20260901"></script>
     <link rel="stylesheet" href="assets/css/styles.css?v=20260821">
     <link rel="stylesheet" href="assets/css/mobile-enhance.css?v=20260821">
     <link rel="stylesheet" href="assets/css/enhance2.css?v=20260821">
@@ -32,6 +35,8 @@
     <link rel="stylesheet" href="assets/css/enhance7.css?v=20260832">
     <link rel="stylesheet" href="assets/css/enhance8.css?v=20260830">
     <link rel="stylesheet" href="assets/css/enhance9.css?v=20260833">
+    <link rel="stylesheet" href="assets/css/enhance10.css?v=20260903">
+    <link rel="stylesheet" href="assets/css/enhance11.css?v=20260822">
 </head>
 
 <body class="light-mode">
@@ -583,20 +588,6 @@
                     <div class="report-canvas-wrap"><canvas id="leaveDistChart"></canvas></div>
                 </div>
             </div>
-
-            <div class="report-bottom-grid">
-                <div class="glass report-lb-card">
-                    <div class="chart-title"><i class="fas fa-city" style="color:#3b82f6;"></i> Payroll share by
-                        department <span class="report-chart-hint"><i class="fas fa-circle-info"></i> click bar to
-                            highlight</span></div>
-                    <div id="reportDeptBars" class="report-dept-bars"></div>
-                </div>
-                <div class="glass report-podium-card">
-                    <div class="chart-title"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Top 5 earners —
-                        current period <span class="report-podium-live"><i class="fas fa-circle"></i> live</span></div>
-                    <div id="reportTopEarners" class="report-podium"></div>
-                </div>
-            </div>
         </section>
 
     </div>
@@ -803,16 +794,17 @@
 
     <div id="toast" role="alert" aria-live="polite"></div>
 
-    <script src="assets/js/script.js?v=20260821"></script>
-    <script src="assets/js/enhance.js?v=20260821"></script>
-    <script src="assets/js/enhance2.js?v=20260821"></script>
-    <script src="assets/js/enhance3.js?v=20260822"></script>
-    <script src="assets/js/enhance4.js?v=20260825"></script>
-    <script src="assets/js/enhance5.js?v=20260822"></script>
-    <script src="assets/js/enhance6.js?v=20260825"></script>
-    <script src="assets/js/enhance7.js?v=20260831"></script>
-    <script src="assets/js/enhance8.js?v=20260830"></script>
-    <script src="assets/js/enhance9.js?v=20260831"></script>
+    <script defer src="assets/js/script.js?v=20260901"></script>
+    <script defer src="assets/js/enhance.js?v=20260901"></script>
+    <script defer src="assets/js/enhance2.js?v=20260901"></script>
+    <script defer src="assets/js/enhance3.js?v=20260901"></script>
+    <script defer src="assets/js/enhance4.js?v=20260901"></script>
+    <script defer src="assets/js/enhance5.js?v=20260901"></script>
+    <script defer src="assets/js/enhance6.js?v=20260901"></script>
+    <script defer src="assets/js/enhance7.js?v=20260901"></script>
+    <script defer src="assets/js/enhance8.js?v=20260901"></script>
+    <script defer src="assets/js/enhance9.js?v=20260901"></script>
+    <script defer src="assets/js/enhance10.js?v=20260903"></script>
 </body>
 
 </html>

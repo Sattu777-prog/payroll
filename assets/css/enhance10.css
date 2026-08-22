@@ -1,0 +1,140 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance10.css
+   Tenth additive layer:
+     1. Dashboard greeting band — one live, animated gradient strip carrying the
+        greeting and the real-time chips (flowing gradient, drifting light orbs,
+        a slow sheen sweep, pulsing avatar ring, staggered entrance).
+     2. Insights relocated into Reports as a collapsible, managed panel.
+   Theme via existing CSS variables; every animation is disabled under
+   body.no-anim and prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* the old hero is emptied into the band, then hidden */
+.dash-hero.dc10-off { display: none !important; }
+
+/* ─────────────── the band shell ─────────────── */
+#dc10-card {
+    position: relative; overflow: hidden; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px; margin-bottom: 18px;
+    box-shadow: 0 20px 44px -20px rgba(79, 70, 229, 0.6), 0 2px 8px rgba(0, 0, 0, 0.12);
+    animation: dc10In 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dc10In { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+.dc10-band {
+    position: relative; isolation: isolate;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 20px 24px; color: #fff;
+    background: linear-gradient(115deg, #2563eb 0%, #4f46e5 26%, #7c3aed 52%, #a855f7 74%, #2563eb 100%);
+    background-size: 260% 100%;
+    animation: dc10Flow 20s linear infinite;
+}
+@keyframes dc10Flow { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+
+/* drifting light orbs */
+.dc10-band::before {
+    content: ''; position: absolute; inset: -45% -12%; pointer-events: none; z-index: 0;
+    background:
+        radial-gradient(38% 62% at 16% 22%, rgba(255, 255, 255, 0.3), transparent 62%),
+        radial-gradient(32% 54% at 84% 78%, rgba(56, 189, 248, 0.38), transparent 64%);
+    animation: dc10Drift 15s ease-in-out infinite alternate;
+}
+@keyframes dc10Drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(3%, -5%, 0) scale(1.1); } }
+
+/* slow sheen sweep */
+.dc10-band::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, 0.22) 48%, transparent 62%);
+    transform: translateX(-130%);
+    animation: dc10Sheen 8s ease-in-out infinite;
+}
+@keyframes dc10Sheen { 0%, 68% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+
+/* ─────────────── avatar with a pulsing ring ─────────────── */
+.dc10-ava, .dc10-hi, .dc10-right { position: relative; z-index: 1; }
+.dc10-ava {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(6px);
+}
+.dc10-ava::after {
+    content: ''; position: absolute; inset: -7px; border-radius: 19px; pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    animation: dc10Pulse 3s ease-out infinite;
+}
+@keyframes dc10Pulse { 0% { opacity: 0.85; transform: scale(0.88); } 100% { opacity: 0; transform: scale(1.22); } }
+
+/* ─────────────── greeting text ─────────────── */
+.dc10-hi { flex: 1; min-width: 200px; }
+.dc10-hi #dashHello {
+    font-size: 1.34rem; font-weight: 800; letter-spacing: -0.015em; color: #fff; margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+    animation: dc10Up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dc10-hi #dashSub {
+    font-size: 0.77rem; font-weight: 500; color: rgba(255, 255, 255, 0.88); margin-top: 4px;
+    animation: dc10Up 0.55s 0.07s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dc10Up { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+/* ─────────────── live chips (glass pills) ─────────────── */
+.dc10-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dc10-right .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.dc10-right .hero-cta { display: none !important; }  /* "View Reports" lives in the tab bar */
+.dc10-right .hero-chip {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    color: #fff !important;
+    border-radius: 999px !important; padding: 8px 16px !important;
+    font-size: 0.76rem !important; font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease, box-shadow 0.2s ease;
+    animation: dc10Up 0.55s both;
+}
+.dc10-right .hero-chip i, .dc10-right .hero-chip span, .dc10-right .hero-chip * { color: #fff !important; }
+.dc10-right .hero-chip span { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.88rem; font-weight: 800; }
+.dc10-right .hero-chip:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(255, 255, 255, 0.27) !important;
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.dc10-right .hero-chip:nth-child(1) { animation-delay: 0.12s; }
+.dc10-right .hero-chip:nth-child(2) { animation-delay: 0.2s; }
+.dc10-right .hero-chip:nth-child(3) { animation-delay: 0.28s; }
+
+/* ─────────────── motion off switch ─────────────── */
+body.no-anim #dc10-card,
+body.no-anim .dc10-band,
+body.no-anim .dc10-band::before,
+body.no-anim .dc10-band::after,
+body.no-anim .dc10-ava::after,
+body.no-anim .dc10-hi #dashHello,
+body.no-anim .dc10-hi #dashSub,
+body.no-anim .dc10-right .hero-chip { animation: none !important; }
+body.no-anim .dc10-band { background-position: 0% 50%; }
+body.no-anim .dc10-band::after { display: none; }
+body.no-anim .dc10-right .hero-chip { transition: none; }
+body.no-anim .dc10-right .hero-chip:hover { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    #dc10-card, .dc10-band, .dc10-band::before, .dc10-band::after, .dc10-ava::after,
+    .dc10-hi #dashHello, .dc10-hi #dashSub, .dc10-right .hero-chip { animation: none !important; }
+    .dc10-band::after { display: none; }
+}
+
+@media (max-width: 640px) {
+    #dc10-card { border-radius: 16px; }
+    .dc10-band { padding: 16px 15px; gap: 13px; }
+    .dc10-ava { width: 42px; height: 42px; border-radius: 12px; font-size: 1rem; }
+    .dc10-hi { min-width: 0; }
+    .dc10-hi #dashHello { font-size: 1.08rem; }
+    .dc10-hi #dashSub { font-size: 0.72rem; }
+    .dc10-right { width: 100%; }
+    .dc10-right .hero-chips { width: 100%; }
+    .dc10-right .hero-chip { flex: 1; justify-content: center; padding: 8px 10px !important; }
+}

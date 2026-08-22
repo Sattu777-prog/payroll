@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance11.css
+   Eleventh additive layer: a COHESIVE POLISH PASS across the whole app.
+   Fills the gaps the base + earlier layers left, without duplicating them:
+     1. One themed scrollbar everywhere (base only styled a few containers).
+     2. Branded ::selection.
+     3. Consistent soft focus glow on every input / select / textarea.
+     4. A unified, gentle hover-lift for card-like .glass panels
+        (deliberately excludes sticky headers, tab bar, modals, the greeting
+         band, and the 3D-tilt KPI cards so nothing fights an existing effect).
+     5. A hairline top-sheen on cards for crisper depth.
+     6. A light sweep across solid buttons on hover.
+     7. Crisper badges with a subtle hover.
+   All colours come from the existing CSS variables, so light + dark both work.
+   The base `body.no-anim *` rule already neutralises animation/transition; the
+   continuous / decorative bits are additionally guarded here and under
+   prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── 1. themed scrollbar (whole app) ─────────────── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-card-border) transparent;
+}
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.55), rgba(139, 92, 246, 0.55));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ─────────────── 2. branded selection ─────────────── */
+::selection { background: rgba(99, 102, 241, 0.28); color: var(--text-primary); }
+::-moz-selection { background: rgba(99, 102, 241, 0.28); color: var(--text-primary); }
+
+/* ─────────────── 3. consistent focus glow on all form controls ───────────────
+   Base only shifts border-color on .field-input:focus. This adds a soft accent
+   halo to every control uniformly (mouse + keyboard); enhance2's :focus-visible
+   ring still handles crisp keyboard outlines on top. */
+.field-input:focus,
+.search-input:focus,
+.report-select:focus,
+.currency-select:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16), 0 2px 10px -4px rgba(99, 102, 241, 0.4);
+    outline: none;
+}
+
+/* ─────────────── 4. unified card hover-lift ───────────────
+   New behaviour — base .glass:hover only changes shadow + border. A small,
+   consistent rise ties every panel together. Excludes structural / already-
+   animated glass so nothing conflicts (sticky header, tab bar, modal card,
+   greeting band, and the JS 3D-tilt KPI cards). */
+.glass:not(.top-header):not(.tab-bar):not(.modal-card):not(.dc10-card):not(.tilt-card):not(.kpi-card):not(.dash-hero):hover {
+    transform: translateY(-3px);
+}
+
+/* ─────────────── 5. hairline top-sheen for depth ───────────────
+   A thin light line along the top edge of card-like glass makes the glass read
+   as glass. Layered as an inset highlight so it never replaces --shadow-card. */
+.glass.chart-card,
+.glass.qa-card,
+.kpi-card,
+.modal-card {
+    box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+body.dark-mode .glass.chart-card,
+body.dark-mode .glass.qa-card,
+body.dark-mode .kpi-card,
+body.dark-mode .modal-card {
+    box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────── 6. light sweep across solid buttons ───────────────
+   .btn::after is a static top gradient; ::before is free. A diagonal band
+   glides across on hover — subtle shine, no layout impact. */
+.btn-primary::before,
+.btn-violet::before,
+.btn-emerald::before,
+.btn-amber::before,
+.btn-danger::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 60%;
+    background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-180%) skewX(-18deg);
+    pointer-events: none;
+}
+.btn-primary:hover::before,
+.btn-violet:hover::before,
+.btn-emerald:hover::before,
+.btn-amber:hover::before,
+.btn-danger:hover::before {
+    transform: translateX(320%) skewX(-18deg);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─────────────── 7. crisper badges ───────────────
+   Base badges are flat tints. Add a hairline ring for definition and a tiny
+   hover rise (base already transitions transform). */
+.badge {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.badge:hover { transform: translateY(-1px); }
+
+/* ─────────────── motion guards ───────────────
+   base `body.no-anim *` already zeroes transitions; make the intent explicit
+   and cover reduced-motion for the decorative bits. */
+body.no-anim .glass:hover,
+body.no-anim .badge:hover { transform: none; }
+body.no-anim .btn-primary::before,
+body.no-anim .btn-violet::before,
+body.no-anim .btn-emerald::before,
+body.no-anim .btn-amber::before,
+body.no-anim .btn-danger::before { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .glass:hover, .badge:hover { transform: none; }
+    .btn-primary::before, .btn-violet::before, .btn-emerald::before,
+    .btn-amber::before, .btn-danger::before { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PERFORMANCE — cut the compositing cost that made the app feel laggy.
+   Measured on the live page: 13 large glass panels are visible at once on the
+   dashboard, each running `backdrop-filter: blur(18px) saturate(1.8)`. blur()
+   combined with saturate() is one of the most expensive things a browser can
+   composite, and it must be redrawn on every scroll, mouse-driven repaint and
+   animation frame — that is the lag. We keep the frosted-glass look but make it
+   much cheaper: a smaller blur radius and no per-layer saturate. enhance11.css
+   loads last, so these win over the base values by source order.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.top-header {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.tab-bar {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+/* Promote the two full-viewport, mouse-tracked atmosphere layers to their own
+   GPU layer so pointer-move repaints stay isolated from the blurred cards.
+   (will-change only — no `contain`, which would collapse these sizeless
+   fixed-position decorative layers.) */
+.fx-spotlight, .fx-aurora { will-change: transform, opacity; }
