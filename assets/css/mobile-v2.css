@@ -1,0 +1,220 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — mobile-v2.css  (FINAL mobile consolidation layer)
+   Loaded LAST so it wins on source order. Fixes the accreted floating-control
+   collisions from earlier enhance layers and gives phones one coherent system:
+     1. Floating "expanding-pill" bottom dock (icon-only inactive, label on active)
+     2. Exactly ONE quick-action FAB, pinned flush-right, never over the nav
+     3. Compact 2-up KPI grid  ·  4. Tidy header  ·  5. Spacing & polish
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+
+  :root {
+    --mnav-h: 60px;      /* height of the floating dock            */
+    --mnav-gap: 12px;    /* inset of the dock from screen edges    */
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     1. FLOATING PILL BOTTOM DOCK
+     The old edge-to-edge bar becomes a detached, rounded glass dock. Inactive
+     tabs shrink to their icon; the active tab expands into a gradient pill that
+     reveals its label. No JS needed — driven entirely by `.tab-btn.active`.
+     ───────────────────────────────────────────────────────────────────────── */
+  .tab-bar {
+    left: var(--mnav-gap);
+    right: var(--mnav-gap);
+    bottom: calc(var(--mnav-gap) + var(--safe-b));
+    top: auto;
+    margin: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 7px;
+    border-radius: 22px;
+    border: 1px solid var(--bg-card-border);
+    background: var(--bg-header);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: 0 14px 36px rgba(2, 6, 23, 0.30), 0 2px 8px rgba(2, 6, 23, 0.12);
+    z-index: 60;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;               /* inactive: natural (icon) width  */
+    flex-direction: row;
+    gap: 0;
+    justify-content: center;
+    min-width: 46px;
+    padding: 10px 11px;
+    border-radius: 15px;
+    font-size: 0;                 /* collapses the raw text node     */
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    transform: none !important;
+    transition: flex-grow .32s cubic-bezier(.34,1.4,.5,1),
+                background .25s ease, color .25s ease, padding .25s ease;
+  }
+  .tab-btn i { font-size: 1.18rem; }
+
+  .tab-indicator { display: none !important; }
+
+  .tab-btn.active {
+    flex: 1 1 auto;               /* active: absorb the free space    */
+    gap: 8px;
+    padding: 10px 15px;
+    font-size: .72rem;            /* reveals the label                */
+    font-weight: 700;
+    letter-spacing: .01em;
+    color: #fff;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, .40);
+  }
+  .tab-btn.active i { font-size: 1.05rem; }
+
+  /* clear the floating dock at the bottom of every view */
+  .page-wrap {
+    padding-bottom: calc(var(--mnav-h) + var(--mnav-gap) * 2 + var(--safe-b) + 8px);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     2. ONE FAB, NO COLLISIONS
+     Earlier layers stacked a "boost" FAB (enhance.js), a speed-dial
+     (enhance5.js) AND a scroll-top (enhance2.js) — three floating controls
+     fighting over one corner. We keep exactly one: the ⊕ speed-dial, pinned
+     flush-right and lifted clear above the dock. Its container was centre-
+     aligned, which pulled the main button left onto the Payroll tab — pinning
+     it flush-right is the real placement fix.
+     ───────────────────────────────────────────────────────────────────────── */
+  .fab.show { display: none !important; }
+  .scroll-top-btn { display: none !important; }   /* declutter: dock is always in reach */
+
+  .fab5 {
+    right: var(--mnav-gap);
+    bottom: calc(var(--mnav-h) + var(--mnav-gap) * 2 + var(--safe-b));
+    align-items: flex-end;        /* THE fix: keep the main button hard-right */
+    transition: transform .3s cubic-bezier(.34,1.4,.5,1);
+  }
+  .fab5-actions { align-items: flex-end; }
+  .fab5-main {
+    width: 56px; height: 56px;
+    box-shadow: 0 10px 26px rgba(59,130,246,.45), 0 2px 6px rgba(2,6,23,.2);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     3. COMPACT 2-UP KPI GRID
+     styles.css collapses the KPIs to a single column under 560px, turning the
+     dashboard into an endless scroll of four tall cards. Two-up is far denser
+     and still very legible on a 360px phone.
+     ───────────────────────────────────────────────────────────────────────── */
+  .kpi-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .kpi-card {
+    padding: 14px 13px 12px;
+    border-radius: 18px;
+  }
+  .kpi-top { gap: 6px; }
+  .kpi-label { font-size: .6rem; letter-spacing: .05em; }
+  .kpi-icon { width: 30px; height: 30px; font-size: .82rem; }
+  .kpi-val { font-size: 1.55rem; margin-top: 2px; }
+  .kpi-sub { font-size: .66rem; }
+  .kpi-spark-wrap { margin-top: 6px; }
+  .kpi-foot { font-size: .58rem; margin-top: 8px; }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     4. TIDY HEADER
+     Square, evenly-sized 44px tap targets; Convert collapses to its icon so the
+     action cluster stays on one tidy row even on narrow devices.
+     ───────────────────────────────────────────────────────────────────────── */
+  .top-header {
+    margin: .4rem .5rem 0;
+    padding: .55rem .7rem;
+    border-radius: 18px;
+    gap: .5rem;
+  }
+  .brand-title { font-size: 1.1rem; }
+  .header-actions { gap: .4rem; }
+  .header-actions .btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 13px;
+  }
+  #converterBtn { font-size: 0; }
+  #converterBtn i { font-size: 1rem; }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     5. SPACING & POLISH
+     ───────────────────────────────────────────────────────────────────────── */
+  .dash-hero { padding: 1.1rem 1.15rem; border-radius: 20px; }
+  .dash-hello { font-size: 1.15rem; }
+  .dash-sub { font-size: .78rem; }
+  .hero-chips { gap: 7px; }
+  .hero-chip { font-size: .72rem; padding: 7px 11px; }
+
+  .section-head { gap: .65rem; margin-bottom: 1rem; }
+  .section-title { font-size: 1.15rem; }
+  .section-head > div { width: 100%; }
+  .section-head .btn-primary { flex: 1 1 auto; justify-content: center; }
+
+  .chart-card { border-radius: 18px; }
+
+  /* Summary strips (dashboard insights, attendance/payroll/leave summaries) are
+     4-up grids whose min-content width overflowed the viewport → horizontal
+     page scroll. Collapse to 2-up and let cells shrink. */
+  .att-summary-row,
+  .pay-summary-row,
+  .leave-summary,
+  .report-kpis { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .att-summary-row > *,
+  .pay-summary-row > *,
+  .leave-summary > *,
+  .report-kpis > * { min-width: 0; }
+  .att-summary-num { font-size: 1.1rem; }
+
+  /* smoother momentum scrolling for the whole app */
+  .page-wrap { -webkit-overflow-scrolling: touch; }
+}
+
+/* respect the global animation toggle / reduced-motion for the dock pill */
+body.no-anim .tab-btn { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .tab-btn { transition: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLOBAL: retire the redundant contextual "boost" (lightning) FAB everywhere.
+   Its job — launch the primary action for the current tab — is fully covered
+   by the quick-action speed-dial (the "+"), so two floating buttons only added
+   clutter and collisions. Removed on every viewport, not just phones.
+   ───────────────────────────────────────────────────────────────────────── */
+.fab, .fab.show { display: none !important; }
+
+/* tactile press feedback on the dock tabs (phones) */
+@media (max-width: 640px) {
+  .tab-btn:active { transform: scale(0.9) !important; }
+  .fab5-main:active { transform: scale(0.92); }
+}
+
+/* ── swipe-between-tabs hint: a brief directional glow at the screen edge ── */
+.swipe-edge {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 46px;
+  z-index: 58;
+  pointer-events: none;
+  opacity: 0;
+}
+.swipe-edge.left  { left: 0;  background: radial-gradient(circle at left,  rgba(59,130,246,.5), transparent 70%); }
+.swipe-edge.right { right: 0; background: radial-gradient(circle at right, rgba(124,58,237,.5), transparent 70%); }
+.swipe-edge.flash { animation: swipeFlash .5s ease; }
+@keyframes swipeFlash { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+body.no-anim .swipe-edge.flash { animation: none; }
