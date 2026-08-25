@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — header-refine.css   (loads last · header polish only)
+   Purely visual enhancement of the existing top-header cluster — no elements
+   are added or removed. Refines the bar, brand mark, live-clock pill, the
+   icon buttons (bell / settings), the Convert button and the divider, on both
+   desktop and mobile. Themed via existing CSS variables; honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   1. THE BAR — more depth, a glassy top highlight, a soft inner sheen.
+   overflow stays visible so the notification badge can sit outside the button.
+   ───────────────────────────────────────────────────────────────────────── */
+.top-header {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 42%),
+    var(--bg-header);
+  border-color: color-mix(in srgb, var(--bg-card-border) 80%, var(--accent) 20%);
+  box-shadow:
+    0 18px 44px -18px rgba(15, 23, 42, 0.45),
+    0 2px 10px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* faint accent aura bleeding in from the corners — sits behind the content */
+.top-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(140% 180% at 0% 0%, rgba(59, 130, 246, 0.10), transparent 55%),
+    radial-gradient(140% 180% at 100% 0%, rgba(124, 58, 237, 0.10), transparent 55%);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   2. BRAND MARK — a crisper, more three-dimensional logo tile and a title
+   with a slow gradient shimmer.
+   ───────────────────────────────────────────────────────────────────────── */
+.brand-icon {
+  border-radius: 0.95rem;
+  background: linear-gradient(140deg, #60a5fa 0%, #3b82f6 45%, #7c3aed 100%);
+  box-shadow:
+    0 6px 18px rgba(59, 130, 246, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -3px 8px rgba(76, 29, 149, 0.35);
+}
+.brand-icon i {
+  filter: drop-shadow(0 1px 2px rgba(30, 27, 75, 0.45));
+}
+
+.brand-title {
+  background: linear-gradient(110deg, #3b82f6, #7c3aed, #3b82f6);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: hdrTitleShimmer 9s ease-in-out infinite;
+}
+@keyframes hdrTitleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.brand-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 0.68rem;
+  opacity: 0.9;
+}
+body.no-anim .brand-title { animation: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   3. LIVE-CLOCK PILL — glassier, the time reads as the hero with a soft glow.
+   ───────────────────────────────────────────────────────────────────────── */
+.live-clock.lc6 {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(124, 58, 237, 0.10));
+  border-color: rgba(99, 102, 241, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 10px rgba(59, 130, 246, 0.10);
+}
+.live-clock.lc6 .live-clock-time {
+  color: #60a5fa;
+  text-shadow: 0 0 14px rgba(59, 130, 246, 0.45);
+}
+.live-clock.lc6 .live-clock-date {
+  border-left-color: rgba(99, 102, 241, 0.35);
+  color: var(--text-secondary);
+}
+.lc6-divider {
+  background: linear-gradient(180deg, transparent, var(--bg-card-border) 30% 70%, transparent);
+  height: 30px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   4. ICON BUTTONS (bell + settings) — even square tap targets, a clean hover
+   lift with an accent halo, refined notification badge.
+   ───────────────────────────────────────────────────────────────────────── */
+#notiBtn,
+#setBtn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 0.7rem;
+}
+#notiBtn i,
+#setBtn i { font-size: 0.95rem; }
+
+#notiBtn:hover,
+#setBtn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 8px 18px -6px rgba(59, 130, 246, 0.55);
+}
+#notiBtn:active,
+#setBtn:active { transform: translateY(0) scale(0.94); }
+
+.hx-badge {
+  box-shadow: 0 0 0 2px var(--bg-header), 0 2px 6px rgba(239, 68, 68, 0.5);
+  font-weight: 800;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   5. CONVERT — a sweeping sheen on hover over the existing gradient.
+   ───────────────────────────────────────────────────────────────────────── */
+#converterBtn {
+  box-shadow: 0 6px 18px -4px rgba(99, 102, 241, 0.55);
+}
+#converterBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+#converterBtn:hover::before { left: 140%; }
+body.no-anim #converterBtn::before { transition: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   6. MOBILE (≤640px) — the clock is already hidden here, leaving brand +
+   bell + Convert + settings. Keep everything on one tidy row with full 44px
+   tap targets and a compact brand mark. Complements mobile-v2.css.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .top-header {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .brand { gap: 0.6rem; min-width: 0; flex: 1 1 auto; }
+  .brand-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 0.8rem;
+    flex-shrink: 0;
+  }
+  .brand-icon i { font-size: 1rem; }
+  /* let a long title ellipsize instead of pushing the actions off-screen */
+  .brand > div { min-width: 0; }
+  .brand-title {
+    font-size: 1.12rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand-sub {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-actions {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 0.4rem;
+  }
+  /* restore comfortable 44px square tap targets on phones */
+  #notiBtn,
+  #setBtn,
+  #converterBtn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    border-radius: 0.8rem;
+  }
+  #notiBtn i,
+  #setBtn i,
+  #converterBtn i { font-size: 1.05rem; }
+  /* nudge the badge in so it doesn't clip at the bar's rounded edge */
+  #notiBtn .hx-badge { top: -3px; right: -3px; }
+}
+
