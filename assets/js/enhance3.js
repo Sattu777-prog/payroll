@@ -468,8 +468,12 @@
         window.addEventListener('storage', scheduleRefresh);
         window.addEventListener('resize', () => { if (Pulse.el.canvas) Pulse.draw(1); });
 
-        // Gentle "live" heartbeat so the panels reflect edits made elsewhere.
-        setInterval(refreshData, 20000);
+        // Gentle "live" heartbeat only when page is visible and dashboard is active
+        setInterval(() => {
+            if (document.hidden) return;
+            const dash = $('#dashboardSection');
+            if (dash && !dash.classList.contains('hidden')) refreshData();
+        }, 30000);
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

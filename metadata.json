@@ -1,0 +1,6 @@
+{
+  "name": "Payroll Nexus",
+  "description": "HR and payroll intelligence platform with financial dashboard, employee management, and attendance tracking",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -14,6 +14,10 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# SQLite WAL files
+backend/data/*.db-shm
+backend/data/*.db-wal
+
 # Build output
 dist/
 build/

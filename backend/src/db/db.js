@@ -24,6 +24,17 @@ CREATE INDEX IF NOT EXISTS idx_leave_employee ON leave_requests(employee_id);
 CREATE INDEX IF NOT EXISTS idx_leave_status ON leave_requests(status);
 CREATE TABLE IF NOT EXISTS payroll (id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))), employee_id TEXT NOT NULL REFERENCES employees(id) ON DELETE CASCADE, period_month INTEGER NOT NULL CHECK (period_month BETWEEN 1 AND 12), period_year INTEGER NOT NULL, work_days INTEGER NOT NULL DEFAULT 0, leave_days INTEGER NOT NULL DEFAULT 0, basic_usd REAL NOT NULL DEFAULT 0, allowances_usd REAL NOT NULL DEFAULT 0, tax_usd REAL NOT NULL DEFAULT 0, net_usd REAL NOT NULL DEFAULT 0, generated_by TEXT REFERENCES users(id) ON DELETE SET NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE (employee_id, period_month, period_year));
 CREATE INDEX IF NOT EXISTS idx_payroll_period ON payroll(period_year, period_month);
+
+INSERT OR IGNORE INTO roles (id, code, name, description) VALUES
+(1, 'admin', 'Administrator', 'Full system access'),
+(2, 'manager', 'Manager', 'HR / management access'),
+(3, 'employee', 'Employee', 'Self-service access');
+
+INSERT OR IGNORE INTO departments (id, name, description) VALUES
+(1, 'Engineering', 'Software & platform engineering'),
+(2, 'Human Resources', 'People operations'),
+(3, 'Sales', 'Revenue & accounts'),
+(4, 'Finance', 'Budgeting & accounting');
 `);
 
 export const all = (sql, ...p) => db.prepare(sql).all(...p);

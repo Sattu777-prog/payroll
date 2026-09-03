@@ -253,19 +253,86 @@ async function fetchFxRates(force = false) {
     fxFetching = true;
     fxStatus = 'loading';
     updateFxStatusUI();
+
+    let fetchedRates = null;
+
+    // Strategy 1: Local /api/fx endpoint (same-origin proxy with server-side caching)
     try {
-        const symbols = CURRENCIES.filter(c => c.code !== 'USD').map(c => c.code).join(',');
-        const res = await fetch(`https://api.frankfurter.app/latest?from=USD&to=${symbols}`);
-        if (!res.ok) throw new Error('FX request failed: ' + res.status);
-        const data = await res.json();
-        if (!data || typeof data.rates !== 'object') throw new Error('Malformed FX response');
-        fxRates = { USD: 1, ...data.rates };
-        fxTimestamp = new Date().toISOString();
-        localStorage.setItem('nexus_fx_rates', JSON.stringify(fxRates));
-        localStorage.setItem('nexus_fx_timestamp', fxTimestamp);
-        fxStatus = 'live';
+        const res = await fetch(`/api/fx${force ? '?force=true' : ''}`, {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && typeof data.rates === 'object' && Object.keys(data.rates).length > 1) {
+                fetchedRates = data.rates;
+            }
+        }
+    } catch {
+        // Fallback to client-side direct endpoints
+    }
+
+    // Strategy 2: Direct public CDN APIs with CORS support
+    if (!fetchedRates) {
+        const directEndpoints = [
+            'https://latest.currency-api.pages.dev/v1/currencies/usd.min.json',
+            'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json',
+            'https://open.er-api.com/v6/latest/USD',
+            'https://api.frankfurter.dev/v1/latest?from=USD'
+        ];
+
+        for (const url of directEndpoints) {
+            try {
+                const ctrl = window.AbortController ? new AbortController() : null;
+                const timer = ctrl ? setTimeout(() => ctrl.abort(), 6000) : null;
+                const res = await fetch(url, ctrl ? { signal: ctrl.signal } : undefined);
+                if (timer) clearTimeout(timer);
+                if (!res.ok) continue;
+
+                const data = await res.json();
+                if (data?.usd && typeof data.usd === 'object') {
+                    // currency-api schema
+                    const parsed = { USD: 1 };
+                    CURRENCIES.forEach(c => {
+                        const val = data.usd[c.code.toLowerCase()];
+                        if (typeof val === 'number') parsed[c.code] = val;
+                    });
+                    if (Object.keys(parsed).length > 2) {
+                        fetchedRates = parsed;
+                        break;
+                    }
+                } else if (data?.rates && typeof data.rates === 'object') {
+                    // open.er-api or frankfurter schema
+                    fetchedRates = { USD: 1, ...data.rates };
+                    break;
+                }
+            } catch {
+                // Try next endpoint
+            }
+        }
+    }
+
+    try {
+        if (fetchedRates) {
+            // Fill any missing currency codes with fallback approximations
+            CURRENCIES.forEach(c => {
+                if (fetchedRates[c.code] === undefined && FALLBACK_RATES[c.code] !== undefined) {
+                    fetchedRates[c.code] = FALLBACK_RATES[c.code];
+                }
+            });
+            fxRates = fetchedRates;
+            fxTimestamp = new Date().toISOString();
+            localStorage.setItem('nexus_fx_rates', JSON.stringify(fxRates));
+            localStorage.setItem('nexus_fx_timestamp', fxTimestamp);
+            fxStatus = 'live';
+        } else {
+            console.warn('FX rate live fetch unavailable; using fallback rates');
+            if (Object.keys(fxRates).length <= 1) {
+                fxRates = { ...FALLBACK_RATES };
+            }
+            fxStatus = Object.keys(fxRates).length > 1 ? 'stale' : 'offline';
+        }
     } catch (err) {
-        console.error('FX rate fetch failed:', err);
+        console.warn('FX rate processing warning:', err);
         fxStatus = Object.keys(fxRates).length > 1 ? 'stale' : 'offline';
     } finally {
         fxFetching = false;
@@ -603,7 +670,7 @@ function renderTrendBars(labels, vals) {
     const mx = Math.max(...vals) || 1;
     const barColors = ['#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6', '#8b5cf6'];
     container.innerHTML = labels.map((lbl, i) => `
-        <div class="bar-col">
+        <div class="bar-col" title="${esc(lbl)}: ${fmtCurrency(vals[i])}" data-value="${fmtCurrency(vals[i])}">
             <div class="bar-track">
                 <div class="bar-fill" data-h="${Math.round(vals[i] / mx * 100)}" style="background:${barColors[i]};height:0%"></div>
             </div>
@@ -651,17 +718,22 @@ function renderDeptBars() {
         return;
     }
     const dMap = {};
+    const dCounts = {};
     employees.forEach(emp => {
         const dept = emp.department || 'General';
         const latest = payrolls.filter(p => p.employeeId === emp.id).sort((a, b) => b.year - a.year || b.month - a.month)[0];
         dMap[dept] = (dMap[dept] || 0) + (latest?.netSalary || (emp.basicSalary || 0) * 0.85);
+        dCounts[dept] = (dCounts[dept] || 0) + 1;
     });
     const entries = Object.entries(dMap).sort((a, b) => b[1] - a[1]);
     const mx = entries[0]?.[1] || 1;
     const dColors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#14b8a6'];
     container.innerHTML = entries.map(([dept, amt], i) => `
-        <div class="dept-row">
-            <div class="dept-head"><span class="dept-name">${esc(dept)}</span><span class="dept-amt">${fmtCurrency(amt)}</span></div>
+        <div class="dept-row" title="${esc(dept)}: ${dCounts[dept]} staff, ${fmtCurrency(amt)}">
+            <div class="dept-head">
+                <span class="dept-name">${esc(dept)} <span style="font-size:0.72rem;color:var(--text-muted);font-weight:500;">(${dCounts[dept]})</span></span>
+                <span class="dept-amt">${fmtCurrency(amt)}</span>
+            </div>
             <div class="dept-bar-track"><div class="dept-bar-fill" data-w="${Math.round(amt / mx * 100)}" style="background:${dColors[i % dColors.length]};width:0%"></div></div>
         </div>
     `).join('');
@@ -2139,19 +2211,23 @@ function populateMonths() {
     setTheme(savedTheme);
     requestAnimationFrame(updateTabIndicator);
 
-    const renders = [renderDashboard, renderEmployees, renderAttendance, renderLeaves, renderPayroll, renderReports];
-    renders.forEach(fn => {
-        try { fn(); }
-        catch (err) { console.error(`Init render failed: ${fn.name}`, err); }
-    });
+    // Render only the active tab initially to keep loading snappy and avoid hidden DOM layout thrashing
+    try {
+        renderDashboard();
+    } catch (err) {
+        console.error('Init render failed: renderDashboard', err);
+    }
 
-    // Fetch live FX rates in the background (or load from cache) and
-    // re-render currency-aware views once they're available.
+    // Fetch live FX rates in the background and refresh only the active visible tab
     fetchFxRates().then(() => {
-        renders.forEach(fn => {
-            try { fn(); }
-            catch (err) { console.error(`FX re-render failed: ${fn.name}`, err); }
-        });
+        const activeTab = document.querySelector('.tab-btn.active')?.dataset?.tab || 'dashboard';
+        if (activeTab === 'dashboard') {
+            try { renderDashboard(); } catch (_) {}
+        } else if (activeTab === 'payroll') {
+            try { renderPayroll(); } catch (_) {}
+        } else if (activeTab === 'reports') {
+            try { renderReports(); } catch (_) {}
+        }
     });
 })();
 
@@ -2309,7 +2385,11 @@ function updateDashHero() {
     mo.observe(el, { childList: true, subtree: true, characterData: true });
 });
 // Cover changes not visible as DOM mutations (approvals count, payroll periods)
-setInterval(updateDashHero, 15000);
+setInterval(() => {
+    if (document.hidden) return;
+    const dash = document.getElementById('dashboardSection');
+    if (dash && !dash.classList.contains('hidden')) updateDashHero();
+}, 25000);
 updateDashHero();
 
 // ── Hero CTA button ──
@@ -2318,27 +2398,7 @@ if (heroReportsBtn) {
     heroReportsBtn.addEventListener('click', () => switchToTab('reports'));
 }
 
-// ── 3D tilt interaction on KPI cards ──
-const _tiltReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-function tiltDisabled() {
-    return document.body.classList.contains('no-anim') || _tiltReduce.matches;
-}
-document.querySelectorAll('.tilt-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        if (tiltDisabled()) { if (card.style.transform) card.style.transform = ''; return; }
-        const r = card.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width - 0.5;
-        const py = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transform =
-            'perspective(800px) rotateX(' + (-py * 6).toFixed(2) + 'deg) rotateY(' + (px * 6).toFixed(2) +
-            'deg) translateY(-3px)';
-        card.classList.add('tilting');
-    });
-    card.addEventListener('mouseleave', () => {
-        card.classList.remove('tilting');
-        card.style.transform = '';
-    });
-});
+// ── KPI card interactions handled natively by CSS for 60fps performance ──
 
 function updateTabIndicator() {
     const bar = document.querySelector('.tab-bar');
@@ -2353,25 +2413,11 @@ function updateTabIndicator() {
 }
 
 (function initAtmosphere() {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const spotlight = document.getElementById('fxSpotlight');
-    let spotRaf = 0;
-
-    if (!reduce && spotlight) {
-        document.addEventListener('pointermove', (e) => {
-            if (document.body.classList.contains('no-anim')) return;
-            if (spotRaf) return;
-            const x = e.clientX;
-            const y = e.clientY;
-            spotRaf = requestAnimationFrame(() => {
-                spotlight.style.setProperty('--spot-x', x + 'px');
-                spotlight.style.setProperty('--spot-y', y + 'px');
-                spotRaf = 0;
-            });
-        }, { passive: true });
-    }
-
     updateTabIndicator();
-    window.addEventListener('resize', updateTabIndicator);
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(updateTabIndicator, 100);
+    });
     window.addEventListener('load', updateTabIndicator);
 })();

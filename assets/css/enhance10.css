@@ -26,32 +26,22 @@
     position: relative; isolation: isolate;
     display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
     padding: 20px 24px; color: #fff;
-    background: linear-gradient(115deg, #2563eb 0%, #4f46e5 26%, #7c3aed 52%, #a855f7 74%, #2563eb 100%);
-    background-size: 260% 100%;
-    animation: dc10Flow 20s linear infinite;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3730a3 40%, #5b21b6 100%);
 }
-@keyframes dc10Flow { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
 
-/* drifting light orbs */
+/* Subtle static light accents */
 .dc10-band::before {
-    content: ''; position: absolute; inset: -45% -12%; pointer-events: none; z-index: 0;
-    background:
-        radial-gradient(38% 62% at 16% 22%, rgba(255, 255, 255, 0.3), transparent 62%),
-        radial-gradient(32% 54% at 84% 78%, rgba(56, 189, 248, 0.38), transparent 64%);
-    animation: dc10Drift 15s ease-in-out infinite alternate;
-}
-@keyframes dc10Drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(3%, -5%, 0) scale(1.1); } }
-
-/* slow sheen sweep */
-.dc10-band::after {
     content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, 0.22) 48%, transparent 62%);
-    transform: translateX(-130%);
-    animation: dc10Sheen 8s ease-in-out infinite;
+    background:
+        radial-gradient(40% 70% at 20% 20%, rgba(255, 255, 255, 0.18), transparent 70%),
+        radial-gradient(35% 60% at 80% 80%, rgba(56, 189, 248, 0.22), transparent 70%);
 }
-@keyframes dc10Sheen { 0%, 68% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
 
-/* ─────────────── avatar with a pulsing ring ─────────────── */
+.dc10-band::after {
+    display: none;
+}
+
+/* ─────────────── avatar ─────────────── */
 .dc10-ava, .dc10-hi, .dc10-right { position: relative; z-index: 1; }
 .dc10-ava {
     width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
@@ -59,14 +49,10 @@
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.38);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(6px);
 }
 .dc10-ava::after {
-    content: ''; position: absolute; inset: -7px; border-radius: 19px; pointer-events: none;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    animation: dc10Pulse 3s ease-out infinite;
+    display: none;
 }
-@keyframes dc10Pulse { 0% { opacity: 0.85; transform: scale(0.88); } 100% { opacity: 0; transform: scale(1.22); } }
 
 /* ─────────────── greeting text ─────────────── */
 .dc10-hi { flex: 1; min-width: 200px; }
