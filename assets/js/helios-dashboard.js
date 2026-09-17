@@ -891,6 +891,15 @@
         role: 'admin',
         avatar: 'assets/images/avatar.jpg'
     };
+    try {
+        const cachedUser = localStorage.getItem('helios_custom_user');
+        if (cachedUser) {
+            const parsed = JSON.parse(cachedUser);
+            if (parsed && typeof parsed === 'object') {
+                currentUserState = { ...currentUserState, ...parsed };
+            }
+        }
+    } catch (e) {}
 
     function updateDashboardGreeting() {
         const dashHello = document.getElementById('dashHello');
@@ -930,11 +939,16 @@
     function updatePillDisplay(user) {
         if (!user) return;
         currentUserState = { ...currentUserState, ...user };
+        try {
+            localStorage.setItem('helios_custom_user', JSON.stringify(currentUserState));
+        } catch (e) {}
 
         const nameEl = document.getElementById('heliosUserName');
         const emailEl = document.getElementById('heliosUserEmail');
         const roleBadge = document.getElementById('heliosUserRoleBadge');
         const avatarImg = document.getElementById('heliosAvatarImg');
+        const modalAvatar = document.getElementById('modalProfileAvatar');
+        const drawerAvatars = document.querySelectorAll('.pn-drawer-avatar');
 
         if (nameEl) nameEl.textContent = currentUserState.name;
         if (emailEl) emailEl.textContent = currentUserState.email;
@@ -947,6 +961,12 @@
         }
         if (avatarImg && currentUserState.avatar) {
             avatarImg.src = currentUserState.avatar;
+        }
+        if (modalAvatar && currentUserState.avatar) {
+            modalAvatar.src = currentUserState.avatar;
+        }
+        if (drawerAvatars && currentUserState.avatar) {
+            drawerAvatars.forEach(img => { img.src = currentUserState.avatar; });
         }
     }
 
@@ -976,118 +996,262 @@
             modal.id = 'heliosAuthModal';
             modal.className = 'modal-backdrop';
             modal.innerHTML = `
-                <div class="modal-card" style="max-width:38rem;background:#13141c;border:1px solid rgba(182,140,255,0.25);box-shadow:0 20px 50px rgba(0,0,0,0.8);">
-                    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:14px;">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg, rgba(182,140,255,0.3) 0%, rgba(156,115,232,0.15) 100%);display:flex;align-items:center;justify-content:center;color:#b68cff;box-shadow:0 0 12px rgba(182,140,255,0.3);">
-                                <i class="fas fa-user-shield" style="font-size:17px;"></i>
+                <div class="modal-card helios-auth-modal-card">
+                    <!-- Modal Header (CSS selector 2) -->
+                    <div class="modal-header helios-auth-modal-header">
+                        <div class="helios-auth-header-main">
+                            <div class="helios-auth-icon-badge">
+                                <i class="fas fa-shield-halved"></i>
+                                <span class="helios-status-pulse-dot" title="Security Gateway Active"></span>
                             </div>
-                            <div>
-                                <h3 style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Helios Identity & Access Gateway</h3>
-                                <div style="font-size:11.5px;color:#8f8d99;">User & Administrator Profile Management</div>
+                            <div class="helios-auth-title-group">
+                                <div class="helios-auth-title-row">
+                                    <h3 class="helios-auth-title">Helios Identity & Access Gateway</h3>
+                                    <span class="helios-security-pill"><i class="fas fa-lock"></i> TLS 1.3</span>
+                                </div>
+                                <div class="helios-auth-subtitle">
+                                    <span class="helios-status-text"><i class="fas fa-circle-check"></i> Zero-Trust Session Active</span>
+                                    <span class="helios-dot-sep">&bull;</span>
+                                    <span>Administrator & Member Directory</span>
+                                </div>
                             </div>
                         </div>
-                        <button class="modal-close" id="closeHeliosAuthModal" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
+                        <button class="modal-close helios-modal-close-btn" id="closeHeliosAuthModal" aria-label="Close modal">
+                            <i class="fas fa-xmark"></i>
+                        </button>
                     </div>
 
-                    <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;">
+                    <!-- Modal Body (CSS selector 1) -->
+                    <div class="modal-body helios-auth-modal-body">
                         <!-- Navigation Tabs: Profile vs Login -->
                         <div class="helios-auth-tabs">
-                            <button type="button" class="helios-auth-tab active" id="tabBtnProfile"><i class="fas fa-id-card"></i> Active Profile</button>
-                            <button type="button" class="helios-auth-tab" id="tabBtnLogin"><i class="fas fa-right-to-bracket"></i> Login & OAuth Gateway</button>
+                            <button type="button" class="helios-auth-tab active" id="tabBtnProfile">
+                                <i class="fas fa-id-card"></i>
+                                <span>Active Identity Profile</span>
+                            </button>
+                            <button type="button" class="helios-auth-tab" id="tabBtnLogin">
+                                <i class="fas fa-right-to-bracket"></i>
+                                <span>Login & OAuth Gateway</span>
+                            </button>
                         </div>
 
                         <!-- Panel 1: Profile & Role Setup -->
-                        <div id="authProfilePanel">
-                            <div style="display:flex;align-items:center;gap:16px;background:#191a24;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);margin-bottom:18px;">
-                                <img src="${currentUserState.avatar}" alt="Avatar" id="modalProfileAvatar" style="width:54px;height:54px;border-radius:50%;border:2px solid #b68cff;object-fit:cover;">
-                                <div style="flex:1;">
-                                    <div style="display:flex;align-items:center;gap:8px;">
-                                        <h4 id="modalProfileName" style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">${currentUserState.name}</h4>
-                                        <span id="modalProfileRoleBadge" class="helios-role-badge ${currentUserState.role}">${currentUserState.role}</span>
+                        <div id="authProfilePanel" class="helios-auth-panel">
+                            <!-- Executive Identity Card -->
+                            <div class="helios-identity-card">
+                                <div class="helios-avatar-container" id="modalAvatarContainer" title="Click or drop an image to change profile photo" tabindex="0" role="button" aria-label="Change profile photo">
+                                    <img src="${currentUserState.avatar}" alt="Avatar" id="modalProfileAvatar" class="helios-profile-avatar">
+                                    <div class="helios-avatar-hover-overlay" id="avatarHoverOverlay" title="Click to upload photo">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Change</span>
                                     </div>
-                                    <div id="modalProfileEmail" style="font-size:12.5px;color:#8f8d99;margin-top:2px;">${currentUserState.email}</div>
-                                    <div style="font-size:11px;color:#62c88a;margin-top:4px;display:flex;align-items:center;gap:5px;">
-                                        <i class="fas fa-circle-check"></i> System session authenticated & verified
+                                    <button type="button" class="helios-avatar-edit-badge" id="btnTriggerAvatarUpload" title="Click to upload new photo" aria-label="Upload photo">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                    <span class="helios-avatar-online-dot" title="Authenticated & Online"></span>
+                                    <input type="file" id="profileAvatarFileInput" accept="image/png, image/jpeg, image/webp, image/gif, image/svg+xml" style="display:none;" aria-label="Upload profile image">
+                                </div>
+                                <div class="helios-identity-info">
+                                    <div class="helios-identity-top">
+                                        <h4 id="modalProfileName" class="helios-profile-name">${currentUserState.name}</h4>
+                                        <span id="modalProfileRoleBadge" class="helios-role-badge ${currentUserState.role}">${currentUserState.role}</span>
+                                        <span class="helios-verified-tag"><i class="fas fa-shield-check"></i> Verified</span>
+                                    </div>
+                                    <div id="modalProfileEmail" class="helios-profile-email">
+                                        <i class="fas fa-envelope"></i> ${currentUserState.email}
+                                    </div>
+                                    <div class="helios-avatar-quick-bar">
+                                        <button type="button" class="helios-avatar-upload-btn" id="btnQuickUploadPhoto" title="Choose image file from your device">
+                                            <i class="fas fa-camera"></i>
+                                            <span>Upload Picture</span>
+                                        </button>
+                                        <div class="helios-preset-avatars-wrap">
+                                            <span class="preset-label">Presets:</span>
+                                            <div class="helios-preset-avatars">
+                                                <button type="button" class="preset-avatar-btn" data-avatar="assets/images/avatar.jpg" title="Nadia (Default)">
+                                                    <img src="assets/images/avatar.jpg" alt="Preset 1">
+                                                </button>
+                                                <button type="button" class="preset-avatar-btn" data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" title="Elena">
+                                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Preset 2">
+                                                </button>
+                                                <button type="button" class="preset-avatar-btn" data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" title="Marcus">
+                                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="Preset 3">
+                                                </button>
+                                                <button type="button" class="preset-avatar-btn" data-avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" title="Sarah">
+                                                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" alt="Preset 4">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="helios-telemetry-chips">
+                                        <div class="helios-telemetry-chip">
+                                            <i class="fas fa-fingerprint"></i> 2FA: Active
+                                        </div>
+                                        <div class="helios-telemetry-chip">
+                                            <i class="fas fa-network-wired"></i> Gateway: Nexus-01
+                                        </div>
+                                        <div class="helios-telemetry-chip success">
+                                            <i class="fas fa-circle-dot"></i> Status: Authorized
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <form id="heliosProfileForm" style="display:flex;flex-direction:column;gap:14px;">
+                            <form id="heliosProfileForm" class="helios-auth-form">
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size:12px;">Display Full Name</label>
-                                    <input type="text" id="profileFullNameInput" class="form-input" value="${currentUserState.name}" required>
+                                    <label class="form-label" for="profileFullNameInput">
+                                        <span>Display Full Name</span>
+                                        <span class="label-hint">Visible on payroll records</span>
+                                    </label>
+                                    <div class="input-icon-wrap">
+                                        <i class="fas fa-user input-leading-icon"></i>
+                                        <input type="text" id="profileFullNameInput" class="form-input with-leading-icon" value="${currentUserState.name}" required>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size:12px;">Account Email</label>
-                                    <input type="email" id="profileEmailInput" class="form-input" value="${currentUserState.email}" required>
+                                    <label class="form-label" for="profileEmailInput">
+                                        <span>Account Email</span>
+                                        <span class="label-hint">Primary corporate email</span>
+                                    </label>
+                                    <div class="input-icon-wrap">
+                                        <i class="fas fa-envelope input-leading-icon"></i>
+                                        <input type="email" id="profileEmailInput" class="form-input with-leading-icon" value="${currentUserState.email}" required>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size:12px;">System Access Role (User / Admin)</label>
-                                    <select id="profileRoleSelect" class="form-input" style="background:#1a1b24;color:#ffffff;">
-                                        <option value="admin" ${currentUserState.role === 'admin' ? 'selected' : ''}>Administrator — Full System & Ledger Control</option>
-                                        <option value="manager" ${currentUserState.role === 'manager' ? 'selected' : ''}>Manager — People & Compensation Operations</option>
-                                        <option value="employee" ${currentUserState.role === 'employee' ? 'selected' : ''}>Employee / User — Self-Service & View Access</option>
-                                    </select>
+                                    <label class="form-label" for="profileRoleSelect">
+                                        <span>System Access Role & Privileges</span>
+                                        <span class="label-hint">Defines permissions & actions</span>
+                                    </label>
+                                    <div class="input-icon-wrap select-wrap">
+                                        <i class="fas fa-shield-alt input-leading-icon"></i>
+                                        <select id="profileRoleSelect" class="form-input with-leading-icon">
+                                            <option value="admin" ${currentUserState.role === 'admin' ? 'selected' : ''}>Administrator — Full System, Payroll Run & Ledger Control</option>
+                                            <option value="manager" ${currentUserState.role === 'manager' ? 'selected' : ''}>Manager — People, Compliance & Review Operations</option>
+                                            <option value="employee" ${currentUserState.role === 'employee' ? 'selected' : ''}>Employee / User — Self-Service Paystubs & Profile Access</option>
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <div id="profileFormNotice" style="display:none;padding:8px 12px;border-radius:8px;font-size:12px;"></div>
+                                <div id="profileFormNotice" class="helios-auth-notice" style="display:none;"></div>
 
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-                                    <button type="button" class="btn btn-ghost" id="logoutHeliosBtn" style="color:#ff6b6b;"><i class="fas fa-arrow-right-from-bracket"></i> Sign Out</button>
-                                    <button type="submit" class="btn btn-primary" id="saveProfileBtn"><i class="fas fa-floppy-disk"></i> Save Profile Setup</button>
+                                <div class="helios-auth-actions">
+                                    <button type="button" class="btn btn-ghost helios-btn-signout" id="logoutHeliosBtn">
+                                        <i class="fas fa-arrow-right-from-bracket"></i> Sign Out
+                                    </button>
+                                    <button type="submit" class="btn btn-primary helios-btn-save" id="saveProfileBtn">
+                                        <i class="fas fa-floppy-disk"></i> Save Profile Setup
+                                    </button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- Panel 2: Full Login & OAuth Gateway -->
-                        <div id="authLoginPanel" style="display:none;">
+                        <div id="authLoginPanel" class="helios-auth-panel" style="display:none;">
                             <!-- 1-Click Role Quick Pick for easy testing -->
-                            <div style="margin-bottom:14px;">
-                                <div style="font-size:11px;color:#706e78;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Quick Profile Switches:</div>
+                            <div class="helios-quick-accounts-section">
+                                <div class="helios-section-subhead">
+                                    <span>Instant Workstation Switch:</span>
+                                    <span class="subhead-badge">1-Click Fast Auth</span>
+                                </div>
                                 <div class="helios-quick-accounts">
-                                    <button type="button" class="helios-quick-acc-btn" data-email="admin@nexus.dev" data-name="Alex Admin" data-role="admin">
-                                        <i class="fas fa-crown" style="color:#b68cff;"></i> Admin
+                                    <button type="button" class="helios-quick-acc-btn admin" data-email="admin@nexus.dev" data-name="Alex Admin" data-role="admin">
+                                        <div class="quick-acc-icon-wrap"><i class="fas fa-crown"></i></div>
+                                        <div class="quick-acc-details">
+                                            <div class="quick-acc-role">Administrator</div>
+                                            <div class="quick-acc-name">Alex Admin</div>
+                                        </div>
                                     </button>
-                                    <button type="button" class="helios-quick-acc-btn" data-email="manager@nexus.dev" data-name="Maria Manager" data-role="manager">
-                                        <i class="fas fa-user-tie" style="color:#62c88a;"></i> Manager
+                                    <button type="button" class="helios-quick-acc-btn manager" data-email="manager@nexus.dev" data-name="Maria Manager" data-role="manager">
+                                        <div class="quick-acc-icon-wrap"><i class="fas fa-user-tie"></i></div>
+                                        <div class="quick-acc-details">
+                                            <div class="quick-acc-role">Manager</div>
+                                            <div class="quick-acc-name">Maria Manager</div>
+                                        </div>
                                     </button>
-                                    <button type="button" class="helios-quick-acc-btn" data-email="employee@nexus.dev" data-name="Chen Wei" data-role="employee">
-                                        <i class="fas fa-user" style="color:#5cb3ff;"></i> Employee
+                                    <button type="button" class="helios-quick-acc-btn employee" data-email="employee@nexus.dev" data-name="Chen Wei" data-role="employee">
+                                        <div class="quick-acc-icon-wrap"><i class="fas fa-user"></i></div>
+                                        <div class="quick-acc-details">
+                                            <div class="quick-acc-role">Employee</div>
+                                            <div class="quick-acc-name">Chen Wei</div>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Social OAuth Gateways -->
-                            <div style="font-size:11.5px;color:#8f8d99;margin-bottom:8px;font-weight:600;">Sign in via Connected OAuth Gateway:</div>
-                            <div class="helios-social-grid">
-                                <button type="button" class="helios-social-btn google" data-provider="google">
-                                    <i class="fab fa-google" style="color:#ea4335;"></i> Gmail / Google
-                                </button>
-                                <button type="button" class="helios-social-btn facebook" data-provider="facebook">
-                                    <i class="fab fa-facebook-f" style="color:#1877f2;"></i> Facebook
-                                </button>
-                                <button type="button" class="helios-social-btn github" data-provider="github">
-                                    <i class="fab fa-github"></i> GitHub
-                                </button>
-                                <button type="button" class="helios-social-btn discord" data-provider="discord">
-                                    <i class="fab fa-discord" style="color:#5865f2;"></i> Discord
-                                </button>
+                            <div class="helios-social-section">
+                                <div class="helios-section-subhead">
+                                    <span>Federated Identity Providers (OAuth 2.0):</span>
+                                </div>
+                                <div class="helios-social-grid">
+                                    <button type="button" class="helios-social-btn google" data-provider="google">
+                                        <i class="fab fa-google"></i>
+                                        <div class="social-btn-text">
+                                            <span class="social-provider">Google Workspace</span>
+                                            <span class="social-hint">Instant Single Sign-On</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="helios-social-btn facebook" data-provider="facebook">
+                                        <i class="fab fa-facebook-f"></i>
+                                        <div class="social-btn-text">
+                                            <span class="social-provider">Meta / Facebook</span>
+                                            <span class="social-hint">Social Authentication</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="helios-social-btn github" data-provider="github">
+                                        <i class="fab fa-github"></i>
+                                        <div class="social-btn-text">
+                                            <span class="social-provider">GitHub Enterprise</span>
+                                            <span class="social-hint">Developer Auth</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="helios-social-btn discord" data-provider="discord">
+                                        <i class="fab fa-discord"></i>
+                                        <div class="social-btn-text">
+                                            <span class="social-provider">Discord Security</span>
+                                            <span class="social-hint">Team Access</span>
+                                        </div>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="helios-auth-divider">Or continue with credentials</div>
+                            <div class="helios-auth-divider">
+                                <span>Or authenticate with credentials</span>
+                            </div>
 
-                            <form id="heliosCredentialsForm" style="display:flex;flex-direction:column;gap:12px;">
+                            <form id="heliosCredentialsForm" class="helios-auth-form">
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size:12px;">Email Address</label>
-                                    <input type="email" id="loginEmailInput" class="form-input" placeholder="admin@nexus.dev" required>
+                                    <label class="form-label" for="loginEmailInput">Work Email Address</label>
+                                    <div class="input-icon-wrap">
+                                        <i class="fas fa-at input-leading-icon"></i>
+                                        <input type="email" id="loginEmailInput" class="form-input with-leading-icon" placeholder="admin@nexus.dev" required>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size:12px;">Password</label>
-                                    <input type="password" id="loginPasswordInput" class="form-input" placeholder="••••••••••••" value="Password123!" required>
+                                    <div class="label-with-action">
+                                        <label class="form-label" for="loginPasswordInput">Security Password</label>
+                                    </div>
+                                    <div class="input-icon-wrap password-wrap">
+                                        <i class="fas fa-lock input-leading-icon"></i>
+                                        <input type="password" id="loginPasswordInput" class="form-input with-leading-icon with-trailing-btn" placeholder="••••••••••••" value="Password123!" required>
+                                        <button type="button" class="password-reveal-btn" id="toggleLoginPassword" aria-label="Toggle password visibility">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div id="loginFormNotice" style="display:none;padding:8px 12px;border-radius:8px;font-size:12px;"></div>
-                                <button type="submit" class="btn btn-primary" id="credentialsLoginBtn" style="margin-top:6px;width:100%;">
+
+                                <div class="form-options-row">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="rememberWorkstationCheck" checked>
+                                        <span>Trust this browser for 30 days</span>
+                                    </label>
+                                    <span class="security-lock-badge"><i class="fas fa-shield-check"></i> AES-256 GCM</span>
+                                </div>
+
+                                <div id="loginFormNotice" class="helios-auth-notice" style="display:none;"></div>
+
+                                <button type="submit" class="btn btn-primary helios-btn-login" id="credentialsLoginBtn">
                                     <i class="fas fa-shield-halved"></i> Sign In to Account
                                 </button>
                             </form>
@@ -1123,6 +1287,155 @@
                 if (e.target === modal) modal.classList.remove('open');
             });
 
+            // ── PROFILE PICTURE CHANGING SYSTEM (FILE UPLOAD, DRAG & DROP, AND PRESETS) ──
+            const avatarFileInput = document.getElementById('profileAvatarFileInput');
+            const avatarContainer = document.getElementById('modalAvatarContainer');
+            const profileAvatarImg = document.getElementById('modalProfileAvatar');
+            const quickUploadBtn = document.getElementById('btnQuickUploadPhoto');
+            const triggerBadgeBtn = document.getElementById('btnTriggerAvatarUpload');
+            const profileNotice = document.getElementById('profileFormNotice');
+
+            function triggerAvatarSelect() {
+                if (avatarFileInput) {
+                    avatarFileInput.value = '';
+                    avatarFileInput.click();
+                }
+            }
+
+            if (avatarContainer) {
+                avatarContainer.addEventListener('click', (e) => {
+                    if (e.target.closest('#btnTriggerAvatarUpload')) return;
+                    triggerAvatarSelect();
+                });
+                avatarContainer.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        triggerAvatarSelect();
+                    }
+                });
+
+                // Drag & Drop
+                avatarContainer.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    avatarContainer.classList.add('drag-over');
+                });
+                avatarContainer.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    avatarContainer.classList.remove('drag-over');
+                });
+                avatarContainer.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    avatarContainer.classList.remove('drag-over');
+                    const files = e.dataTransfer?.files;
+                    if (files && files.length > 0) {
+                        handleAvatarFile(files[0]);
+                    }
+                });
+            }
+
+            if (triggerBadgeBtn) {
+                triggerBadgeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    triggerAvatarSelect();
+                });
+            }
+
+            if (quickUploadBtn) {
+                quickUploadBtn.addEventListener('click', () => {
+                    triggerAvatarSelect();
+                });
+            }
+
+            function applyNewAvatar(dataUrl, sourceLabel = 'Profile Photo') {
+                updatePillDisplay({ avatar: dataUrl });
+                if (profileAvatarImg) {
+                    profileAvatarImg.src = dataUrl;
+                    profileAvatarImg.classList.remove('avatar-updated-pulse');
+                    void profileAvatarImg.offsetWidth; // force DOM reflow
+                    profileAvatarImg.classList.add('avatar-updated-pulse');
+                }
+
+                // Update active preset indicator if matching
+                modal.querySelectorAll('.preset-avatar-btn').forEach(btn => {
+                    if (btn.dataset.avatar === dataUrl) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                if (profileNotice) {
+                    profileNotice.style.display = 'block';
+                    profileNotice.style.background = 'rgba(98, 200, 138, 0.15)';
+                    profileNotice.style.color = '#62c88a';
+                    profileNotice.style.border = '1px solid rgba(98, 200, 138, 0.3)';
+                    profileNotice.innerHTML = `<i class="fas fa-circle-check"></i> Profile picture changed successfully (${sourceLabel})!`;
+                    setTimeout(() => { profileNotice.style.display = 'none'; }, 3500);
+                }
+            }
+
+            function handleAvatarFile(file) {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    if (profileNotice) {
+                        profileNotice.style.display = 'block';
+                        profileNotice.style.background = 'rgba(255, 107, 107, 0.15)';
+                        profileNotice.style.color = '#ff6b6b';
+                        profileNotice.style.border = '1px solid rgba(255, 107, 107, 0.3)';
+                        profileNotice.innerHTML = '<i class="fas fa-circle-exclamation"></i> Please select a valid image file (PNG, JPG, WebP, GIF).';
+                    }
+                    return;
+                }
+                if (file.size > 6 * 1024 * 1024) {
+                    if (profileNotice) {
+                        profileNotice.style.display = 'block';
+                        profileNotice.style.background = 'rgba(255, 107, 107, 0.15)';
+                        profileNotice.style.color = '#ff6b6b';
+                        profileNotice.style.border = '1px solid rgba(255, 107, 107, 0.3)';
+                        profileNotice.innerHTML = '<i class="fas fa-circle-exclamation"></i> Image size exceeds 6MB. Please choose a smaller photo.';
+                    }
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const result = event.target?.result;
+                    if (result) {
+                        applyNewAvatar(result, file.name);
+                    }
+                };
+                reader.onerror = () => {
+                    if (profileNotice) {
+                        profileNotice.style.display = 'block';
+                        profileNotice.style.background = 'rgba(255, 107, 107, 0.15)';
+                        profileNotice.style.color = '#ff6b6b';
+                        profileNotice.innerHTML = '<i class="fas fa-circle-exclamation"></i> Error loading selected file.';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+
+            if (avatarFileInput) {
+                avatarFileInput.addEventListener('change', (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleAvatarFile(file);
+                });
+            }
+
+            // Preset avatar buttons
+            modal.querySelectorAll('.preset-avatar-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const presetSrc = btn.dataset.avatar;
+                    const presetTitle = btn.title || 'Preset';
+                    if (presetSrc) {
+                        applyNewAvatar(presetSrc, presetTitle);
+                    }
+                });
+            });
+
             // Handle Profile Save
             document.getElementById('heliosProfileForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1146,7 +1459,7 @@
                             role: data.user.role || role
                         });
                         document.getElementById('modalProfileName').textContent = fullName;
-                        document.getElementById('modalProfileEmail').textContent = email;
+                        document.getElementById('modalProfileEmail').innerHTML = `<i class="fas fa-envelope"></i> ${email}`;
                         const rBadge = document.getElementById('modalProfileRoleBadge');
                         rBadge.textContent = role;
                         rBadge.className = `helios-role-badge ${role}`;
@@ -1284,6 +1597,36 @@
                     loginNotice.textContent = 'Server connection error during login.';
                 }
             });
+
+            // Password Visibility Toggle
+            const togglePassBtn = document.getElementById('toggleLoginPassword');
+            const passInput = document.getElementById('loginPasswordInput');
+            if (togglePassBtn && passInput) {
+                togglePassBtn.addEventListener('click', () => {
+                    const isPass = passInput.type === 'password';
+                    passInput.type = isPass ? 'text' : 'password';
+                    togglePassBtn.innerHTML = isPass ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+                });
+            }
+        }
+
+        // Always sync active user profile values when opened
+        const nameField = document.getElementById('profileFullNameInput');
+        const emailField = document.getElementById('profileEmailInput');
+        const roleField = document.getElementById('profileRoleSelect');
+        const cardName = document.getElementById('modalProfileName');
+        const cardEmail = document.getElementById('modalProfileEmail');
+        const cardAvatar = document.getElementById('modalProfileAvatar');
+        const cardRole = document.getElementById('modalProfileRoleBadge');
+        if (nameField) nameField.value = currentUserState.name;
+        if (emailField) emailField.value = currentUserState.email;
+        if (roleField) roleField.value = currentUserState.role;
+        if (cardName) cardName.textContent = currentUserState.name;
+        if (cardEmail) cardEmail.innerHTML = `<i class="fas fa-envelope"></i> ${currentUserState.email}`;
+        if (cardAvatar) cardAvatar.src = currentUserState.avatar;
+        if (cardRole) {
+            cardRole.textContent = currentUserState.role;
+            cardRole.className = `helios-role-badge ${currentUserState.role}`;
         }
 
         modal.classList.add('open');

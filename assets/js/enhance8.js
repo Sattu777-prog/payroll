@@ -70,7 +70,8 @@
       + '<div class="ins8-panel" data-panel="leaders"></div>'
       + '<div class="ins8-panel" data-panel="currency"></div>'
       + '</div>';
-    grid.insertBefore(card, actCard);
+    if (actCard.parentElement === grid) grid.insertBefore(card, actCard);
+    else grid.appendChild(card);
 
     var pAct = q('.ins8-panel[data-panel="activity"]', card);
     var pLead = q('.ins8-panel[data-panel="leaders"]', card);

@@ -681,89 +681,1086 @@ body.light-mode .helios-welcome-date {
 }
 
 /* ═══════════════════════════════ USER PROFILE & AUTH GATEWAY MODAL ═══════════════════════════ */
+.helios-auth-modal-card {
+    max-width: 41rem !important;
+    width: 94vw;
+    background: #13141c !important;
+    border: 1px solid rgba(182, 140, 255, 0.28) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(182, 140, 255, 0.12) !important;
+    overflow: hidden;
+}
+
+/* Modal Header (CSS selector 2) */
+.helios-auth-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px 24px !important;
+    background: linear-gradient(180deg, rgba(25, 26, 38, 0.75) 0%, rgba(19, 20, 28, 0.4) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.helios-auth-header-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.helios-auth-icon-badge {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(182, 140, 255, 0.35) 0%, rgba(124, 58, 237, 0.2) 100%);
+    border: 1px solid rgba(182, 140, 255, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c4a1ff;
+    font-size: 19px;
+    box-shadow: 0 0 16px rgba(182, 140, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.helios-status-pulse-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #62c88a;
+    border: 2px solid #13141c;
+    box-shadow: 0 0 6px #62c88a;
+}
+
+.helios-auth-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.helios-auth-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.helios-auth-title {
+    margin: 0;
+    font-size: 16.5px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+}
+
+.helios-security-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: var(--h-radius-pill);
+    background: rgba(182, 140, 255, 0.14);
+    border: 1px solid rgba(182, 140, 255, 0.3);
+    color: #c4a1ff;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.helios-auth-subtitle {
+    font-size: 12px;
+    color: #8f8d99;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.helios-auth-subtitle .helios-status-text {
+    color: #62c88a;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.helios-dot-sep {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.helios-modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #8f8d99;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.helios-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+/* Modal Body (CSS selector 1) */
+.helios-auth-modal-body {
+    padding: 22px 24px 26px 24px !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Segmented Tabs */
 .helios-auth-tabs {
     display: flex;
-    gap: 8px;
-    background: #191a24;
-    padding: 4px;
-    border-radius: var(--h-radius-pill);
+    gap: 6px;
+    background: #0f1017;
+    padding: 5px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .helios-auth-tab {
     flex: 1;
-    padding: 8px 14px;
-    border-radius: var(--h-radius-pill);
+    padding: 9px 14px;
+    border-radius: 9px;
     background: transparent;
     border: none;
     color: #8f8d99;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+}
+
+.helios-auth-tab:hover:not(.active) {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .helios-auth-tab.active {
-    background: var(--h-accent-primary);
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
     color: #ffffff;
-    box-shadow: 0 2px 10px rgba(182, 140, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+}
+
+/* Identity Card */
+.helios-identity-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #181924 0%, #15161f 100%);
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(182, 140, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.helios-identity-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 100%;
+    background: radial-gradient(circle at 100% 0%, rgba(182, 140, 255, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.helios-avatar-container {
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 16px;
+    outline: none;
+    transition: transform 0.2s ease;
+}
+
+.helios-avatar-container:hover,
+.helios-avatar-container:focus-visible {
+    transform: scale(1.03);
+}
+
+.helios-avatar-container.drag-over {
+    transform: scale(1.08);
+}
+
+.helios-avatar-container.drag-over .helios-profile-avatar {
+    border-color: #62c88a !important;
+    box-shadow: 0 0 25px rgba(98, 200, 138, 0.6) !important;
+    filter: brightness(1.1);
+}
+
+div#heliosAuthModal:nth-of-type(14) > div:nth-of-type(1) > div:nth-of-type(2) > div#authProfilePanel:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > img#modalProfileAvatar:nth-of-type(1),
+#heliosAuthModal #modalProfileAvatar,
+.helios-profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    border: 2px solid #b68cff;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 16px rgba(182, 140, 255, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.helios-avatar-hover-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: rgba(19, 20, 28, 0.78);
+    backdrop-filter: blur(3px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    border: 2px dashed rgba(182, 140, 255, 0.7);
+    z-index: 1;
+}
+
+.helios-avatar-hover-overlay i {
+    font-size: 15px;
+    color: #c4a1ff;
+}
+
+.helios-avatar-container:hover .helios-avatar-hover-overlay,
+.helios-avatar-container:focus-visible .helios-avatar-hover-overlay,
+.helios-avatar-container.drag-over .helios-avatar-hover-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.helios-avatar-edit-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    border: 2px solid #13141c;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.5);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    padding: 0;
+}
+
+.helios-avatar-edit-badge:hover {
+    transform: scale(1.18);
+    background: #b68cff;
+    color: #13141c;
+    box-shadow: 0 4px 12px rgba(182, 140, 255, 0.6);
+}
+
+.helios-avatar-online-dot {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #62c88a;
+    border: 2px solid #13141c;
+    box-shadow: 0 0 6px #62c88a;
+    z-index: 2;
+}
+
+/* Avatar quick bar and presets */
+.helios-avatar-quick-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+}
+
+.helios-avatar-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(182, 140, 255, 0.15);
+    border: 1px solid rgba(182, 140, 255, 0.35);
+    color: #c4a1ff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.helios-avatar-upload-btn:hover {
+    background: rgba(182, 140, 255, 0.25);
+    border-color: #b68cff;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.helios-preset-avatars-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.preset-label {
+    font-size: 10.5px;
+    color: #7e7c8c;
+    font-weight: 500;
+}
+
+.helios-preset-avatars {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.preset-avatar-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preset-avatar-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.preset-avatar-btn:hover {
+    transform: scale(1.18);
+    border-color: #b68cff;
+    box-shadow: 0 0 8px rgba(182, 140, 255, 0.4);
+}
+
+.preset-avatar-btn.active {
+    border-color: #62c88a;
+    box-shadow: 0 0 8px rgba(98, 200, 138, 0.5);
+}
+
+/* Animation on picture change */
+@keyframes avatarUpdatedPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); box-shadow: 0 0 30px rgba(98, 200, 138, 0.8); }
+    100% { transform: scale(1); }
+}
+
+.avatar-updated-pulse {
+    animation: avatarUpdatedPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.helios-identity-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.helios-identity-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.helios-profile-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.helios-verified-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: rgba(98, 200, 138, 0.12);
+    border: 1px solid rgba(98, 200, 138, 0.28);
+    color: #62c88a;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.helios-profile-email {
+    font-size: 12.5px;
+    color: #8f8d99;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.helios-telemetry-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.helios-telemetry-chip {
+    font-size: 10.5px;
+    color: #b0aec0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2px 7px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.helios-telemetry-chip.success {
+    color: #62c88a;
+    border-color: rgba(98, 200, 138, 0.25);
+    background: rgba(98, 200, 138, 0.08);
+}
+
+/* Form Styles & Inputs with Icons */
+.helios-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cfcdd9;
+}
+
+.label-hint {
+    font-size: 11px;
+    font-weight: 400;
+    color: #787685;
+}
+
+.input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.input-leading-icon {
+    position: absolute;
+    left: 14px;
+    color: #8f8d99;
+    font-size: 13px;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.form-input.with-leading-icon {
+    padding-left: 38px !important;
+    background: #191a24;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 13px;
+    height: 42px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.form-input.with-leading-icon:focus {
+    border-color: #b68cff;
+    box-shadow: 0 0 0 3px rgba(182, 140, 255, 0.2);
+    background: #1e1f2b;
+}
+
+.form-input.with-leading-icon:focus + .input-leading-icon,
+.input-icon-wrap:focus-within .input-leading-icon {
+    color: #b68cff;
+}
+
+.form-input.with-trailing-btn {
+    padding-right: 42px !important;
+}
+
+.password-reveal-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #787685;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.password-reveal-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.form-options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #8f8d99;
+    margin-top: -2px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #7c3aed;
+    cursor: pointer;
+}
+
+.security-lock-badge {
+    color: #62c88a;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+}
+
+/* Action Buttons Footer */
+.helios-auth-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 12px;
+}
+
+.helios-btn-signout {
+    color: #ff6b6b !important;
+    background: rgba(255, 107, 107, 0.08) !important;
+    border: 1px solid rgba(255, 107, 107, 0.25) !important;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 12.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.helios-btn-signout:hover {
+    background: rgba(255, 107, 107, 0.18) !important;
+    border-color: #ff6b6b !important;
+    color: #ffffff !important;
+}
+
+.helios-btn-save,
+.helios-btn-login {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(182, 140, 255, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35) !important;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.helios-btn-login {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+}
+
+.helios-btn-save:hover,
+.helios-btn-login:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5) !important;
+    border-color: #b68cff !important;
+}
+
+/* Notice Alerts */
+.helios-auth-notice {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeInNotice 0.25s ease;
+}
+
+@keyframes fadeInNotice {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Section Subheads */
+.helios-section-subhead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #8f8d99;
+    margin-bottom: 8px;
+}
+
+.subhead-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: #b68cff;
+    background: rgba(182, 140, 255, 0.12);
+    border: 1px solid rgba(182, 140, 255, 0.25);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+/* Quick Role Accounts Cards */
+.helios-quick-accounts-section {
+    margin-bottom: 18px;
+}
+
+.helios-quick-accounts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.helios-quick-acc-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 11px;
+    background: #181924;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cfcdd9;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+}
+
+.helios-quick-acc-btn:hover {
+    transform: translateY(-2px);
+    background: #20212e;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.helios-quick-acc-btn.admin:hover {
+    border-color: #b68cff;
+    box-shadow: 0 6px 18px rgba(182, 140, 255, 0.2);
+}
+
+.helios-quick-acc-btn.manager:hover {
+    border-color: #62c88a;
+    box-shadow: 0 6px 18px rgba(98, 200, 138, 0.2);
+}
+
+.helios-quick-acc-btn.employee:hover {
+    border-color: #5cb3ff;
+    box-shadow: 0 6px 18px rgba(92, 179, 255, 0.2);
+}
+
+.quick-acc-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.helios-quick-acc-btn.admin .quick-acc-icon-wrap {
+    background: rgba(182, 140, 255, 0.18);
+    color: #c4a1ff;
+    border: 1px solid rgba(182, 140, 255, 0.3);
+}
+
+.helios-quick-acc-btn.manager .quick-acc-icon-wrap {
+    background: rgba(98, 200, 138, 0.18);
+    color: #62c88a;
+    border: 1px solid rgba(98, 200, 138, 0.3);
+}
+
+.helios-quick-acc-btn.employee .quick-acc-icon-wrap {
+    background: rgba(92, 179, 255, 0.18);
+    color: #5cb3ff;
+    border: 1px solid rgba(92, 179, 255, 0.3);
+}
+
+.quick-acc-details {
+    min-width: 0;
+}
+
+.quick-acc-role {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.quick-acc-name {
+    font-size: 10.5px;
+    color: #8f8d99;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+/* Social OAuth Grid */
+.helios-social-section {
+    margin-bottom: 18px;
 }
 
 .helios-social-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-bottom: 16px;
 }
 
 .helios-social-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 12px;
     padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: #1c1d27;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: #171822;
     color: #eae9ee;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+}
+
+.helios-social-btn i {
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.social-btn-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.social-provider {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.social-hint {
+    font-size: 10px;
+    font-weight: 400;
+    color: #7e7c8c;
 }
 
 .helios-social-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
+.helios-social-btn.google i { color: #ea4335; }
 .helios-social-btn.google:hover {
     border-color: #ea4335;
     background: rgba(234, 67, 53, 0.12);
-    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(234, 67, 53, 0.2);
 }
 
+.helios-social-btn.facebook i { color: #1877f2; }
 .helios-social-btn.facebook:hover {
     border-color: #1877f2;
     background: rgba(24, 119, 242, 0.12);
-    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(24, 119, 242, 0.2);
 }
 
+.helios-social-btn.github i { color: #ffffff; }
 .helios-social-btn.github:hover {
     border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.14);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 18px rgba(255, 255, 255, 0.15);
 }
 
+.helios-social-btn.discord i { color: #5865f2; }
 .helios-social-btn.discord:hover {
     border-color: #5865f2;
     background: rgba(88, 101, 242, 0.14);
-    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(88, 101, 242, 0.2);
+}
+
+/* Hairline Divider */
+.helios-auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 18px 0;
+    color: #72707e;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.helios-auth-divider::before,
+.helios-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.helios-auth-divider span {
+    padding: 0 12px;
+}
+
+/* ═══════════════════════════════ LIGHT MODE OVERRIDES FOR AUTH MODAL ═══════════════════════════ */
+body.light-mode .helios-auth-modal-card {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 24px 60px -10px rgba(15, 23, 42, 0.2), 0 0 30px rgba(124, 58, 237, 0.08) !important;
+}
+
+body.light-mode .helios-auth-modal-header {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-bottom-color: #e2e8f0 !important;
+}
+
+body.light-mode .helios-auth-title {
+    color: #0f172a !important;
+}
+
+body.light-mode .helios-auth-subtitle {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-modal-close-btn {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+}
+
+body.light-mode .helios-modal-close-btn:hover {
+    background: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .helios-auth-tabs {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+}
+
+body.light-mode .helios-auth-tab {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-auth-tab:hover:not(.active) {
+    color: #0f172a !important;
+    background: #e2e8f0 !important;
+}
+
+body.light-mode .helios-identity-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode .helios-avatar-hover-overlay {
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: #0f172a !important;
+    border-color: #7c3aed !important;
+}
+
+body.light-mode .helios-avatar-hover-overlay i {
+    color: #7c3aed !important;
+}
+
+body.light-mode .helios-avatar-edit-badge {
+    border-color: #ffffff !important;
+}
+
+body.light-mode .helios-avatar-online-dot {
+    border-color: #ffffff !important;
+}
+
+body.light-mode .helios-avatar-upload-btn {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #475569 !important;
+}
+
+body.light-mode .helios-avatar-upload-btn:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+body.light-mode .preset-avatar-btn {
+    border-color: #cbd5e1 !important;
+}
+
+body.light-mode .preset-label {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-profile-name {
+    color: #0f172a !important;
+}
+
+body.light-mode .helios-profile-email {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-telemetry-chip {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+body.light-mode .form-label {
+    color: #334155 !important;
+}
+
+body.light-mode .label-hint {
+    color: #64748b !important;
+}
+
+body.light-mode .form-input.with-leading-icon {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .form-input.with-leading-icon:focus {
+    background: #ffffff !important;
+    border-color: #7c3aed !important;
+}
+
+body.light-mode .input-leading-icon {
+    color: #94a3b8 !important;
+}
+
+body.light-mode .password-reveal-btn {
+    color: #64748b !important;
+}
+
+body.light-mode .password-reveal-btn:hover {
+    color: #0f172a !important;
+    background: #e2e8f0 !important;
+}
+
+body.light-mode .helios-quick-acc-btn {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+body.light-mode .quick-acc-role {
+    color: #0f172a !important;
+}
+
+body.light-mode .quick-acc-name {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-social-btn {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .social-provider {
+    color: #0f172a !important;
+}
+
+body.light-mode .social-hint {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-social-btn.github i {
+    color: #0f172a !important;
+}
+
+body.light-mode .helios-auth-divider {
+    color: #64748b !important;
+}
+
+body.light-mode .helios-auth-divider::before,
+body.light-mode .helios-auth-divider::after {
+    background: #e2e8f0 !important;
+}
+
+@media (max-width: 640px) {
+    .helios-auth-modal-card {
+        width: 96vw;
+        border-radius: 14px !important;
+    }
+    .helios-quick-accounts {
+        grid-template-columns: 1fr;
+    }
+    .helios-social-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ═══════════════════════════════ PROPER OAUTH CONSENT DIALOGS ═══════════════════════════ */
@@ -922,30 +1919,7 @@ body.light-mode .helios-welcome-date {
     background: rgba(255, 255, 255, 0.08);
 }
 
-.helios-quick-accounts {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-}
 
-.helios-quick-acc-btn {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: #181922;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #b6b4bc;
-    font-size: 11.5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-.helios-quick-acc-btn:hover {
-    color: #ffffff;
-    border-color: rgba(182, 140, 255, 0.4);
-    background: #232431;
-}
 
 /* ═══════════════════════════════ DASHBOARD GRID ═══════════════════════════ */
 .helios-dash-grid {
@@ -4279,28 +5253,74 @@ body.light-mode .pn-drawer-footer {
 
     /* Topbar on mobile: Clean, minimal, non-colliding */
     .helios-topbar {
-        padding: 4px 0 12px 0 !important;
+        padding: 4px 0 10px 0 !important;
         margin-bottom: 12px !important;
         border-bottom: 1px solid var(--h-border-subtle) !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
     }
 
     .helios-welcome {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 2px;
+        min-width: 0;
+        flex: 1 1 auto;
     }
 
     .helios-welcome-title {
-        font-size: 18px !important;
+        font-size: 15px !important;
+        line-height: 1.2 !important;
         margin: 0 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
+    .helios-welcome-date {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        opacity: 0.75;
+    }
+
+    /* Compact, sleek AI search capsule on mobile */
+    #heliosAiSearchCapsule,
     .helios-ai-search {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        max-width: 145px !important;
+        min-width: 110px !important;
+        height: 32px !important;
+        padding: 2px 6px 2px 10px !important;
+        gap: 4px !important;
+        border-radius: var(--h-radius-pill) !important;
+        box-sizing: border-box !important;
+    }
+
+    #heliosAiSearchCapsule input,
+    .helios-ai-search input {
+        font-size: 11.5px !important;
+        height: 100% !important;
         width: 100% !important;
-        max-width: 100% !important;
+    }
+
+    #heliosAiSearchCapsule .helios-ai-send-btn,
+    .helios-ai-search .helios-ai-send-btn {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 9.5px !important;
+        flex-shrink: 0 !important;
+    }
+
+    #heliosAiSearchCapsule:focus-within,
+    .helios-ai-search:focus-within {
+        max-width: 170px !important;
+        flex-basis: 170px !important;
     }
 
     /* Hide redundant desktop items from topbar on mobile */

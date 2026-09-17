@@ -27,6 +27,9 @@
         var hero = document.getElementById('dashGreeting');
         if (!sec || !hero) return false;
         if (document.getElementById('dc10-card')) return true;
+        // If helios topbar exists or hero is not a direct child of sec (e.g. hidden compatibility container),
+        // skip injecting dc10-card to avoid invalid insertBefore calls
+        if (document.querySelector('.helios-topbar') || hero.parentElement !== sec) return true;
 
         var card = document.createElement('div');
         card.className = 'glass dc10-card';
@@ -70,8 +73,9 @@
             + '<i class="fas fa-chevron-down rep10-chev"></i></button>'
             + '<div class="rep10-body"></div>';
         // sits under the chart grid so the charts stay the lead of the report
-        if (grid.nextSibling) rep.insertBefore(wrap, grid.nextSibling);
-        else rep.appendChild(wrap);
+        var parent = grid.parentNode || rep;
+        if (grid.nextSibling && grid.nextSibling.parentNode === parent) parent.insertBefore(wrap, grid.nextSibling);
+        else parent.appendChild(wrap);
         $('.rep10-body', wrap).appendChild(card);
 
         var closed = false;

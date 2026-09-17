@@ -354,7 +354,9 @@
         btnEl.setAttribute('aria-label', 'Settings & data hub'); btnEl.title = 'Settings & data';
         btnEl.innerHTML = '<i class="fas fa-sliders"></i>';
         // place just before theme toggle if present
-        const theme = $('#themeToggle'); bar.insertBefore(btnEl, theme || null);
+        const theme = $('#themeToggle');
+        const refTheme = (theme && theme.parentNode === bar) ? theme : null;
+        bar.insertBefore(btnEl, refTheme);
         const api = makeOver('setOver', 'Settings & Data', 'fa-sliders');
         Settings.el = { body: api.body, api };
         btnEl.addEventListener('click', () => { renderSettings(); api.open(); });
