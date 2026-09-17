@@ -84,18 +84,18 @@ function sanitizeImportedArray(arr, spec) {
    Live rates are fetched from the free, key-less Frankfurter API
    (European Central Bank reference rates) and cached in localStorage. */
 const CURRENCIES = [
-    { code: 'USD', symbol: '$', name: 'US Dollar', timezone: 'America/New_York', country: 'US' },
-    { code: 'EUR', symbol: '€', name: 'Euro', timezone: 'Europe/Paris', country: 'EU' },
-    { code: 'GBP', symbol: '£', name: 'British Pound', timezone: 'Europe/London', country: 'UK' },
-    { code: 'INR', symbol: '₹', name: 'Indian Rupee', timezone: 'Asia/Kolkata', country: 'IN' },
-    { code: 'NPR', symbol: 'Rs', name: 'Nepali Rupee', timezone: 'Asia/Kathmandu', country: 'NP' },
-    { code: 'JPY', symbol: '¥', name: 'Japanese Yen', timezone: 'Asia/Tokyo', country: 'JP' },
-    { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', timezone: 'Asia/Shanghai', country: 'CN' },
-    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', timezone: 'Australia/Sydney', country: 'AU' },
-    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', timezone: 'America/Toronto', country: 'CA' },
-    { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', timezone: 'Asia/Singapore', country: 'SG' },
-    { code: 'CHF', symbol: 'Fr', name: 'Swiss Franc', timezone: 'Europe/Zurich', country: 'CH' },
-    { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham', timezone: 'Asia/Dubai', country: 'AE' }
+    { code: 'USD', symbol: '$', name: 'US Dollar', timezone: 'America/New_York', country: 'US', city: 'New York', tzAbbr: 'EDT' },
+    { code: 'EUR', symbol: '€', name: 'Euro', timezone: 'Europe/Paris', country: 'EU', city: 'Paris', tzAbbr: 'CEST' },
+    { code: 'GBP', symbol: '£', name: 'British Pound', timezone: 'Europe/London', country: 'UK', city: 'London', tzAbbr: 'BST' },
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee', timezone: 'Asia/Kolkata', country: 'IN', city: 'New Delhi', tzAbbr: 'IST' },
+    { code: 'NPR', symbol: 'Rs', name: 'Nepali Rupee', timezone: 'Asia/Kathmandu', country: 'NP', city: 'Kathmandu', tzAbbr: 'NPT' },
+    { code: 'JPY', symbol: '¥', name: 'Japanese Yen', timezone: 'Asia/Tokyo', country: 'JP', city: 'Tokyo', tzAbbr: 'JST' },
+    { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', timezone: 'Asia/Shanghai', country: 'CN', city: 'Beijing', tzAbbr: 'CST' },
+    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', timezone: 'Australia/Sydney', country: 'AU', city: 'Sydney', tzAbbr: 'AEST' },
+    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', timezone: 'America/Toronto', country: 'CA', city: 'Toronto', tzAbbr: 'EDT' },
+    { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', timezone: 'Asia/Singapore', country: 'SG', city: 'Singapore', tzAbbr: 'SGT' },
+    { code: 'CHF', symbol: 'Fr', name: 'Swiss Franc', timezone: 'Europe/Zurich', country: 'CH', city: 'Zurich', tzAbbr: 'CEST' },
+    { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham', timezone: 'Asia/Dubai', country: 'AE', city: 'Dubai', tzAbbr: 'GST' }
 ];
 
 function getCurrencyTimezone(code) {
@@ -119,11 +119,11 @@ function fmtTime(timestamp, options = {}) {
         hour: '2-digit',
         minute: '2-digit',
         second: options.includeSeconds ? '2-digit' : undefined,
-        hour12: false,
+        hour12: options.hour12 !== undefined ? options.hour12 : false,
         timeZone: tz
     };
     try {
-        return new Date(timestamp).toLocaleTimeString(tz, { ...defaultOptions, ...options });
+        return new Date(timestamp).toLocaleTimeString('en-US', { ...defaultOptions, ...options });
     } catch {
         return new Date(timestamp).toLocaleTimeString(undefined, defaultOptions);
     }
@@ -139,7 +139,7 @@ function fmtDate(timestamp, options = {}) {
         timeZone: tz
     };
     try {
-        return new Date(timestamp).toLocaleDateString(tz, { ...defaultOptions, ...options });
+        return new Date(timestamp).toLocaleDateString('en-US', { ...defaultOptions, ...options });
     } catch {
         return new Date(timestamp).toLocaleDateString(undefined, defaultOptions);
     }
@@ -148,7 +148,7 @@ function fmtDate(timestamp, options = {}) {
 function fmtDateTime(timestamp) {
     const tz = getCurrencyTimezone(appCurrency);
     try {
-        return new Date(timestamp).toLocaleString(tz, {
+        return new Date(timestamp).toLocaleString('en-US', {
             month: 'short',
             day: '2-digit',
             hour: '2-digit',
@@ -164,6 +164,56 @@ function fmtDateTime(timestamp) {
         });
     }
 }
+
+function updateGeographicalSyncTime(currencyCode = appCurrency, isImmediateSwitch = false) {
+    const syncEl = document.getElementById('lastSyncTime');
+    if (!syncEl) return;
+
+    const cur = CURRENCIES.find(c => c.code === currencyCode) || {
+        code: currencyCode,
+        timezone: 'UTC',
+        country: 'Global',
+        city: currencyCode,
+        tzAbbr: 'UTC'
+    };
+
+    const now = new Date();
+    const tz = cur.timezone || 'UTC';
+
+    let timeStr = '';
+    try {
+        timeStr = now.toLocaleTimeString('en-US', {
+            timeZone: tz,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+    } catch {
+        timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    const city = cur.city || cur.name || cur.code;
+    const tzLabel = cur.tzAbbr || cur.country || 'UTC';
+
+    syncEl.innerHTML = `<span class="sync-prefix">Sync</span><span class="sync-clock-val">${timeStr}</span><span class="sync-geo-badge" title="Geographical Time: ${esc(city)} (${esc(tz)})"><i class="fas fa-location-dot"></i><span class="geo-city-label">${esc(city)} ·</span><span>${esc(tzLabel)}</span></span>`;
+
+    if (isImmediateSwitch) {
+        syncEl.classList.remove('geo-flash');
+        void syncEl.offsetWidth; // Force reflow to re-trigger micro-pulse animation
+        syncEl.classList.add('geo-flash');
+
+        const currWrap = document.querySelector('.helios-curr-wrap');
+        if (currWrap) {
+            currWrap.classList.remove('curr-switch-flash');
+            void currWrap.offsetWidth;
+            currWrap.classList.add('curr-switch-flash');
+        }
+    }
+}
+window.updateGeographicalSyncTime = updateGeographicalSyncTime;
+window.CURRENCIES = CURRENCIES;
+
 
 // Frankfurter API supported currencies (subset of our list)
 // We'll use fallback approximate rates for unsupported ones
@@ -429,6 +479,7 @@ function showToast(msg, type = 'info') {
 
 function openModal(id) {
     const el = document.getElementById(id);
+    if (!el) return;
     el.classList.add('open');
     el.addEventListener('click', _backdropClose);
     setTimeout(() => {
@@ -438,6 +489,7 @@ function openModal(id) {
 }
 function closeModal(id) {
     const el = document.getElementById(id);
+    if (!el) return;
     el.classList.remove('open');
     el.removeEventListener('click', _backdropClose);
 }
@@ -446,7 +498,7 @@ function _backdropClose(e) {
 }
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        ['empModal', 'leaveModal', 'confirmModal', 'historyModal', 'currencyModal'].forEach(id => {
+        ['empModal', 'leaveModal', 'confirmModal', 'historyModal', 'currencyModal', 'settingsModal', 'supportModal', 'notifModal'].forEach(id => {
             if (document.getElementById(id)?.classList.contains('open')) closeModal(id);
         });
     }
@@ -1473,10 +1525,49 @@ function exportToExcel() {
 }
 
 function setTheme(theme) {
-    document.body.classList.toggle('dark-mode', theme === 'dark');
-    document.body.classList.toggle('light-mode', theme === 'light');
-    document.getElementById('themeIcon').className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    document.body.classList.toggle('light-mode', !isDark);
+
+    // Header toggle button switch
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.classList.toggle('is-dark', isDark);
+        themeToggle.classList.toggle('is-light', !isDark);
+        themeToggle.setAttribute('aria-checked', String(isDark));
+        themeToggle.title = isDark ? 'Current: Dark Theme (Click to switch to Light)' : 'Current: Light Theme (Click to switch to Dark)';
+        themeToggle.setAttribute('aria-label', isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme');
+    }
+    const themeIcon = document.getElementById('themeIcon');
+    if (themeIcon) {
+        themeIcon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    }
+
+    // Sidebar theme toggle
+    const sidebarThemeLabel = document.getElementById('sidebarThemeLabel');
+    if (sidebarThemeLabel) {
+        sidebarThemeLabel.textContent = isDark ? 'Dark Theme' : 'Light Theme';
+    }
+    const sidebarThumbIcon = document.getElementById('sidebarThumbIcon');
+    if (sidebarThumbIcon) {
+        sidebarThumbIcon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    }
+    const sidebarThemeToggle = document.getElementById('sidebarThemeToggle');
+    if (sidebarThemeToggle) {
+        sidebarThemeToggle.setAttribute('aria-checked', String(isDark));
+        sidebarThemeToggle.title = isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme';
+    }
+
+    // Settings modal theme chips
+    const settingsDark = document.getElementById('settingsThemeDark');
+    const settingsLight = document.getElementById('settingsThemeLight');
+    if (settingsDark) settingsDark.classList.toggle('active', isDark);
+    if (settingsLight) settingsLight.classList.toggle('active', !isDark);
+
     localStorage.setItem('nexus_theme', theme);
+    if (typeof window.heliosRenderChart === 'function') {
+        try { window.heliosRenderChart(); } catch (_) {}
+    }
     try { renderDashboard(); } catch (err) { console.error('renderDashboard failed in setTheme', err); }
     try { renderReports(); } catch (err) { console.error('renderReports failed in setTheme', err); }
 }
@@ -1491,7 +1582,15 @@ function initTabs() {
             const section = document.getElementById(tab + 'Section');
             if (section) section.classList.remove('hidden');
             updateTabIndicator();
-            if (tab === 'dashboard') renderDashboard();
+            if (tab === 'dashboard') {
+                renderDashboard();
+                if (typeof window.heliosRenderChart === 'function') {
+                    try { window.heliosRenderChart(); } catch (_) {}
+                }
+                if (typeof window.updateDashboardGreeting === 'function') {
+                    try { window.updateDashboardGreeting(); } catch (_) {}
+                }
+            }
             if (tab === 'employees') renderEmployees();
             if (tab === 'attendance') renderAttendance();
             if (tab === 'leaves') renderLeaves();
@@ -1501,9 +1600,91 @@ function initTabs() {
     });
 }
 
-document.getElementById('themeToggle').addEventListener('click', () => {
-    setTheme(document.body.classList.contains('dark-mode') ? 'light' : 'dark');
-});
+// ── Theme Toggle Event Handlers ──
+const themeToggleBtn = document.getElementById('themeToggle');
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', (e) => {
+        // If user clicked specifically on dark option or light option
+        const targetOpt = e.target.closest('.theme-toggle-opt');
+        if (targetOpt) {
+            if (targetOpt.id === 'themeOptDark') {
+                if (!document.body.classList.contains('dark-mode')) {
+                    setTheme('dark');
+                    showToast('Switched to Dark Theme', 'info');
+                }
+                return;
+            }
+            if (targetOpt.id === 'themeOptLight') {
+                if (!document.body.classList.contains('light-mode')) {
+                    setTheme('light');
+                    showToast('Switched to Light Theme', 'info');
+                }
+                return;
+            }
+        }
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        setTheme(nextTheme);
+        showToast(nextTheme === 'light' ? 'Switched to Light Theme' : 'Switched to Dark Theme', 'info');
+    });
+}
+
+// Sidebar Theme Toggle
+const sidebarThemeToggleBtn = document.getElementById('sidebarThemeToggle');
+if (sidebarThemeToggleBtn) {
+    sidebarThemeToggleBtn.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        setTheme(nextTheme);
+        showToast(nextTheme === 'light' ? 'Switched to Light Theme' : 'Switched to Dark Theme', 'info');
+    });
+}
+
+// Settings Modal Theme Chips
+const settingsDarkChip = document.getElementById('settingsThemeDark');
+if (settingsDarkChip) {
+    settingsDarkChip.addEventListener('click', () => {
+        setTheme('dark');
+        showToast('Switched to Dark Theme', 'info');
+    });
+}
+
+const settingsLightChip = document.getElementById('settingsThemeLight');
+if (settingsLightChip) {
+    settingsLightChip.addEventListener('click', () => {
+        setTheme('light');
+        showToast('Switched to Light Theme', 'info');
+    });
+}
+
+// Settings Modal Animations Control
+const settingsAnimOn = document.getElementById('settingsAnimOn');
+const settingsAnimOff = document.getElementById('settingsAnimOff');
+const settingsAnimBtn = document.getElementById('settingsAnimBtn');
+if (settingsAnimOn) {
+    settingsAnimOn.addEventListener('click', () => {
+        if (!globalAnimsEnabled) {
+            globalAnimsEnabled = true;
+            localStorage.setItem('globalAnimsEnabled', 'true');
+            applyGlobalAnimState();
+            showToast('✓ Motion & animations enabled', 'info');
+        }
+    });
+}
+if (settingsAnimOff) {
+    settingsAnimOff.addEventListener('click', () => {
+        if (globalAnimsEnabled) {
+            globalAnimsEnabled = false;
+            localStorage.setItem('globalAnimsEnabled', 'false');
+            applyGlobalAnimState();
+            showToast('✓ Motion & animations disabled', 'info');
+        }
+    });
+}
+if (settingsAnimBtn) {
+    settingsAnimBtn.addEventListener('click', () => {
+        const animToggleBtn = document.getElementById('animToggle');
+        if (animToggleBtn) animToggleBtn.click();
+    });
+}
 
 document.getElementById('addEmpBtn').addEventListener('click', () => {
     document.getElementById('empForm').reset();
@@ -1786,13 +1967,36 @@ function applyGlobalAnimState() {
     }
     const animBtn = document.getElementById('animToggle');
     const animIcon = document.getElementById('animIcon');
+    const animLabel = document.getElementById('animToggleLabel');
     if (animBtn) {
-        animBtn.classList.toggle('active', globalAnimsEnabled);
-        animBtn.setAttribute('aria-pressed', String(globalAnimsEnabled));
-        animBtn.title = globalAnimsEnabled ? 'Disable all animations' : 'Enable all animations';
+        animBtn.classList.toggle('is-active', globalAnimsEnabled);
+        animBtn.classList.toggle('is-disabled', !globalAnimsEnabled);
+        animBtn.setAttribute('aria-checked', String(globalAnimsEnabled));
+        animBtn.title = globalAnimsEnabled ? 'Motion & Animations Active (Click to disable)' : 'Motion & Animations Disabled (Click to enable)';
+    }
+    if (animLabel) {
+        animLabel.textContent = globalAnimsEnabled ? 'Motion ON' : 'Motion OFF';
     }
     if (animIcon) {
-        animIcon.className = globalAnimsEnabled ? 'fas fa-magic-wand-sparkles' : 'fas fa-magic';
+        animIcon.className = globalAnimsEnabled ? 'fas fa-wand-magic-sparkles' : 'fas fa-ban';
+    }
+
+    // Sync settings modal chips
+    const chipOn = document.getElementById('settingsAnimOn');
+    const chipOff = document.getElementById('settingsAnimOff');
+    if (chipOn) chipOn.classList.toggle('active', globalAnimsEnabled);
+    if (chipOff) chipOff.classList.toggle('active', !globalAnimsEnabled);
+
+    // Replay entrance effects when turned back on
+    if (globalAnimsEnabled) {
+        document.querySelectorAll('.helios-telemetry-banner, .helios-top-triad > div, .helios-chart-card, .helios-hub-grid, .helios-live-feed-strip').forEach(el => {
+            el.style.animation = 'none';
+            void el.offsetHeight; // trigger reflow
+            el.style.animation = '';
+        });
+        if (typeof window.heliosRenderChart === 'function') {
+            try { window.heliosRenderChart(true); } catch (_) {}
+        }
     }
 }
 applyGlobalAnimState();
@@ -1801,7 +2005,7 @@ document.getElementById('animToggle')?.addEventListener('click', () => {
     globalAnimsEnabled = !globalAnimsEnabled;
     localStorage.setItem('globalAnimsEnabled', String(globalAnimsEnabled));
     applyGlobalAnimState();
-    showToast(globalAnimsEnabled ? '✓ Animations enabled' : '✓ Animations disabled', 'info');
+    showToast(globalAnimsEnabled ? '✓ Motion & animations enabled' : '✓ Motion & animations disabled', 'info');
 });
 
 // ── Report year filter ──
@@ -1873,6 +2077,8 @@ function tick() {
     if (timeEl) {
         timeEl.textContent = fmtTime(now, { includeSeconds: true, hour12: true });
     }
+    // Continuously update live geographical sync time in dashboard telemetry banner
+    updateGeographicalSyncTime(appCurrency, false);
 }
 
 function startLiveClock() {
@@ -1899,6 +2105,8 @@ function updateClockForCurrency() {
     if (timeEl) {
         timeEl.title = `${getCurrencyTimezone(appCurrency)} time`;
     }
+    // Immediate geographical sync time update
+    updateGeographicalSyncTime(appCurrency, true);
     tick();
 }
 
@@ -2077,6 +2285,16 @@ function populateCurrencySelectors() {
         headerSel.innerHTML = CURRENCIES.map(c => `<option value="${esc(c.code)}">${esc(c.code)} — ${esc(c.name)}</option>`).join('');
         headerSel.value = appCurrency;
     }
+    const settingsSel = document.getElementById('settingsCurrencySelect');
+    if (settingsSel) {
+        settingsSel.innerHTML = CURRENCIES.map(c => `<option value="${esc(c.code)}">${esc(c.code)} — ${esc(c.name)}</option>`).join('');
+        settingsSel.value = appCurrency;
+    }
+    const mobileSel = document.getElementById('pnMobileCurrencySelect');
+    if (mobileSel) {
+        mobileSel.innerHTML = CURRENCIES.map(c => `<option value="${esc(c.code)}">${esc(c.code)} (${c.symbol})</option>`).join('');
+        mobileSel.value = appCurrency;
+    }
     const fromSel = document.getElementById('convFrom');
     const toSel = document.getElementById('convTo');
     if (fromSel && toSel) {
@@ -2085,6 +2303,15 @@ function populateCurrencySelectors() {
         if (!toSel.options.length) toSel.innerHTML = opts;
         if (!fromSel.value) fromSel.value = 'USD';
         if (!toSel.value) toSel.value = appCurrency === 'USD' ? 'EUR' : appCurrency;
+    }
+    const sFromSel = document.getElementById('settingsConvFrom');
+    const sToSel = document.getElementById('settingsConvTo');
+    if (sFromSel && sToSel) {
+        const opts = CURRENCIES.map(c => `<option value="${esc(c.code)}">${esc(c.code)} — ${esc(c.name)}</option>`).join('');
+        if (!sFromSel.options.length) sFromSel.innerHTML = opts;
+        if (!sToSel.options.length) sToSel.innerHTML = opts;
+        if (!sFromSel.value) sFromSel.value = 'USD';
+        if (!sToSel.value) sToSel.value = appCurrency === 'USD' ? 'EUR' : appCurrency;
     }
 }
 
@@ -2122,9 +2349,46 @@ function updateConversion() {
     }
 }
 
-document.getElementById('currencySelect').addEventListener('change', function () {
-    appCurrency = this.value;
+function updateSettingsConversion() {
+    const amountEl = document.getElementById('settingsConvAmount');
+    const fromEl = document.getElementById('settingsConvFrom');
+    const toEl = document.getElementById('settingsConvTo');
+    const resultEl = document.getElementById('settingsConvResult');
+    const rateLineEl = document.getElementById('settingsConvRate');
+    if (!amountEl || !fromEl || !toEl || !resultEl) return;
+
+    const amount = parseFloat(amountEl.value) || 0;
+    const from = fromEl.value, to = toEl.value;
+    const converted = convertBetween(amount, from, to);
+
+    if (converted === null) {
+        resultEl.textContent = 'Rates unavailable';
+        if (rateLineEl) rateLineEl.textContent = 'Refresh rates to compute.';
+    } else {
+        const toInfo = currencyInfo(to);
+        resultEl.textContent = `${toInfo.symbol} ${converted.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
+        if (rateLineEl) {
+            const unitRate = convertBetween(1, from, to);
+            rateLineEl.textContent = `1 ${from} = ${unitRate !== null ? unitRate.toLocaleString(undefined, { maximumFractionDigits: 4 }) : '—'} ${to}`;
+        }
+    }
+}
+window.updateSettingsConversion = updateSettingsConversion;
+window.populateCurrencySelectors = populateCurrencySelectors;
+
+function onAppCurrencyChange(newCurrency) {
+    appCurrency = newCurrency;
     localStorage.setItem('nexus_currency', appCurrency);
+
+    const headerSel = document.getElementById('currencySelect');
+    if (headerSel && headerSel.value !== appCurrency) headerSel.value = appCurrency;
+    const settingsSel = document.getElementById('settingsCurrencySelect');
+    if (settingsSel && settingsSel.value !== appCurrency) settingsSel.value = appCurrency;
+    const mobileSel = document.getElementById('pnMobileCurrencySelect');
+    if (mobileSel && mobileSel.value !== appCurrency) mobileSel.value = appCurrency;
+
+    // Instantaneous geographical sync time update with zero delay
+    updateGeographicalSyncTime(appCurrency, true);
     updateClockForCurrency();
     updateFxStatusUI();
     try { renderDashboard(); } catch (err) { console.error('renderDashboard failed on currency change', err); }
@@ -2133,18 +2397,66 @@ document.getElementById('currencySelect').addEventListener('change', function ()
     try { renderReports(); } catch (err) { console.error('renderReports failed on currency change', err); }
     try { renderFxSnapshot(); } catch (err) { console.error('renderFxSnapshot failed on currency change', err); }
     showToast(`${getCurrencyFullName(appCurrency)} (${getCurrencyTimezone(appCurrency)})`, 'info');
-});
+    updateSettingsConversion();
+}
 
-document.getElementById('converterBtn').addEventListener('click', async () => {
-    populateCurrencySelectors();
-    openModal('currencyModal');
-    updateConversion();
-    if (fxStatus !== 'live') {
-        await fetchFxRates();
-        updateConversion();
-        try { renderFxSnapshot(); } catch (err) { console.error('renderFxSnapshot error:', err); }
+const headerCurrSelectEl = document.getElementById('currencySelect');
+if (headerCurrSelectEl) {
+    headerCurrSelectEl.addEventListener('change', function () {
+        onAppCurrencyChange(this.value);
+    });
+}
+
+const settingsCurrSelectEl = document.getElementById('settingsCurrencySelect');
+if (settingsCurrSelectEl) {
+    settingsCurrSelectEl.addEventListener('change', function () {
+        onAppCurrencyChange(this.value);
+    });
+}
+
+const mobileCurrSelectEl = document.getElementById('pnMobileCurrencySelect');
+if (mobileCurrSelectEl) {
+    mobileCurrSelectEl.addEventListener('change', function () {
+        onAppCurrencyChange(this.value);
+    });
+}
+
+// Settings converter listeners
+['settingsConvAmount', 'settingsConvFrom', 'settingsConvTo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', updateSettingsConversion);
+        el.addEventListener('change', updateSettingsConversion);
     }
 });
+
+const settingsConvSwapBtn = document.getElementById('settingsConvSwap');
+if (settingsConvSwapBtn) {
+    settingsConvSwapBtn.addEventListener('click', () => {
+        const fromEl = document.getElementById('settingsConvFrom');
+        const toEl = document.getElementById('settingsConvTo');
+        if (fromEl && toEl) {
+            const temp = fromEl.value;
+            fromEl.value = toEl.value;
+            toEl.value = temp;
+            updateSettingsConversion();
+        }
+    });
+}
+
+const converterBtnEl = document.getElementById('converterBtn');
+if (converterBtnEl) {
+    converterBtnEl.addEventListener('click', async () => {
+        populateCurrencySelectors();
+        openModal('currencyModal');
+        updateConversion();
+        if (fxStatus !== 'live') {
+            await fetchFxRates();
+            updateConversion();
+            try { renderFxSnapshot(); } catch (err) { console.error('renderFxSnapshot error:', err); }
+        }
+    });
+}
 
 const convAmountEl = document.getElementById('convAmount');
 if (convAmountEl) {
@@ -2206,8 +2518,9 @@ function populateMonths() {
     initSortableTables();
     startLiveClock();
     updateClockForCurrency();
+    updateGeographicalSyncTime(appCurrency, false);
 
-    const savedTheme = localStorage.getItem('nexus_theme') || 'light';
+    const savedTheme = localStorage.getItem('nexus_theme') || (document.body.classList.contains('light-mode') ? 'light' : 'dark');
     setTheme(savedTheme);
     requestAnimationFrame(updateTabIndicator);
 
@@ -2363,8 +2676,10 @@ function updateDashHero() {
     const presentEl = document.getElementById('presentToday');
     const pendingEl = document.getElementById('pendingLeaves');
 
-    if (elHello) {
-        const name = (Array.isArray(employees) && employees.length) ? employees[0].firstName : 'Admin';
+    if (typeof window.updateDashboardGreeting === 'function') {
+        window.updateDashboardGreeting();
+    } else if (elHello) {
+        const name = (Array.isArray(employees) && employees.length) ? employees[0].firstName : 'Nadia';
         elHello.textContent = dashGreeting(new Date()) + ', ' + name;
     }
     if (elSub) {

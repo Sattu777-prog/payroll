@@ -5,13 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.frankfurter.dev https://api.frankfurter.app https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://open.er-api.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+        content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: https://api.frankfurter.dev https://api.frankfurter.app https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://open.er-api.com; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Payroll Nexus</title>
-    <meta name="description" content="HR and payroll intelligence platform with financial dashboard, employee management, and attendance tracking">
+    <meta name="description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring real-time payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
+    <meta property="og:title" content="Payroll Nexus">
+    <meta property="og:description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring real-time payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
+    <link rel="icon" type="image/svg+xml" href="assets/images/payroll-nexus-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
+    <script>
+        // Immediately synchronize theme class before paint to avoid flash
+        (function () {
+            try {
+                var t = localStorage.getItem('nexus_theme');
+                if (t === 'light') {
+                    document.documentElement.classList.add('light-mode');
+                    document.documentElement.classList.remove('dark-mode');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Bind Tailwind's dark: variant to the app's own theme class instead of
@@ -42,344 +57,458 @@
     <link rel="stylesheet" href="assets/css/mobile-v2.css?v=20260826d">
     <!-- Header polish layer (visual only, no elements added/removed) -->
     <link rel="stylesheet" href="assets/css/header-refine.css?v=20260825a">
+    <!-- Helios luxury financial command center design system -->
+    <link rel="stylesheet" href="assets/css/helios-dashboard.css?v=20260914">
 </head>
 
-<body class="light-mode">
+<body class="dark-mode">
 
-    <div class="fx-aurora" aria-hidden="true">
-        <span class="fx-blob fx-blob-a"></span>
-        <span class="fx-blob fx-blob-b"></span>
-        <span class="fx-blob fx-blob-c"></span>
-    </div>
-    <div class="fx-grain" aria-hidden="true"></div>
-    <div class="fx-spotlight" id="fxSpotlight" aria-hidden="true"></div>
+    <!-- Atmospheric ambient backlight glow -->
+    <div class="helios-canvas-glow" aria-hidden="true"></div>
 
-    <div class="page-wrap">
+    <div class="helios-wrapper">
+        <div class="helios-shell">
 
-        <!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
-        <header class="top-header">
-            <div class="brand">
-                <div class="brand-icon"><i class="fas fa-chart-line"></i></div>
+            <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+            <aside class="helios-sidebar">
                 <div>
-                    <div class="brand-title">Payroll Nexus</div>
-                    <div class="brand-sub">HR Intelligence Platform</div>
-                </div>
-            </div>
-            <div class="live-clock" id="liveClock">
-                <div class="live-status"><span class="live-status-dot"></span> LIVE</div>
-                <div class="live-clock-date" id="liveClockDate">—</div>
-                <div class="live-clock-time" id="liveClockTime">--:--:--</div>
-            </div>
-            <div class="header-actions">
-                <input type="file" id="importFile" class="hidden" accept=".json" aria-label="Import backup file">
-                <div class="currency-select-wrap" title="Display currency">
-                    <i class="fas fa-coins currency-select-icon"></i>
-                    <select id="currencySelect" class="currency-select" aria-label="Display currency"></select>
-                </div>
-                <button id="converterBtn" class="btn btn-primary"><i class="fas fa-right-left"></i> Convert</button>
-                <button id="animToggle" class="btn btn-neutral" aria-label="Toggle animations" aria-pressed="false" title="Enable/disable all animations">
-                    <i class="fas fa-magic-wand-sparkles" id="animIcon"></i>
-                </button>
-                <button id="themeToggle" class="btn btn-neutral" aria-label="Toggle dark mode">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
-            </div>
-        </header>
+                    <!-- Brand Monogram -->
+                    <div class="helios-brand" id="heliosBrand">
+                        <div class="helios-brand-logo pn-brand-mark">
+                            <svg viewBox="0 0 100 100" class="pn-logo-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="pnBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0062ff"/>
+                                        <stop offset="100%" stop-color="#00c8ff"/>
+                                    </linearGradient>
+                                    <linearGradient id="pnPurpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#7928ca"/>
+                                        <stop offset="100%" stop-color="#ff0080"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+                                <!-- Stylized Interlocking P & N -->
+                                <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="url(#pnBlueGrad)" />
+                                <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="url(#pnPurpleGrad)" opacity="0.95"/>
+                            </svg>
+                        </div>
+                        <div class="helios-brand-name"><span class="pn-brand-payroll">Payroll</span> <span class="pn-brand-nexus">Nexus</span></div>
+                    </div>
 
-        <!-- ═══════════════════════════════ TABS ═══════════════════════════════ -->
-        <nav class="tab-bar" role="tablist">
-            <span class="tab-indicator" id="tabIndicator" aria-hidden="true"></span>
-            <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true"><i
-                    class="fas fa-chart-pie"></i> Dashboard</button>
-            <button class="tab-btn" data-tab="employees" role="tab"><i class="fas fa-users"></i> Employees</button>
-            <button class="tab-btn" data-tab="attendance" role="tab"><i class="fas fa-calendar-check"></i>
-                Attendance</button>
-            <button class="tab-btn" data-tab="leaves" role="tab"><i class="fas fa-plane-departure"></i> Leaves</button>
-            <button class="tab-btn" data-tab="payroll" role="tab"><i class="fas fa-wallet"></i> Payroll</button>
-            <button class="tab-btn" data-tab="reports" role="tab"><i class="fas fa-chart-bar"></i> Reports</button>
-        </nav>
+                    <!-- Sidebar Navigation (Exact mapping requested: portfolio->employees, analysis->attendances, market->leaves, community->payroll, reports) -->
+                    <nav class="helios-nav-group" role="tablist">
+                        <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button class="tab-btn" data-tab="employees" role="tab" aria-selected="false">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Employees</span>
+                        </button>
+                        <button class="tab-btn" data-tab="attendance" role="tab" aria-selected="false">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Attendance</span>
+                        </button>
+                        <button class="tab-btn" data-tab="leaves" role="tab" aria-selected="false">
+                            <i class="fas fa-calendar-minus"></i>
+                            <span>Leaves</span>
+                        </button>
+                        <button class="tab-btn" data-tab="payroll" role="tab" aria-selected="false">
+                            <i class="fas fa-wallet"></i>
+                            <span>Payroll</span>
+                        </button>
+                        <button class="tab-btn" data-tab="reports" role="tab" aria-selected="false">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Sidebar Bottom Actions -->
+                <div class="helios-sidebar-bottom">
+                    <button type="button" class="helios-sidebar-link" id="sidebarSettingsBtn">
+                        <i class="fas fa-gear"></i>
+                        <span>Settings</span>
+                    </button>
+                    <button type="button" class="helios-sidebar-link" id="sidebarSupportBtn">
+                        <i class="fas fa-circle-question"></i>
+                        <span>Support</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- ═══════════════════════════════ MAIN CONTENT ═══════════════════════════════ -->
+            <main class="helios-main">
+
+                <!-- Mobile Command Bar (Sticky header on small screens) -->
+                <header class="pn-mobile-header" id="pnMobileHeader" aria-label="Mobile Navigation Bar">
+                    <div class="pn-mobile-brand">
+                        <div class="pn-mobile-logo">
+                            <svg viewBox="0 0 100 100" class="pn-logo-svg-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+                                <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="#0076fe"/>
+                                <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="#9333ea"/>
+                            </svg>
+                        </div>
+                        <span class="pn-mobile-title"><strong class="pn-mob-name-main">Payroll</strong> <span class="pn-mob-name-accent">Nexus</span></span>
+                    </div>
+                    <div class="pn-mobile-actions">
+                        <button type="button" class="pn-mobile-icon-btn" id="mobileThemeToggle" title="Toggle Theme" aria-label="Toggle light and dark theme">
+                            <i class="fas fa-moon" id="mobileThemeIcon"></i>
+                        </button>
+                        <button type="button" class="pn-mobile-icon-btn" id="mobileNotifBtn" title="Notifications" aria-label="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="pn-icon-badge"></span>
+                        </button>
+                        <button type="button" class="pn-mobile-icon-btn pn-drawer-trigger" id="mobileMenuBtn" title="Menu & Controls" aria-label="Open mobile navigation drawer">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </header>
 
         <!-- ═══════════════════════════════ DASHBOARD ═════════════════════════ -->
         <section id="dashboardSection" class="tab-content" role="tabpanel">
 
-            <!-- ── Hero greeting ── -->
-            <div class="dash-hero glass" id="dashGreeting">
-                <div class="dash-hero-left">
-                    <div class="dash-hero-avatar" id="heroAvatar"><i class="fas fa-user-tie"></i></div>
-                    <div>
-                        <div class="dash-hello" id="dashHello">Good day, Admin</div>
-                        <div class="dash-sub" id="dashSub">Here's what's happening at Payroll Nexus today.</div>
-                    </div>
-                </div>
-                <div class="dash-hero-right">
-                    <div class="hero-chips">
-                        <div class="hero-chip chip-blue"><i class="fas fa-user-check"></i><span
-                                id="chipPresentDash">0</span> present</div>
-                        <div class="hero-chip chip-amber"><i class="fas fa-hourglass-half"></i><span
-                                id="chipPendingDash">0</span> pending</div>
-                        <div class="hero-chip chip-purple"><i class="fas fa-users"></i><span id="chipStaffDash">0</span>
-                            staff</div>
-                    </div>
-                    <button class="btn btn-primary hero-cta" id="heroGoReports"><i class="fas fa-chart-pie"></i> View
-                        Reports</button>
-                </div>
-                <div class="dash-hero-orb"></div>
-                <div class="dash-hero-orb dash-hero-orb-2"></div>
-            </div>
-
-            <!-- ── KPI row ── -->
-            <div class="kpi-row" id="kpiRow">
-
-                <div class="kpi-card kpi-blue glass tilt-card">
-                    <div class="kpi-shine"></div>
-                    <div class="kpi-top"><span class="kpi-label">Total Staff</span>
-                        <div class="kpi-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;"><i
-                                class="fas fa-users"></i></div>
-                    </div>
-                    <div class="kpi-val" id="totalEmployees">0</div>
-                    <div class="kpi-sub" id="ks-staff"></div>
-                    <div class="kpi-spark-wrap"><svg id="sp-staff" viewBox="0 0 120 28" preserveAspectRatio="none"
-                            style="width:100%;height:28px;display:block;"></svg></div>
-                    <div class="kpi-foot"><i class="fas fa-arrow-trend-up kpi-foot-icon"></i> All systems
-                        operational</div>
+            <!-- Top Header Bar (Unified action & search bar — Dashboard Only) -->
+            <header class="helios-topbar" id="heliosTopbar">
+                <div class="helios-welcome">
+                    <h1 class="helios-welcome-title" id="dashHello">Good morning, Nadia</h1>
+                    <div class="helios-welcome-date" id="dashDate"><i class="far fa-calendar-alt" style="margin-right:6px;opacity:0.8;"></i>Today</div>
                 </div>
 
-                <div class="kpi-card kpi-green glass tilt-card">
-                    <div class="kpi-shine"></div>
-                    <div class="kpi-top"><span class="kpi-label">Present Today</span>
-                        <div class="kpi-icon" style="background:rgba(16,185,129,.12);color:#10b981;"><i
-                                class="fas fa-user-check"></i></div>
+                <!-- Compact AI Command Trigger -->
+                <div class="helios-ai-search" id="heliosAiSearchCapsule">
+                    <input type="text" id="heliosAiInput" placeholder="Ask AI..." autocomplete="off">
+                    <button type="button" id="heliosAiBtn" class="helios-ai-send-btn" aria-label="Ask AI" title="Send to AI">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="helios-top-actions">
+                    <!-- Interactive Dark / Light Theme Toggle Button Switch -->
+                    <div class="helios-theme-toggle-wrap" title="Toggle Light / Dark Theme">
+                        <button type="button" id="themeToggle" class="helios-theme-toggle-btn is-dark" role="switch" aria-checked="true" aria-label="Toggle between dark and light theme">
+                            <span class="theme-toggle-track">
+                                <span class="theme-toggle-opt dark-opt" id="themeOptDark" title="Switch to Dark Mode">
+                                    <i class="fas fa-moon"></i>
+                                    <span class="theme-toggle-text">Dark</span>
+                                </span>
+                                <span class="theme-toggle-opt light-opt" id="themeOptLight" title="Switch to Light Mode">
+                                    <i class="fas fa-sun"></i>
+                                    <span class="theme-toggle-text">Light</span>
+                                </span>
+                                <span class="theme-toggle-thumb" id="themeThumb" aria-hidden="true">
+                                    <i id="themeIcon" class="fas fa-moon"></i>
+                                </span>
+                            </span>
+                        </button>
                     </div>
-                    <div class="kpi-val" id="presentToday">0</div>
-                    <div class="kpi-sub" id="ks-present"></div>
-                    <div class="kpi-spark-wrap"
-                        style="display:flex;align-items:center;justify-content:flex-end;height:28px;margin-top:8px;">
-                        <div style="position:relative;width:36px;height:36px;">
-                            <svg width="36" height="36" viewBox="0 0 36 36" style="transform:rotate(-90deg)">
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(16,185,129,.15)"
-                                    stroke-width="4" />
-                                <circle id="ring-arc" cx="18" cy="18" r="14" fill="none" stroke="#10b981"
-                                    stroke-width="4" stroke-dasharray="0 88" stroke-linecap="round"
-                                    style="transition:stroke-dasharray 1.1s cubic-bezier(.34,1.56,.64,1)" />
-                            </svg>
-                            <div id="ring-pct"
-                                style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--text-primary);">
-                                0%</div>
+                    <!-- Interactive Animations & Motion Toggle Button Switch -->
+                    <div class="helios-anim-toggle-wrap" title="Toggle Dashboard Animations & Motion">
+                        <button type="button" id="animToggle" class="helios-anim-toggle-btn is-active" role="switch" aria-checked="true" aria-label="Toggle animations and motion effects">
+                            <span class="anim-toggle-track">
+                                <span class="anim-toggle-icon">
+                                    <i id="animIcon" class="fas fa-wand-magic-sparkles"></i>
+                                </span>
+                                <span class="anim-toggle-label" id="animToggleLabel">Motion ON</span>
+                                <span class="anim-toggle-switch">
+                                    <span class="anim-toggle-switch-thumb"></span>
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                    <button id="notifBtn" class="helios-icon-btn" title="Notifications" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="helios-icon-badge"></span>
+                    </button>
+                    <!-- User Capsule & Login Gateway Trigger -->
+                    <div class="helios-user-pill" id="heliosUserPill" title="Manage Profile & Login" role="button" tabindex="0">
+                        <img src="assets/images/avatar.jpg" alt="User Profile" id="heliosAvatarImg" class="helios-avatar-img">
+                        <div class="helios-user-meta">
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <span class="helios-user-name" id="heliosUserName">Nadia Rachel</span>
+                                <span class="helios-role-badge admin" id="heliosUserRoleBadge">Admin</span>
+                            </div>
+                            <span class="helios-user-email" id="heliosUserEmail">rachel_helios@gmail.com</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;"></i>
+                    </div>
+
+                    <!-- Compatibility elements for existing script.js listeners -->
+                    <input type="file" id="importFile" class="hidden" accept=".json" aria-label="Import backup file">
+                    <span id="tabIndicator" class="hidden"></span>
+                </div>
+            </header>
+            <div class="helios-dash-grid">
+
+                <!-- REALTIME TELEMETRY SYSTEM BANNER -->
+                <div class="helios-telemetry-banner">
+                    <div class="helios-telemetry-left">
+                        <span class="helios-live-pulse-dot" id="globalPulseDot"></span>
+                        <span class="helios-telemetry-title">LIVE TELEMETRY STREAM</span>
+                    </div>
+                    <div class="helios-telemetry-right">
+                        <span class="helios-telemetry-sync-time" id="lastSyncTime"><span class="sync-prefix">Sync</span><span class="sync-clock-val">--:--:--</span></span>
+                    </div>
+                </div>
+
+                <!-- MIDDLE: Realtime Performance Analytics & Interactive Curve -->
+                <div class="helios-chart-card">
+                    <div class="helios-chart-head">
+                        <div class="helios-chart-title-group">
+                            <span class="helios-chart-title">Realtime Performance Analytics</span>
+                            <div class="helios-metric-switch" id="perfMetricSwitch">
+                                <button type="button" class="helios-metric-pill active" data-metric="holding">Holding Valuation</button>
+                                <button type="button" class="helios-metric-pill" data-metric="attendance">Attendance Index</button>
+                                <button type="button" class="helios-metric-pill" data-metric="payroll">Payroll Efficiency</button>
+                            </div>
+                        </div>
+                        <div class="helios-time-pills">
+                            <button type="button" class="helios-time-pill h-time-pill" data-period="1D">1D</button>
+                            <button type="button" class="helios-time-pill h-time-pill" data-period="1W">1W</button>
+                            <button type="button" class="helios-time-pill h-time-pill" data-period="1M">1M</button>
+                            <button type="button" class="helios-time-pill h-time-pill" data-period="6M">6M</button>
+                            <button type="button" class="helios-time-pill h-time-pill active" data-period="1Y">1Y</button>
                         </div>
                     </div>
-                    <div class="kpi-foot"><i class="fas fa-stopwatch kpi-foot-icon"></i> Updated live</div>
+                    <div class="helios-chart-canvas-wrap" id="heliosChartWrap">
+                        <svg id="heliosSvgChart" class="helios-svg-chart"></svg>
+                        <div class="helios-tooltip-box" id="heliosTooltip">
+                            <span class="helios-tt-date" id="heliosTtDate">Today</span>
+                            <div class="helios-tt-val-row">
+                                <span class="helios-tt-val" id="heliosTtVal">$159,735</span>
+                                <span class="helios-tt-badge" id="heliosTtBadge">+14.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Realtime KPIs -->
+                    <div class="helios-perf-kpis">
+                        <div class="perf-kpi-item">
+                            <span class="kpi-label">Performance Alpha</span>
+                            <span class="kpi-val text-emerald" id="kpiAlpha">+35.1%</span>
+                        </div>
+                        <div class="perf-kpi-item">
+                            <span class="kpi-label">Attendance Stability</span>
+                            <span class="kpi-val text-cyan" id="kpiAttStability">100% On-Duty</span>
+                        </div>
+                        <div class="perf-kpi-item">
+                            <span class="kpi-label">Disbursement Compliance</span>
+                            <span class="kpi-val text-purple" id="kpiDisbursement">99.4% Verified</span>
+                        </div>
+                        <div class="perf-kpi-item">
+                            <span class="kpi-label">Telemetry Latency</span>
+                            <span class="kpi-val text-muted" id="kpiLatency">12ms</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="kpi-card kpi-amber glass tilt-card">
-                    <div class="kpi-shine"></div>
-                    <div class="kpi-top"><span class="kpi-label">Pending Leaves</span>
-                        <div class="kpi-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;"><i
-                                class="fas fa-hourglass-half"></i></div>
-                    </div>
-                    <div class="kpi-val pending-pulse" id="pendingLeaves">0</div>
-                    <div class="kpi-sub" id="ks-leaves"></div>
-                    <div class="kpi-spark-wrap"><svg id="sp-leaves" viewBox="0 0 120 28" preserveAspectRatio="none"
-                            style="width:100%;height:28px;display:block;"></svg></div>
-                    <div class="kpi-foot"><i class="fas fa-bell kpi-foot-icon"></i> Needs attention</div>
-                </div>
-
-                <div class="kpi-card kpi-purple glass tilt-card">
-                    <div class="kpi-shine"></div>
-                    <div class="kpi-top"><span class="kpi-label">Projected Payroll</span>
-                        <div class="kpi-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;"><i
-                                class="fas fa-coins"></i></div>
-                    </div>
-                    <div class="kpi-val" id="projectedCost">$0</div>
-                    <div class="kpi-sub" id="ks-payroll"></div>
-                    <div class="kpi-spark-wrap"><svg id="sp-payroll" viewBox="0 0 120 28" preserveAspectRatio="none"
-                            style="width:100%;height:28px;display:block;"></svg></div>
-                    <div class="kpi-foot"><i class="fas fa-calculator kpi-foot-icon"></i> Gross estimate</div>
-                </div>
-
-            </div>
-
-            <!-- ── Insights strip ── -->
-            <div class="att-summary-row" id="dashInsightsRow"></div>
-
-            <!-- ── Quick actions (grouped) ── -->
-            <div class="quick-actions-wrapper">
-                <!-- Core HR Actions -->
-                <div class="qa-group" id="dashCoreGroup">
-                    <div class="qa-group-header qa-collapsible" data-toggle="qa-core-actions">
-                        <i class="fas fa-users"></i>
-                        <span>Core Actions</span>
-                        <i class="fas fa-chevron-down qa-toggle-icon"></i>
-                    </div>
-                    <div class="qa-group-grid qa-grid-collapsed" id="qa-core-actions">
-                        <button class="qa-card" data-tab-target="employees">
-                            <div class="qa-card-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;">
-                                <i class="fas fa-user-plus"></i>
+                <!-- BOTTOM: OVERALL DASHBOARD REALTIME OPERATIONS HUB (ATTENDANCE, PAYROLL, EMPLOYEES) -->
+                <div class="helios-operations-hub">
+                    <div class="helios-hub-header">
+                        <div class="helios-hub-headline">
+                            <div class="helios-hub-icon"><i class="fas fa-chart-line"></i></div>
+                            <div>
+                                <h3 class="helios-hub-title">Realtime Operations Analysis</h3>
+                                <p class="helios-hub-sub">Continuous live telemetry analyzing Attendance, Payroll Disbursements, and Employee Workforce</p>
                             </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Add Employee</div>
-                                <div class="qa-card-desc">Create new staff record</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" data-tab-target="attendance">
-                            <div class="qa-card-icon" style="background:rgba(16,185,129,.12);color:#10b981;">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Take Attendance</div>
-                                <div class="qa-card-desc">Mark present/absent</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" data-tab-target="leaves">
-                            <div class="qa-card-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;">
-                                <i class="fas fa-envelope-open-text"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">New Leave Request</div>
-                                <div class="qa-card-desc">Submit leave application</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" data-tab-target="reports">
-                            <div class="qa-card-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">View Reports</div>
-                                <div class="qa-card-desc">Analytics & insights</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" data-tab-target="payroll">
-                            <div class="qa-card-icon" style="background:rgba(16,185,129,.12);color:#10b981;">
-                                <i class="fas fa-calculator"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Run Payroll</div>
-                                <div class="qa-card-desc">Process salary calculations</div>
-                            </div>
-                            <button class="qa-card-action" id="qaRefresh" title="Refresh data">
-                                <i class="fas fa-rotate"></i>
+                        </div>
+                        <div class="helios-hub-quick-actions">
+                            <button type="button" class="helios-action-pill" id="liveRollCallBtn">
+                                <i class="fas fa-user-check"></i>
+                                <span>Live Roll-Call</span>
                             </button>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Data Management Actions -->
-                <div class="qa-group" id="dashDataGroup">
-                    <div class="qa-group-header qa-collapsible" data-toggle="qa-data-mgmt">
-                        <i class="fas fa-database"></i>
-                        <span>Data Management</span>
-                        <i class="fas fa-chevron-down qa-toggle-icon"></i>
-                    </div>
-                    <div class="qa-group-grid qa-grid-collapsed" id="qa-data-mgmt">
-                        <button class="qa-card" id="exportExcelBtn">
-                            <div class="qa-card-icon" style="background:rgba(34,197,94,.12);color:#22c55e;">
-                                <i class="fas fa-file-excel"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Export Data</div>
-                                <div class="qa-card-desc">Download as Excel</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" id="backupBtn">
-                            <div class="qa-card-icon" style="background:rgba(59,130,246,.12);color:#3b82f6;">
-                                <i class="fas fa-download"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Backup</div>
-                                <div class="qa-card-desc">Save all data locally</div>
-                            </div>
-                        </button>
-                        <button class="qa-card" onclick="document.getElementById('importFile').click()">
-                            <div class="qa-card-icon" style="background:rgba(168,85,247,.12);color:#a855f7;">
-                                <i class="fas fa-upload"></i>
-                            </div>
-                            <div class="qa-card-text">
-                                <div class="qa-card-title">Restore</div>
-                                <div class="qa-card-desc">Load backup file</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Bottom 3-col grid ── -->
-            <div class="dash-bottom-grid" id="dashGrid">
-
-                <!-- 6-month bar chart -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><i class="fas fa-chart-bar" style="color:#3b82f6;"></i> Payroll trend — 6
-                        months <span class="live-badge"><span class="live-dot"></span> live</span></div>
-                    <div class="trend-bars" id="trend-bars"></div>
-                </div>
-
-                <!-- Attendance donut -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><i class="fas fa-chart-pie" style="color:#10b981;"></i> Attendance this
-                        month</div>
-                    <div class="donut-wrap">
-                        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
-                            <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
-                                <circle cx="36" cy="36" r="27" fill="none" stroke="rgba(99,115,129,.12)"
-                                    stroke-width="9" />
-                                <circle id="don-present" cx="36" cy="36" r="27" fill="none" stroke="#10b981"
-                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
-                                    style="transition:stroke-dasharray 1s ease .2s" />
-                                <circle id="don-late" cx="36" cy="36" r="27" fill="none" stroke="#f59e0b"
-                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
-                                    style="transition:stroke-dasharray 1s ease .35s" />
-                                <circle id="don-half" cx="36" cy="36" r="27" fill="none" stroke="#8b5cf6"
-                                    stroke-width="9" stroke-dasharray="0 170" stroke-linecap="butt"
-                                    style="transition:stroke-dasharray 1s ease .5s" />
-                            </svg>
-                            <div
-                                style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                                <span id="don-pct"
-                                    style="font-size:15px;font-weight:800;color:var(--text-primary);line-height:1;">0%</span>
-                                <span style="font-size:9px;color:var(--text-muted);">present</span>
-                            </div>
-                        </div>
-                        <div id="att-legend" class="att-legend"
-                            style="display:flex;flex-direction:column;gap:5px;flex:1;font-size:11px;">
+                            <button type="button" class="helios-action-pill accent" id="liveRunPayrollBtn">
+                                <i class="fas fa-bolt"></i>
+                                <span>Run Live Cycle</span>
+                            </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Dept salary bars -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><i class="fas fa-building" style="color:#8b5cf6;"></i> Salary by department
+                    <div class="helios-hub-grid">
+                        <!-- Card A: Attendance Realtime Analysis -->
+                        <div class="helios-hub-card">
+                            <div class="hub-card-head">
+                                <div class="hub-card-title"><i class="fas fa-calendar-check" style="color:#62c88a;"></i> Attendance Analytics</div>
+                                <span class="hub-card-badge positive" id="hubAttBadge">100% Rate</span>
+                            </div>
+                            <div class="hub-att-body">
+                                <div class="hub-att-ring-wrap">
+                                    <svg class="hub-radial-svg" viewBox="0 0 80 80">
+                                        <circle class="hub-radial-bg" cx="40" cy="40" r="32"></circle>
+                                        <circle class="hub-radial-progress" id="hubRadialArc" cx="40" cy="40" r="32"></circle>
+                                    </svg>
+                                    <div class="hub-radial-text">
+                                        <span class="hub-radial-pct" id="hubAttPct">100%</span>
+                                        <span class="hub-radial-label">On-Duty</span>
+                                    </div>
+                                </div>
+                                <div class="hub-att-stats">
+                                    <div class="att-stat-row">
+                                        <span class="stat-dot present"></span>
+                                        <span class="stat-name">Present Today</span>
+                                        <span class="stat-count" id="hubAttPresent">3</span>
+                                    </div>
+                                    <div class="att-stat-row">
+                                        <span class="stat-dot late"></span>
+                                        <span class="stat-name">Late Arrival</span>
+                                        <span class="stat-count" id="hubAttLate">0</span>
+                                    </div>
+                                    <div class="att-stat-row">
+                                        <span class="stat-dot absent"></span>
+                                        <span class="stat-name">Absent</span>
+                                        <span class="stat-count" id="hubAttAbsent">0</span>
+                                    </div>
+                                    <div class="att-stat-row">
+                                        <span class="stat-dot leave"></span>
+                                        <span class="stat-name">Pending Leaves</span>
+                                        <span class="stat-count" id="hubAttLeaves">1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hub-card-footer">
+                                <div class="hub-footer-status">
+                                    <i class="fas fa-circle-check" style="color:#62c88a;"></i>
+                                    <span id="hubAttStatusDesc">All departments meeting punctuality baseline</span>
+                                </div>
+                                <button type="button" class="helios-hub-action-btn" id="liveRollCallBtn" title="Trigger Instant Live Roll-Call Broadcast">
+                                    <i class="fas fa-clipboard-check"></i> Roll-Call
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card B: Payroll Realtime Analysis -->
+                        <div class="helios-hub-card">
+                            <div class="hub-card-head">
+                                <div class="hub-card-title"><i class="fas fa-wallet" style="color:#b68cff;"></i> Payroll Analytics</div>
+                                <span class="hub-card-badge accent" id="hubPayrollMonthBadge">Cycle 9/2026</span>
+                            </div>
+                            <div class="hub-pay-body">
+                                <div class="hub-pay-main">
+                                    <span class="hub-pay-label">Total Monthly Net Liability</span>
+                                    <div class="hub-pay-amount" id="hubPayrollNetVal">$19,788.00</div>
+                                </div>
+                                <div class="hub-pay-progress-bar">
+                                    <div class="pay-seg basic" style="width:70%;" title="Basic Salary"></div>
+                                    <div class="pay-seg allow" style="width:15%;" title="Allowances"></div>
+                                    <div class="pay-seg tax" style="width:15%;" title="Tax Withholdings"></div>
+                                </div>
+                                <div class="hub-pay-ledger">
+                                    <div class="pay-ledger-col">
+                                        <span class="ledger-label">Gross Cost</span>
+                                        <span class="ledger-val" id="hubPayrollGross">$23,280.00</span>
+                                    </div>
+                                    <div class="pay-ledger-col">
+                                        <span class="ledger-label">Tax Escrow</span>
+                                        <span class="ledger-val" id="hubPayrollTax">$3,492.00</span>
+                                    </div>
+                                    <div class="pay-ledger-col">
+                                        <span class="ledger-label">Average Net</span>
+                                        <span class="ledger-val" id="hubPayrollAvg">$6,467.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hub-card-footer">
+                                <div class="hub-footer-status">
+                                    <i class="fas fa-lock" style="color:#b68cff;"></i>
+                                    <span>Escrow funded · Verified & ready for disbursement</span>
+                                </div>
+                                <button type="button" class="helios-hub-action-btn" id="liveRunPayrollBtn" title="Trigger Instant Live Payroll Recalculation">
+                                    <i class="fas fa-play"></i> Process Cycle
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card C: Employee Workforce Analysis -->
+                        <div class="helios-hub-card">
+                            <div class="hub-card-head">
+                                <div class="hub-card-title"><i class="fas fa-users-gear" style="color:#5cb3ff;"></i> Employee Workforce</div>
+                                <span class="hub-card-badge info" id="hubEmployeeBadge">3 Active Staff</span>
+                            </div>
+                            <div class="hub-emp-body">
+                                <div class="hub-dept-list" id="hubDeptList">
+                                    <!-- Populated dynamically with Department progress bars -->
+                                </div>
+                                <div class="hub-emp-metrics">
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-cyan" id="hubRetentionRate">99.4%</span>
+                                        <span class="tile-label">Retention</span>
+                                    </div>
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-emerald" id="hubEfficiencyIndex">98.5%</span>
+                                        <span class="tile-label">Efficiency</span>
+                                    </div>
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-purple" id="hubActiveDeptCount">3</span>
+                                        <span class="tile-label">Depts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hub-card-footer">
+                                <div class="hub-footer-status">
+                                    <i class="fas fa-shield-heart" style="color:#5cb3ff;"></i>
+                                    <span>Workforce healthy with zero turnover alerts</span>
+                                </div>
+                                <button type="button" class="helios-hub-action-btn" id="liveManageStaffBtn" title="Switch to Employee Directory">
+                                    <i class="fas fa-users"></i> Staff
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div id="dept-list" style="display:flex;flex-direction:column;gap:9px;"></div>
-                </div>
 
-                <!-- Live activity feed -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><span class="live-dot"></span> Live activity <span class="live-badge"><span
-                                class="live-dot"></span> realtime</span></div>
-                    <div id="activity-feed" class="activity-scroll"></div>
-                </div>
-
-                <!-- Top earners -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Top earners this
-                        period</div>
-                    <div id="top-earners-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-                </div>
-
-                <!-- Live FX snapshot -->
-                <div class="glass chart-card reveal-card">
-                    <div class="chart-title"><i class="fas fa-right-left" style="color:#10b981;"></i> Exchange rates
-                        <span style="font-weight:500;text-transform:none;letter-spacing:0;">(base USD)</span>
+                    <!-- Live Realtime Telemetry Feed Bar -->
+                    <div class="helios-live-feed-strip">
+                        <div class="feed-strip-label">
+                            <span class="feed-pulse-indicator"></span>
+                            <span>LIVE TELEMETRY</span>
+                        </div>
+                        <div class="feed-ticker-container">
+                            <div class="feed-ticker-track" id="liveFeedTickerTrack">
+                                <span class="feed-ticker-item">● WebSocket connected: streaming live attendance and payroll events</span>
+                                <span class="feed-ticker-item">● Treasury runway stable at 6.9 months reserve</span>
+                                <span class="feed-ticker-item">● Aarav Sharma · Lead Developer · Attendance verified</span>
+                                <span class="feed-ticker-item">● Real-time currency conversions synchronized with ECB rates</span>
+                                <span class="feed-ticker-item">● WebSocket connected: streaming live attendance and payroll events</span>
+                                <span class="feed-ticker-item">● Treasury runway stable at 6.9 months reserve</span>
+                                <span class="feed-ticker-item">● Aarav Sharma · Lead Developer · Attendance verified</span>
+                                <span class="feed-ticker-item">● Real-time currency conversions synchronized with ECB rates</span>
+                            </div>
+                        </div>
                     </div>
-                    <div id="fx-snapshot-list" style="display:flex;flex-direction:column;gap:7px;"></div>
-                    <div id="fx-snapshot-meta" class="fx-meta"></div>
+                </div>
+
+                <!-- Hidden compatibility elements to support core scripts seamlessly -->
+                <div style="display:none;" aria-hidden="true">
+                    <button id="exportExcelBtn"></button>
+                    <button id="backupBtn"></button>
+                    <span id="totalEmployees">0</span>
+                    <span id="presentToday">0</span>
+                    <span id="pendingLeaves">0</span>
+                    <span id="projectedCost">$0</span>
+                    <span id="ks-staff"></span>
+                    <span id="ks-present"></span>
+                    <span id="ks-leaves"></span>
+                    <span id="ks-payroll"></span>
+                    <svg id="sp-staff"></svg>
+                    <svg id="sp-leaves"></svg>
+                    <svg id="sp-payroll"></svg>
+                    <circle id="ring-arc"></circle>
+                    <span id="ring-pct"></span>
+                    <span id="chipPresentDash">0</span>
+                    <span id="chipPendingDash">0</span>
+                    <span id="chipStaffDash">0</span>
+                    <div id="trend-bars"></div>
+                    <div id="activity-feed"></div>
+                    <div id="top-earners-list"></div>
+                    <div id="dashGreeting"></div>
+                    <div id="liveClockDate"></div>
+                    <div id="liveClockTime"></div>
+                    <canvas id="payrollTrendChart"></canvas>
+                    <canvas id="attendancePieChart"></canvas>
+                    <div id="dashboardAlertFeed"></div>
                 </div>
 
             </div>
-
-            <!-- hidden compat elements for old renderDashboard() calls -->
-            <canvas id="payrollTrendChart" style="display:none;"></canvas>
-            <canvas id="attendancePieChart" style="display:none;"></canvas>
-            <div id="dashboardAlertFeed" style="display:none;"></div>
-
         </section>
 
         <!-- ═══════════════════════════════ EMPLOYEES ═════════════════════════ -->
@@ -594,7 +723,8 @@
                 </div>
             </div>
         </section>
-
+            </main>
+        </div>
     </div>
 
     <!-- ══════════════════════════════ MODALS ════════════════════════════════ -->
@@ -757,6 +887,97 @@
         </div>
     </div>
 
+    <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="modal-card" style="max-width:32rem;">
+            <div class="modal-header">
+                <h3 id="settingsModalTitle"><i class="fas fa-gear" style="color:var(--h-accent-primary);margin-right:0.5rem;"></i> System Settings</h3>
+                <button type="button" class="modal-close" onclick="closeModal('settingsModal')" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div id="settingsModalBody" class="modal-body" style="display:flex;flex-direction:column;gap:1.25rem;max-height:calc(85vh - 100px);overflow-y:auto;padding:18px;">
+                <!-- Appearance Section -->
+                <div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--h-text-dim);margin-bottom:0.6rem;">Appearance & Theme</div>
+                    <div class="settings-card-row">
+                        <div class="settings-row-info">
+                            <div style="font-weight:600;font-size:14px;">Interface Theme</div>
+                            <div style="font-size:12px;color:var(--h-text-muted);">Switch between luxury dark command center and clean light mode</div>
+                        </div>
+                        <div class="settings-theme-selector">
+                            <button type="button" class="settings-theme-chip active" id="settingsThemeDark" title="Dark Theme">
+                                <i class="fas fa-moon"></i> Dark
+                            </button>
+                            <button type="button" class="settings-theme-chip" id="settingsThemeLight" title="Light Theme">
+                                <i class="fas fa-sun"></i> Light
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools & Currency -->
+                <div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--h-text-dim);margin-bottom:0.6rem;">Currency & Financial Tools</div>
+                    
+                    <!-- Base Currency Setting -->
+                    <div class="settings-card-row" style="margin-bottom:0.75rem;">
+                        <div class="settings-row-info">
+                            <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-coins" style="color:#b68cff;"></i> Base Display Currency
+                            </div>
+                            <div style="font-size:12px;color:var(--h-text-muted);">Default currency for salaries, ledger, and all telemetry</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <select id="settingsCurrencySelect" class="currency-select settings-curr-select" aria-label="Base Currency Selector"></select>
+                        </div>
+                    </div>
+
+                    <!-- Inline Quick Currency Converter -->
+                    <div class="settings-conv-card" style="background:var(--h-bg-card-elevated);border:1px solid var(--h-border-subtle);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-right-left" style="color:#62c88a;"></i> Quick Currency Converter
+                            </div>
+                            <span id="settingsFxBadge" class="fx-live-badge" style="font-size:11px;padding:2px 8px;border-radius:9999px;background:rgba(98,200,138,0.15);color:#62c88a;font-weight:600;">Live FX</span>
+                        </div>
+                        
+                        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+                            <div>
+                                <label for="settingsConvFrom" style="display:block;font-size:11px;color:var(--h-text-dim);margin-bottom:3px;font-weight:600;">From</label>
+                                <select id="settingsConvFrom" class="field-input" style="width:100%;padding:6px 8px;font-size:12px;border-radius:8px;"></select>
+                            </div>
+                            <div style="display:flex;align-items:flex-end;padding-top:14px;">
+                                <button type="button" id="settingsConvSwap" class="btn btn-neutral btn-sm" title="Swap currencies" aria-label="Swap currencies" style="padding:6px 10px;border-radius:8px;">
+                                    <i class="fas fa-arrow-right-arrow-left"></i>
+                                </button>
+                            </div>
+                            <div>
+                                <label for="settingsConvTo" style="display:block;font-size:11px;color:var(--h-text-dim);margin-bottom:3px;font-weight:600;">To</label>
+                                <select id="settingsConvTo" class="field-input" style="width:100%;padding:6px 8px;font-size:12px;border-radius:8px;"></select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <div style="flex:1;">
+                                <label for="settingsConvAmount" style="display:block;font-size:11px;color:var(--h-text-dim);margin-bottom:3px;font-weight:600;">Amount</label>
+                                <input type="number" id="settingsConvAmount" class="field-input" value="1000" min="0" step="0.01" style="width:100%;padding:6px 10px;font-size:13px;border-radius:8px;">
+                            </div>
+                            <div class="settings-result-box" style="flex:1.4;border-radius:8px;padding:8px 12px;margin-top:14px;">
+                                <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--h-text-dim);font-weight:700;">Result</div>
+                                <div id="settingsConvResult" class="settings-result-text" style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+                            </div>
+                        </div>
+
+                        <div class="settings-conv-divider" style="display:flex;align-items:center;justify-content:space-between;padding-top:4px;">
+                            <div id="settingsConvRate" style="font-size:11px;color:var(--h-text-muted);font-family:'JetBrains Mono',monospace;"></div>
+                            <button type="button" class="btn btn-neutral btn-sm" onclick="closeModal('settingsModal'); openModal('currencyModal');" style="font-size:11.5px;padding:4px 10px;">
+                                <i class="fas fa-table-cells"></i> Full FX Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="currencyModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="currencyModalTitle">
         <div class="modal-card" style="max-width:28rem;">
             <div class="modal-header">
@@ -797,6 +1018,143 @@
         </div>
     </div>
 
+    <!-- ═══════════════════════════════ ULTRA-HIGH UX MOBILE DOCK ═══════════════════════════════ -->
+    <nav class="pn-mobile-dock" id="pnMobileDock" role="tablist" aria-label="Mobile Navigation Bar">
+        <button class="pn-dock-btn tab-btn active" data-tab="dashboard" role="tab" aria-selected="true">
+            <span class="pn-dock-icon"><i class="fas fa-chart-pie"></i></span>
+            <span class="pn-dock-label">Dashboard</span>
+        </button>
+        <button class="pn-dock-btn tab-btn" data-tab="employees" role="tab" aria-selected="false">
+            <span class="pn-dock-icon"><i class="fas fa-briefcase"></i></span>
+            <span class="pn-dock-label">Employees</span>
+        </button>
+        <button class="pn-dock-btn tab-btn" data-tab="attendance" role="tab" aria-selected="false">
+            <span class="pn-dock-icon"><i class="fas fa-chart-line"></i></span>
+            <span class="pn-dock-label">Attendance</span>
+        </button>
+        <button class="pn-dock-btn tab-btn" data-tab="leaves" role="tab" aria-selected="false">
+            <span class="pn-dock-icon"><i class="fas fa-calendar-minus"></i></span>
+            <span class="pn-dock-label">Leaves</span>
+        </button>
+        <button class="pn-dock-btn tab-btn" data-tab="payroll" role="tab" aria-selected="false">
+            <span class="pn-dock-icon"><i class="fas fa-wallet"></i></span>
+            <span class="pn-dock-label">Payroll</span>
+        </button>
+        <button class="pn-dock-btn tab-btn" data-tab="reports" role="tab" aria-selected="false">
+            <span class="pn-dock-icon"><i class="fas fa-chart-bar"></i></span>
+            <span class="pn-dock-label">Reports</span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════ MOBILE SLIDE-OVER DRAWER ═══════════════════════════════ -->
+    <div class="pn-drawer-backdrop" id="pnDrawerBackdrop"></div>
+    <aside class="pn-mobile-drawer" id="pnMobileDrawer" aria-label="Mobile Navigation & Controls">
+        <div class="pn-drawer-head">
+            <div class="pn-drawer-brand">
+                <svg viewBox="0 0 100 100" class="pn-logo-svg-sm" fill="none">
+                    <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+                    <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="#0076fe"/>
+                    <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="#9333ea"/>
+                </svg>
+                <span><strong>Payroll</strong> Nexus</span>
+            </div>
+            <button type="button" class="pn-drawer-close" id="pnDrawerCloseBtn" aria-label="Close menu">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="pn-drawer-profile" id="pnDrawerProfileBtn" role="button" tabindex="0">
+            <img src="assets/images/avatar.jpg" alt="User Profile" class="pn-drawer-avatar">
+            <div class="pn-drawer-profile-info">
+                <div class="pn-drawer-profile-name">Nadia Rachel <span class="helios-role-badge admin">Admin</span></div>
+                <div class="pn-drawer-profile-email">rachel_helios@gmail.com</div>
+            </div>
+            <i class="fas fa-chevron-right pn-drawer-chevron"></i>
+        </div>
+
+        <div class="pn-drawer-body">
+            <!-- Navigation section -->
+            <div class="pn-drawer-section-title">Navigation Hub</div>
+            <div class="pn-drawer-nav">
+                <button class="pn-drawer-nav-item tab-btn" data-tab="dashboard">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="pn-drawer-nav-item tab-btn" data-tab="employees">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Employees</span>
+                </button>
+                <button class="pn-drawer-nav-item tab-btn" data-tab="attendance">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Attendance</span>
+                </button>
+                <button class="pn-drawer-nav-item tab-btn" data-tab="leaves">
+                    <i class="fas fa-calendar-minus"></i>
+                    <span>Leaves</span>
+                </button>
+                <button class="pn-drawer-nav-item tab-btn" data-tab="payroll">
+                    <i class="fas fa-wallet"></i>
+                    <span>Payroll</span>
+                </button>
+                <button class="pn-drawer-nav-item tab-btn" data-tab="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </button>
+            </div>
+
+            <div class="pn-drawer-section-title" style="margin-top:16px;">Quick Tools & Preferences</div>
+            <div class="pn-drawer-tools">
+                <!-- Theme Switcher Card -->
+                <div class="pn-drawer-tool-card">
+                    <div class="pn-drawer-tool-label">
+                        <i class="fas fa-palette" style="color:#7c3aed;"></i>
+                        <span>Appearance Theme</span>
+                    </div>
+                    <div class="pn-drawer-theme-pills">
+                        <button type="button" class="pn-theme-pill active" id="pnThemeDarkPill">
+                            <i class="fas fa-moon"></i> Dark
+                        </button>
+                        <button type="button" class="pn-theme-pill" id="pnThemeLightPill">
+                            <i class="fas fa-sun"></i> Light
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Currency Selection & Converter -->
+                <div class="pn-drawer-tool-card">
+                    <div class="pn-drawer-tool-label">
+                        <i class="fas fa-coins" style="color:#b68cff;"></i>
+                        <span>Base Currency</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <select id="pnMobileCurrencySelect" class="pn-mobile-curr-select" aria-label="Mobile Base Currency"></select>
+                        <button type="button" class="btn btn-neutral btn-sm" id="pnMobileFxBtn" style="padding:6px 10px;font-size:12px;">
+                            <i class="fas fa-calculator"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- App Settings & Support Buttons -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+                    <button type="button" class="btn btn-neutral" id="pnMobileSettingsBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
+                        <i class="fas fa-gear" style="margin-right:6px;"></i> Settings
+                    </button>
+                    <button type="button" class="btn btn-neutral" id="pnMobileSupportBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
+                        <i class="fas fa-circle-question" style="margin-right:6px;"></i> Support
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pn-drawer-footer">
+            <div class="pn-drawer-status">
+                <span class="helios-live-pulse-dot"></span>
+                <span>Payroll Nexus v4.2 • Cloud Telemetry Live</span>
+            </div>
+        </div>
+    </aside>
+
     <div id="toast" role="alert" aria-live="polite"></div>
 
     <script defer src="assets/js/script.js?v=20260901"></script>
@@ -810,6 +1168,8 @@
     <script defer src="assets/js/enhance8.js?v=20260901"></script>
     <script defer src="assets/js/enhance9.js?v=20260901"></script>
     <script defer src="assets/js/enhance10.js?v=20260903"></script>
+    <!-- Helios interactive intelligence layer -->
+    <script defer src="assets/js/helios-dashboard.js?v=20260914"></script>
     <!-- Mobile experience layer (swipe-between-tabs, boost-FAB safety net) — loads last -->
     <script defer src="assets/js/mobile-v2.js?v=20260826c"></script>
 </body>

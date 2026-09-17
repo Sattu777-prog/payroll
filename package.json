@@ -6,11 +6,13 @@
     "dev": "node backend/src/server.js",
     "start": "node backend/src/server.js",
     "build": "echo 'Static assets ready'",
+    "lint": "node --check backend/src/server.js",
     "db:setup": "node backend/src/db/migrate.js",
     "db:seed": "node backend/src/db/seed.js",
     "db:reset": "node backend/src/db/migrate.js && node backend/src/db/seed.js"
   },
   "dependencies": {
+    "@google/genai": "^2.22.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -19,7 +21,8 @@
     "express-rate-limit": "^7.2.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "ws": "^8.21.3"
   },
   "engines": {
     "node": ">=22.0.0"

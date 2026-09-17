@@ -309,7 +309,7 @@
 
     function mountCurrencyMirror(mount) {
         if (!mount) return;
-        const real = $('#currencySelect'); if (!real) { mount.textContent = '—'; return; }
+        const real = $('#settingsCurrencySelect') || $('#currencySelect'); if (!real) { mount.textContent = '—'; return; }
         const sel = document.createElement('select');
         sel.className = 'set-currency-sel';
         sel.setAttribute('aria-label', 'Display currency');

@@ -70,17 +70,12 @@
     /* ═══════════ 3. SECTION-ENTER STAGGER ═══════════ */
     function playEnter(section) {
         if (!section || !anim()) return;
-        var kids = section.children;
-        for (var i = 0; i < kids.length; i++) {
-            kids[i].style.animationDelay = Math.min(i * 45, 500) + 'ms';
-        }
-        section.classList.remove('mx5-enter');
-        void section.offsetWidth; /* reflow to restart */
-        section.classList.add('mx5-enter');
-        setTimeout(function () {
-            section.classList.remove('mx5-enter');
-            for (var j = 0; j < kids.length; j++) kids[j].style.animationDelay = '';
-        }, 1100);
+        requestAnimationFrame(function () {
+            section.classList.add('mx5-enter');
+            setTimeout(function () {
+                section.classList.remove('mx5-enter');
+            }, 650);
+        });
     }
     function initSectionTransitions() {
         var sections = document.querySelectorAll('.tab-content');
@@ -104,46 +99,8 @@
         { icon: 'fa-flask', label: 'What-If', run: function () { var b = $('#whatIfBtn'); if (b) b.click(); } }
     ];
     function initFab() {
-        if ($('#fab5')) return;
-        var wrap = document.createElement('div');
-        wrap.className = 'fab5';
-        wrap.id = 'fab5';
-        var backdrop = document.createElement('div');
-        backdrop.className = 'fab5-backdrop';
-        var actions = document.createElement('div');
-        actions.className = 'fab5-actions';
-        FAB_ACTIONS.forEach(function (a) {
-            var item = document.createElement('div');
-            item.className = 'fab5-item';
-            item.innerHTML = '<span class="lbl">' + a.label + '</span>' +
-                '<button class="fab5-btn" type="button" aria-label="' + a.label + '"><i class="fas ' + a.icon + '"></i></button>';
-            item.querySelector('.fab5-btn').addEventListener('click', function () { close(); a.run(); });
-            actions.appendChild(item);
-        });
-        var main = document.createElement('button');
-        main.className = 'fab5-main';
-        main.type = 'button';
-        main.setAttribute('aria-label', 'Quick actions');
-        main.setAttribute('aria-expanded', 'false');
-        main.innerHTML = '<i class="fas fa-plus"></i>';
-        wrap.appendChild(actions);
-        wrap.appendChild(main);
-        document.body.appendChild(backdrop);
-        document.body.appendChild(wrap);
-
-        var open = false;
-        function setDelays(opening) {
-            var items = actions.querySelectorAll('.fab5-item');
-            items.forEach(function (it, i) {
-                var idx = opening ? (items.length - 1 - i) : i;
-                it.style.transitionDelay = (anim() ? idx * 40 : 0) + 'ms';
-            });
-        }
-        function openFn() { open = true; setDelays(true); wrap.classList.add('open'); backdrop.classList.add('show'); main.setAttribute('aria-expanded', 'true'); }
-        function close() { open = false; setDelays(false); wrap.classList.remove('open'); backdrop.classList.remove('show'); main.setAttribute('aria-expanded', 'false'); }
-        main.addEventListener('click', function () { open ? close() : openFn(); });
-        backdrop.addEventListener('click', close);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) close(); });
+        // Floating action button removed per user specification
+        return;
     }
     /* ═══════════ 5. THEME-REVEAL FLOURISH ═══════════ */
     var lastPt = { x: window.innerWidth - 40, y: 40 };

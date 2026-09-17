@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 380" fill="none" class="pn-logo-svg">
+  <defs>
+    <!-- Vibrant electric blue gradient matching image -->
+    <linearGradient id="pnBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0080ff"/>
+      <stop offset="60%" stop-color="#006aff"/>
+      <stop offset="100%" stop-color="#0050ee"/>
+    </linearGradient>
+    <!-- Fold 3D shading gradient on ribbon tuck -->
+    <linearGradient id="pnFoldShadow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002d80" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0044b3" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Glyph: Letter 'P' (Stylized rounded arch with inner counter) -->
+  <path class="pn-glyph-p" fill-rule="evenodd" clip-rule="evenodd" 
+    d="M110 50 C82.3858 50 60 72.3858 60 100 V270 C60 286.569 73.4315 300 90 300 C106.569 300 120 286.569 120 270 V210 H220 C264.183 210 300 174.183 300 130 C300 85.8172 264.183 50 220 50 H110 Z M120 110 H220 C231.046 110 240 118.954 240 130 C240 141.046 231.046 150 220 150 H120 V110 Z" 
+    fill="currentColor"/>
+
+  <!-- Lower blue ribbon wing emerging through the counter of P -->
+  <path d="M120 210 L195 150 H240 L120 250 H90 V210 H120 Z" fill="url(#pnBlueGrad)"/>
+
+  <!-- Main Diagonal of 'N' crossing down to right leg -->
+  <path d="M165 174 L308 300 H360 L235 150 H195 L165 174 Z" fill="url(#pnBlueGrad)"/>
+
+  <!-- Right Vertical Column of 'N' -->
+  <path class="pn-glyph-n-pillar" 
+    d="M300 50 H360 C376.569 50 390 63.4315 390 80 V270 C390 286.569 376.569 300 360 300 C343.431 300 330 286.569 330 270 V110 H300 V50 Z" 
+    fill="url(#pnBlueGrad)"/>
+
+  <!-- 3D Ribbon fold crease shadow beneath the white arch -->
+  <path d="M225 150 L275 195 L300 170 V150 H225 Z" fill="url(#pnFoldShadow)" opacity="0.8"/>
+  <path d="M300 230 L330 270 V200 L300 230 Z" fill="url(#pnFoldShadow)" opacity="0.6"/>
+</svg>

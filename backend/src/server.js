@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'node:http';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,23 +9,33 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { config } from './config.js';
 import { notFoundHandler, errorHandler } from './middleware/error.js';
-import authRoutes from './routes/auth.routes.js';
+import { seed } from './db/seed.js';
+import authRoutes, { handleOAuthCallback } from './routes/auth.routes.js';
 import employeesRoutes from './routes/employees.routes.js';
 import payrollRoutes from './routes/payroll.routes.js';
 import fxRoutes from './routes/fx.routes.js';
+import aiRoutes from './routes/ai.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
+import { initRealtime } from './services/realtime.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..', '..');
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize WebSocket realtime engine
+initRealtime(server);
 
 app.set('trust proxy', 1); // behind reverse proxy (Heroku/Fly/Railway etc.)
 
 // ── Security middleware ─────────────────────────────────────────
-// Disable helmet CSP, frameguard and COEP so AI Studio iframe preview and external CDNs work cleanly
+// Disable helmet CSP, frameguard, COEP, CORP, and COOP so AI Studio iframe preview works cleanly
 app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginOpenerPolicy: false,
     frameguard: false,
 }));
 
@@ -56,9 +67,13 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+// Standard OAuth Callback endpoints per OAuth Integration specifications
+app.get(['/auth/callback/:provider', '/auth/callback/:provider/'], handleOAuthCallback);
 app.use('/api/employees', employeesRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/fx', fxRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // ── Static frontend serving ─────────────────────────────────────
 app.use(express.static(rootDir));
@@ -73,6 +88,13 @@ app.get('*', (req, res, next) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(config.port, '0.0.0.0', () => {
-    console.log(`[server] Payroll Nexus API listening on http://0.0.0.0:${config.port} (${config.nodeEnv})`);
+// Auto-seed default accounts and sample data if needed
+try {
+    await seed(false);
+} catch (err) {
+    console.warn('[server] Auto-seed status:', err?.message || err);
+}
+
+server.listen(config.port, '0.0.0.0', () => {
+    console.log(`[server] Payroll Nexus API & Realtime WebSocket listening on http://0.0.0.0:${config.port} (${config.nodeEnv})`);
 });

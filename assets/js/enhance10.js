@@ -45,7 +45,7 @@
         var hello = document.getElementById('dashHello');
         var sub = document.getElementById('dashSub');
         var chips = $('.hero-chips', hero);
-        if (hello) hi.appendChild(hello);
+        if (hello && !hello.closest('.helios-topbar')) hi.appendChild(hello);
         if (sub) hi.appendChild(sub);
         if (chips) right.appendChild(chips);
         // NOTE: #heroGoReports is deliberately left behind in the hidden hero —

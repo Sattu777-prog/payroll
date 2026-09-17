@@ -257,7 +257,7 @@
       }, true);
     }
     if (!_curBound) {
-      var cs = $('#currencySelect');
+      var cs = $('#settingsCurrencySelect') || $('#currencySelect');
       if (cs) { _curBound = true; cs.addEventListener('change', function () { logActivity('fa-coins', '#f59e0b', 'Currency set to ' + cs.value); }); }
     }
   }

@@ -109,9 +109,191 @@
     });
   }
 
+  /* ── Sync active tab indicator across mobile dock and drawer ── */
+  function syncTabUI(tabId) {
+    var cur = tabId || activeTab();
+    document.querySelectorAll('.pn-dock-btn[data-tab]').forEach(function (btn) {
+      var match = btn.getAttribute('data-tab') === cur;
+      btn.classList.toggle('active', match);
+      btn.setAttribute('aria-selected', match ? 'true' : 'false');
+    });
+    document.querySelectorAll('.pn-drawer-nav-item[data-tab]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === cur);
+    });
+  }
+
+  /* ── Sync theme across mobile buttons and drawer pills ── */
+  function syncThemeUI() {
+    var isLight = document.body.classList.contains('light-mode');
+    var icon = document.getElementById('mobileThemeIcon');
+    if (icon) {
+      icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+      icon.style.color = isLight ? '#f59e0b' : '';
+    }
+    var darkPill = document.getElementById('pnThemeDarkPill');
+    var lightPill = document.getElementById('pnThemeLightPill');
+    if (darkPill && lightPill) {
+      darkPill.classList.toggle('active', !isLight);
+      lightPill.classList.toggle('active', isLight);
+    }
+  }
+
+  /* ── Slide-over drawer controls ── */
+  function openDrawer() {
+    var drawer = document.getElementById('pnMobileDrawer');
+    var backdrop = document.getElementById('pnDrawerBackdrop');
+    if (drawer) drawer.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    var drawer = document.getElementById('pnMobileDrawer');
+    var backdrop = document.getElementById('pnDrawerBackdrop');
+    if (drawer) drawer.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function initMobileControls() {
+    // Menu button & Drawer open/close
+    var menuBtn = document.getElementById('mobileMenuBtn');
+    if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+
+    var closeBtn = document.getElementById('pnDrawerCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+    var backdrop = document.getElementById('pnDrawerBackdrop');
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    // Close drawer on Escape
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    // Mobile Header Theme Toggle
+    var themeToggle = document.getElementById('mobileThemeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', function () {
+        if (typeof window.setTheme === 'function') {
+          var nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+          window.setTheme(nextTheme);
+        } else {
+          var btn = document.getElementById('heliosThemeToggleBtn') || document.getElementById('themeBtn');
+          if (btn) btn.click();
+        }
+      });
+    }
+
+    // Drawer Theme Pills
+    var darkPill = document.getElementById('pnThemeDarkPill');
+    if (darkPill) {
+      darkPill.addEventListener('click', function () {
+        if (typeof window.setTheme === 'function') window.setTheme('dark');
+      });
+    }
+    var lightPill = document.getElementById('pnThemeLightPill');
+    if (lightPill) {
+      lightPill.addEventListener('click', function () {
+        if (typeof window.setTheme === 'function') window.setTheme('light');
+      });
+    }
+
+    // Mobile Header Notifications button
+    var notifBtn = document.getElementById('mobileNotifBtn');
+    if (notifBtn) {
+      notifBtn.addEventListener('click', function () {
+        if (typeof window.openModal === 'function') {
+          window.openModal('heliosNotifModal');
+        } else {
+          var nb = document.getElementById('notifBtn');
+          if (nb) nb.click();
+        }
+      });
+    }
+
+    // Drawer Profile card
+    var profileCard = document.getElementById('pnDrawerProfileBtn');
+    if (profileCard) {
+      profileCard.addEventListener('click', function () {
+        closeDrawer();
+        if (typeof window.openModal === 'function') {
+          window.openModal('heliosAuthModal');
+        }
+      });
+    }
+
+    // Drawer Navigation items click -> go to tab and close drawer
+    document.querySelectorAll('.pn-drawer-nav-item[data-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = this.getAttribute('data-tab');
+        if (t) {
+          goTab(t);
+          syncTabUI(t);
+          closeDrawer();
+        }
+      });
+    });
+
+    // Dock buttons click
+    document.querySelectorAll('.pn-dock-btn[data-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = this.getAttribute('data-tab');
+        if (t) {
+          goTab(t);
+          syncTabUI(t);
+        }
+      });
+    });
+
+    // Drawer Quick Tools
+    var fxBtn = document.getElementById('pnMobileFxBtn');
+    if (fxBtn) {
+      fxBtn.addEventListener('click', function () {
+        closeDrawer();
+        if (typeof window.openModal === 'function') window.openModal('currencyModal');
+      });
+    }
+
+    var settingsBtn = document.getElementById('pnMobileSettingsBtn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', function () {
+        closeDrawer();
+        if (typeof window.openModal === 'function') window.openModal('settingsModal');
+      });
+    }
+
+    var supportBtn = document.getElementById('pnMobileSupportBtn');
+    if (supportBtn) {
+      supportBtn.addEventListener('click', function () {
+        closeDrawer();
+        if (typeof window.openModal === 'function') window.openModal('heliosSupportModal');
+      });
+    }
+
+    // Watch for theme class changes on body
+    var themeObserver = new MutationObserver(function () {
+      syncThemeUI();
+    });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Watch for tab switching across all tabs in the app
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = this.getAttribute('data-tab');
+        if (t) syncTabUI(t);
+      });
+    });
+
+    // Initial sync
+    syncThemeUI();
+    syncTabUI();
+  }
+
   function boot() {
     initSwipe();
     killBoostFab();
+    initMobileControls();
     // late-injected FABs (other defer scripts) — sweep again shortly after load
     setTimeout(killBoostFab, 400);
     setTimeout(killBoostFab, 1500);
