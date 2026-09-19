@@ -7,9 +7,9 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: https://api.frankfurter.dev https://api.frankfurter.app https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://open.er-api.com; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Payroll Nexus</title>
-    <meta name="description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring real-time payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
+    <meta name="description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
     <meta property="og:title" content="Payroll Nexus">
-    <meta property="og:description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring real-time payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
+    <meta property="og:description" content="Payroll Nexus — Enterprise workforce financial intelligence platform featuring payroll analytics, automated attendance, multi-currency ledger, and AI insights.">
     <link rel="icon" type="image/svg+xml" href="assets/images/payroll-nexus-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
@@ -57,13 +57,43 @@
     <link rel="stylesheet" href="assets/css/mobile-v2.css?v=20260826d">
     <!-- Header polish layer (visual only, no elements added/removed) -->
     <link rel="stylesheet" href="assets/css/header-refine.css?v=20260825a">
-    <!-- Helios luxury financial command center design system -->
+    <!-- Payroll Nexus command center design system -->
     <link rel="stylesheet" href="assets/css/helios-dashboard.css?v=20260914">
     <!-- Autonomous living mascot layer (Lumi firefly) -->
     <link rel="stylesheet" href="assets/css/firefly.css?v=20260917">
 </head>
 
 <body class="dark-mode">
+
+    <!-- Master Payroll Nexus SVG Defs (Always rendered & globally accessible for desktop, tablet & mobile preview) -->
+    <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;" aria-hidden="true" focusable="false">
+        <defs>
+            <linearGradient id="pnBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0094ff"/>
+                <stop offset="35%" stop-color="#007efc"/>
+                <stop offset="100%" stop-color="#0056e4"/>
+            </linearGradient>
+            <linearGradient id="pnPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#008efc"/>
+                <stop offset="50%" stop-color="#0076fa"/>
+                <stop offset="100%" stop-color="#0056e0"/>
+            </linearGradient>
+            <linearGradient id="pnUnderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0074f8"/>
+                <stop offset="40%" stop-color="#0043c0"/>
+                <stop offset="80%" stop-color="#002882"/>
+                <stop offset="100%" stop-color="#001a60"/>
+            </linearGradient>
+            <linearGradient id="pnFoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#00144c" stop-opacity="0.95"/>
+                <stop offset="50%" stop-color="#002b90" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#005ce6" stop-opacity="0.1"/>
+            </linearGradient>
+            <filter id="pnWhiteShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="3" dy="9" stdDeviation="7" flood-color="#001038" flood-opacity="0.52"/>
+            </filter>
+        </defs>
+    </svg>
 
     <!-- Atmospheric ambient backlight glow -->
     <div class="helios-canvas-glow" aria-hidden="true"></div>
@@ -80,21 +110,41 @@
                     <!-- Brand Monogram -->
                     <div class="helios-brand" id="heliosBrand">
                         <div class="helios-brand-logo pn-brand-mark">
-                            <svg viewBox="0 0 100 100" class="pn-logo-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg viewBox="0 0 540 380" class="pn-logo-svg" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Payroll Nexus Logo">
                                 <defs>
                                     <linearGradient id="pnBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#0062ff"/>
-                                        <stop offset="100%" stop-color="#00c8ff"/>
+                                        <stop offset="0%" stop-color="#0094ff"/>
+                                        <stop offset="35%" stop-color="#007efc"/>
+                                        <stop offset="100%" stop-color="#0056e4"/>
                                     </linearGradient>
-                                    <linearGradient id="pnPurpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#7928ca"/>
-                                        <stop offset="100%" stop-color="#ff0080"/>
+                                    <linearGradient id="pnPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#008efc"/>
+                                        <stop offset="50%" stop-color="#0076fa"/>
+                                        <stop offset="100%" stop-color="#0056e0"/>
                                     </linearGradient>
+                                    <linearGradient id="pnUnderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0074f8"/>
+                                        <stop offset="40%" stop-color="#0043c0"/>
+                                        <stop offset="80%" stop-color="#002882"/>
+                                        <stop offset="100%" stop-color="#001a60"/>
+                                    </linearGradient>
+                                    <linearGradient id="pnFoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#00144c" stop-opacity="0.95"/>
+                                        <stop offset="50%" stop-color="#002b90" stop-opacity="0.8"/>
+                                        <stop offset="100%" stop-color="#005ce6" stop-opacity="0.1"/>
+                                    </linearGradient>
+                                    <filter id="pnWhiteShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="3" dy="9" stdDeviation="7" flood-color="#001038" flood-opacity="0.52"/>
+                                    </filter>
                                 </defs>
-                                <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-                                <!-- Stylized Interlocking P & N -->
-                                <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="url(#pnBlueGrad)" />
-                                <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="url(#pnPurpleGrad)" opacity="0.95"/>
+                                <g class="pn-blue-layer">
+                                    <path d="M 140 176 H 232 L 194 236 H 140 Z" fill="url(#pnBlueGrad)" />
+                                    <path d="M 232 176 L 310 258 L 262 324 L 194 236 Z" fill="url(#pnUnderGrad)" />
+                                    <path d="M 262 324 L 310 258 L 378 324 Z" fill="url(#pnFoldFacet)" />
+                                    <path d="M 288 324 H 432 C 443 324 452 315 452 304 V 76 C 452 65 443 56 432 56 H 396 C 389 56 384 61 384 68 V 256 L 348 324 Z" fill="url(#pnPillarGrad)" />
+                                </g>
+                                <path class="pn-white-layer" filter="url(#pnWhiteShadow)" fill="#FFFFFF"
+                                      d="M 72 306 V 116 C 72 83 98 56 132 56 H 250 C 272 56 292 68 305 88 L 394 236 C 400 246 397 258 387 264 L 352 286 C 342 292 330 289 324 279 L 248 152 C 240 139 226 124 206 124 H 156 C 147 124 140 131 140 140 V 324 H 90 C 80 324 72 316 72 306 Z" />
                             </svg>
                         </div>
                         <div class="helios-brand-name"><span class="pn-brand-payroll">Payroll</span> <span class="pn-brand-nexus">Nexus</span></div>
@@ -145,27 +195,55 @@
             <!-- ═══════════════════════════════ MAIN CONTENT ═══════════════════════════════ -->
             <main class="helios-main">
 
-                <!-- Mobile Command Bar (Sticky header on small screens) -->
-                <header class="pn-mobile-header" id="pnMobileHeader" aria-label="Mobile Navigation Bar">
+                <!-- Mobile & Tablet Command Bar (Sticky header on small & tablet screens) -->
+                <header class="pn-mobile-header" id="pnMobileHeader" aria-label="Mobile & Tablet Navigation Bar">
                     <div class="pn-mobile-brand">
-                        <div class="pn-mobile-logo">
-                            <svg viewBox="0 0 100 100" class="pn-logo-svg-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-                                <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="#0076fe"/>
-                                <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="#9333ea"/>
+                        <div class="pn-mobile-logo pn-brand-mark">
+                            <svg viewBox="0 0 540 380" class="pn-logo-svg-sm" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Payroll Nexus Logo">
+                                <defs>
+                                    <linearGradient id="pnMobBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0094ff"/>
+                                        <stop offset="35%" stop-color="#007efc"/>
+                                        <stop offset="100%" stop-color="#0056e4"/>
+                                    </linearGradient>
+                                    <linearGradient id="pnMobPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#008efc"/>
+                                        <stop offset="50%" stop-color="#0076fa"/>
+                                        <stop offset="100%" stop-color="#0056e0"/>
+                                    </linearGradient>
+                                    <linearGradient id="pnMobUnderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0074f8"/>
+                                        <stop offset="40%" stop-color="#0043c0"/>
+                                        <stop offset="80%" stop-color="#002882"/>
+                                        <stop offset="100%" stop-color="#001a60"/>
+                                    </linearGradient>
+                                    <linearGradient id="pnMobFoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#00144c" stop-opacity="0.95"/>
+                                        <stop offset="50%" stop-color="#002b90" stop-opacity="0.8"/>
+                                        <stop offset="100%" stop-color="#005ce6" stop-opacity="0.1"/>
+                                    </linearGradient>
+                                    <filter id="pnMobWhiteShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="3" dy="9" stdDeviation="7" flood-color="#001038" flood-opacity="0.52"/>
+                                    </filter>
+                                </defs>
+                                <g class="pn-blue-layer">
+                                    <path d="M 140 176 H 232 L 194 236 H 140 Z" fill="url(#pnMobBlueGrad)" />
+                                    <path d="M 232 176 L 310 258 L 262 324 L 194 236 Z" fill="url(#pnMobUnderGrad)" />
+                                    <path d="M 262 324 L 310 258 L 378 324 Z" fill="url(#pnFoldFacet)" />
+                                    <path d="M 288 324 H 432 C 443 324 452 315 452 304 V 76 C 452 65 443 56 432 56 H 396 C 389 56 384 61 384 68 V 256 L 348 324 Z" fill="url(#pnMobPillarGrad)" />
+                                </g>
+                                <path class="pn-white-layer" filter="url(#pnMobWhiteShadow)" fill="#FFFFFF"
+                                      d="M 72 306 V 116 C 72 83 98 56 132 56 H 250 C 272 56 292 68 305 88 L 394 236 C 400 246 397 258 387 264 L 352 286 C 342 292 330 289 324 279 L 248 152 C 240 139 226 124 206 124 H 156 C 147 124 140 131 140 140 V 324 H 90 C 80 324 72 316 72 306 Z" />
                             </svg>
                         </div>
-                        <span class="pn-mobile-title"><strong class="pn-mob-name-main">Payroll</strong> <span class="pn-mob-name-accent">Nexus</span></span>
+                        <span class="pn-mobile-title"><strong class="pn-mob-name-main">Payroll</strong> <span class="pn-mob-name-accent pn-brand-nexus">Nexus</span></span>
                     </div>
                     <div class="pn-mobile-actions">
-                        <button type="button" class="pn-mobile-icon-btn" id="mobileThemeToggle" title="Toggle Theme" aria-label="Toggle light and dark theme">
-                            <i class="fas fa-moon" id="mobileThemeIcon"></i>
-                        </button>
                         <button type="button" class="pn-mobile-icon-btn" id="mobileNotifBtn" title="Notifications" aria-label="Notifications">
                             <i class="fas fa-bell"></i>
                             <span class="pn-icon-badge"></span>
                         </button>
-                        <button type="button" class="pn-mobile-icon-btn pn-drawer-trigger" id="mobileMenuBtn" title="Menu & Controls" aria-label="Open mobile navigation drawer">
+                        <button type="button" class="pn-mobile-icon-btn pn-drawer-trigger" id="mobileMenuBtn" title="Menu & Controls" aria-label="Open navigation drawer">
                             <i class="fas fa-bars"></i>
                         </button>
                     </div>
@@ -179,14 +257,6 @@
                 <div class="helios-welcome">
                     <h1 class="helios-welcome-title" id="dashHello">Good morning, Nadia</h1>
                     <div class="helios-welcome-date" id="dashDate"><i class="far fa-calendar-alt" style="margin-right:6px;opacity:0.8;"></i>Today</div>
-                </div>
-
-                <!-- Compact AI Command Trigger -->
-                <div class="helios-ai-search" id="heliosAiSearchCapsule">
-                    <input type="text" id="heliosAiInput" placeholder="Ask AI..." autocomplete="off">
-                    <button type="button" id="heliosAiBtn" class="helios-ai-send-btn" aria-label="Ask AI" title="Send to AI">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
                 </div>
 
                 <div class="helios-top-actions">
@@ -234,7 +304,7 @@
                                 <span class="helios-user-name" id="heliosUserName">Nadia Rachel</span>
                                 <span class="helios-role-badge admin" id="heliosUserRoleBadge">Admin</span>
                             </div>
-                            <span class="helios-user-email" id="heliosUserEmail">rachel_helios@gmail.com</span>
+                            <span class="helios-user-email" id="heliosUserEmail">rachel_nexus@gmail.com</span>
                         </div>
                         <i class="fas fa-chevron-down" style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;"></i>
                     </div>
@@ -257,18 +327,18 @@
                     </div>
                 </div>
 
-                <!-- MIDDLE: Realtime Performance Analytics & Interactive Curve -->
-                <div class="helios-chart-card">
+                <!-- MIDDLE: Performance Analytics & Interactive Curve -->
+                <div class="helios-chart-card" id="heliosChartCard">
                     <div class="helios-chart-head">
                         <div class="helios-chart-title-group">
-                            <span class="helios-chart-title">Realtime Performance Analytics</span>
+                            <span class="helios-chart-title"><i class="fas fa-chart-area" style="color:#b68cff;margin-right:8px;"></i>Performance Analytics</span>
                             <div class="helios-metric-switch" id="perfMetricSwitch">
-                                <button type="button" class="helios-metric-pill active" data-metric="holding">Holding Valuation</button>
-                                <button type="button" class="helios-metric-pill" data-metric="attendance">Attendance Index</button>
-                                <button type="button" class="helios-metric-pill" data-metric="payroll">Payroll Efficiency</button>
+                                <button type="button" class="helios-metric-pill active" data-metric="holding"><i class="fas fa-coins" style="margin-right:5px;font-size:10.5px;"></i>Disbursement Volume</button>
+                                <button type="button" class="helios-metric-pill" data-metric="attendance"><i class="fas fa-user-check" style="margin-right:5px;font-size:10.5px;"></i>Attendance Index</button>
+                                <button type="button" class="helios-metric-pill" data-metric="payroll"><i class="fas fa-shield-halved" style="margin-right:5px;font-size:10.5px;"></i>Payroll Efficiency</button>
                             </div>
                         </div>
-                        <div class="helios-time-pills">
+                        <div class="helios-time-pills" id="heliosTimePills">
                             <button type="button" class="helios-time-pill h-time-pill" data-period="1D">1D</button>
                             <button type="button" class="helios-time-pill h-time-pill" data-period="1W">1W</button>
                             <button type="button" class="helios-time-pill h-time-pill" data-period="1M">1M</button>
@@ -287,43 +357,39 @@
                         </div>
                     </div>
 
-                    <!-- Performance Realtime KPIs -->
+                    <!-- Performance Realtime KPIs (Clean 3-column workforce & financial indicators) -->
                     <div class="helios-perf-kpis">
                         <div class="perf-kpi-item">
-                            <span class="kpi-label">Performance Alpha</span>
-                            <span class="kpi-val text-emerald" id="kpiAlpha">+35.1%</span>
+                            <span class="kpi-label"><i class="fas fa-arrow-trend-up" style="color:#62c88a;margin-right:5px;"></i>Disbursement Trend</span>
+                            <span class="kpi-val text-emerald" id="kpiAlpha">+35.1% YoY</span>
                         </div>
                         <div class="perf-kpi-item">
-                            <span class="kpi-label">Attendance Stability</span>
+                            <span class="kpi-label"><i class="fas fa-user-clock" style="color:#5cb3ff;margin-right:5px;"></i>Attendance Stability</span>
                             <span class="kpi-val text-cyan" id="kpiAttStability">100% On-Duty</span>
                         </div>
                         <div class="perf-kpi-item">
-                            <span class="kpi-label">Disbursement Compliance</span>
+                            <span class="kpi-label"><i class="fas fa-badge-check" style="color:#b68cff;margin-right:5px;"></i>Disbursement Compliance</span>
                             <span class="kpi-val text-purple" id="kpiDisbursement">99.4% Verified</span>
-                        </div>
-                        <div class="perf-kpi-item">
-                            <span class="kpi-label">Telemetry Latency</span>
-                            <span class="kpi-val text-muted" id="kpiLatency">12ms</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- BOTTOM: OVERALL DASHBOARD REALTIME OPERATIONS HUB (ATTENDANCE, PAYROLL, EMPLOYEES) -->
+                <!-- BOTTOM: OVERALL DASHBOARD OPERATIONS HUB (ATTENDANCE, EMPLOYEES, PAYROLL, LEAVES) -->
                 <div class="helios-operations-hub">
                     <div class="helios-hub-header">
                         <div class="helios-hub-headline">
                             <div class="helios-hub-icon"><i class="fas fa-chart-line"></i></div>
                             <div>
-                                <h3 class="helios-hub-title">Realtime Operations Analysis</h3>
-                                <p class="helios-hub-sub">Continuous live telemetry analyzing Attendance, Payroll Disbursements, and Employee Workforce</p>
+                                <h3 class="helios-hub-title">Operations Analysis</h3>
+                                <p class="helios-hub-sub">Continuous live telemetry analyzing Attendance, Employee Workforce, Payroll Disbursements, and Leave Allocations</p>
                             </div>
                         </div>
                         <div class="helios-hub-quick-actions">
-                            <button type="button" class="helios-action-pill" id="liveRollCallBtn">
+                            <button type="button" class="helios-action-pill" id="liveRollCallBtn" title="Trigger Instant Live Roll-Call Broadcast">
                                 <i class="fas fa-user-check"></i>
                                 <span>Live Roll-Call</span>
                             </button>
-                            <button type="button" class="helios-action-pill accent" id="liveRunPayrollBtn">
+                            <button type="button" class="helios-action-pill accent" id="liveRunPayrollBtn" title="Trigger Live Payroll Recalculation">
                                 <i class="fas fa-bolt"></i>
                                 <span>Run Live Cycle</span>
                             </button>
@@ -332,7 +398,7 @@
 
                     <div class="helios-hub-grid">
                         <!-- Card A: Attendance Realtime Analysis -->
-                        <div class="helios-hub-card">
+                        <div class="helios-hub-card hub-att-card">
                             <div class="hub-card-head">
                                 <div class="hub-card-title"><i class="fas fa-calendar-check" style="color:#62c88a;"></i> Attendance Analytics</div>
                                 <span class="hub-card-badge positive" id="hubAttBadge">100% Rate</span>
@@ -365,9 +431,9 @@
                                         <span class="stat-count" id="hubAttAbsent">0</span>
                                     </div>
                                     <div class="att-stat-row">
-                                        <span class="stat-dot leave"></span>
-                                        <span class="stat-name">Pending Leaves</span>
-                                        <span class="stat-count" id="hubAttLeaves">1</span>
+                                        <span class="stat-dot halfday"></span>
+                                        <span class="stat-name">Half-Day / Remote</span>
+                                        <span class="stat-count" id="hubAttHalfDay">0</span>
                                     </div>
                                 </div>
                             </div>
@@ -376,14 +442,44 @@
                                     <i class="fas fa-circle-check" style="color:#62c88a;"></i>
                                     <span id="hubAttStatusDesc">All departments meeting punctuality baseline</span>
                                 </div>
-                                <button type="button" class="helios-hub-action-btn" id="liveRollCallBtn" title="Trigger Instant Live Roll-Call Broadcast">
-                                    <i class="fas fa-clipboard-check"></i> Roll-Call
-                                </button>
                             </div>
                         </div>
 
-                        <!-- Card B: Payroll Realtime Analysis -->
-                        <div class="helios-hub-card">
+                        <!-- Card B: Employee Workforce Analysis -->
+                        <div class="helios-hub-card hub-emp-card">
+                            <div class="hub-card-head">
+                                <div class="hub-card-title"><i class="fas fa-users-gear" style="color:#5cb3ff;"></i> Employee Workforce</div>
+                                <span class="hub-card-badge info" id="hubEmployeeBadge">3 Active Staff</span>
+                            </div>
+                            <div class="hub-emp-body">
+                                <div class="hub-dept-list" id="hubDeptList">
+                                    <!-- Populated dynamically with Department progress bars -->
+                                </div>
+                                <div class="hub-emp-metrics">
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-cyan" id="hubRetentionRate">100%</span>
+                                        <span class="tile-label">Active Ratio</span>
+                                    </div>
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-emerald" id="hubEfficiencyIndex">98.5%</span>
+                                        <span class="tile-label">Efficiency</span>
+                                    </div>
+                                    <div class="emp-metric-tile">
+                                        <span class="tile-val text-purple" id="hubActiveDeptCount">3</span>
+                                        <span class="tile-label">Depts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hub-card-footer">
+                                <div class="hub-footer-status">
+                                    <i class="fas fa-shield-heart" style="color:#5cb3ff;"></i>
+                                    <span id="hubEmpStatusDesc">Workforce healthy with zero turnover alerts</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card C: Payroll Realtime Analysis -->
+                        <div class="helios-hub-card hub-pay-card">
                             <div class="hub-card-head">
                                 <div class="hub-card-title"><i class="fas fa-wallet" style="color:#b68cff;"></i> Payroll Analytics</div>
                                 <span class="hub-card-badge accent" id="hubPayrollMonthBadge">Cycle 9/2026</span>
@@ -393,10 +489,10 @@
                                     <span class="hub-pay-label">Total Monthly Net Liability</span>
                                     <div class="hub-pay-amount" id="hubPayrollNetVal">$19,788.00</div>
                                 </div>
-                                <div class="hub-pay-progress-bar">
-                                    <div class="pay-seg basic" style="width:70%;" title="Basic Salary"></div>
-                                    <div class="pay-seg allow" style="width:15%;" title="Allowances"></div>
-                                    <div class="pay-seg tax" style="width:15%;" title="Tax Withholdings"></div>
+                                <div class="hub-pay-progress-bar" id="hubPayProgressBar">
+                                    <div class="pay-seg basic" id="hubPaySegBasic" style="width:70%;" title="Basic Salary"></div>
+                                    <div class="pay-seg allow" id="hubPaySegAllow" style="width:15%;" title="Allowances"></div>
+                                    <div class="pay-seg tax" id="hubPaySegTax" style="width:15%;" title="Tax & Deductions"></div>
                                 </div>
                                 <div class="hub-pay-ledger">
                                     <div class="pay-ledger-col">
@@ -416,47 +512,43 @@
                             <div class="hub-card-footer">
                                 <div class="hub-footer-status">
                                     <i class="fas fa-lock" style="color:#b68cff;"></i>
-                                    <span>Escrow funded · Verified & ready for disbursement</span>
+                                    <span id="hubPayrollStatusDesc">Escrow funded · Verified & ready for disbursement</span>
                                 </div>
-                                <button type="button" class="helios-hub-action-btn" id="liveRunPayrollBtn" title="Trigger Instant Live Payroll Recalculation">
-                                    <i class="fas fa-play"></i> Process Cycle
-                                </button>
                             </div>
                         </div>
 
-                        <!-- Card C: Employee Workforce Analysis -->
-                        <div class="helios-hub-card">
+                        <!-- Card D: Leaves & Absence Analytics -->
+                        <div class="helios-hub-card hub-leave-card">
                             <div class="hub-card-head">
-                                <div class="hub-card-title"><i class="fas fa-users-gear" style="color:#5cb3ff;"></i> Employee Workforce</div>
-                                <span class="hub-card-badge info" id="hubEmployeeBadge">3 Active Staff</span>
+                                <div class="hub-card-title"><i class="fas fa-umbrella-beach" style="color:#f59e0b;"></i> Leaves Analytics</div>
+                                <span class="hub-card-badge warning" id="hubLeaveBadge">1 Pending</span>
                             </div>
-                            <div class="hub-emp-body">
-                                <div class="hub-dept-list" id="hubDeptList">
-                                    <!-- Populated dynamically with Department progress bars -->
+                            <div class="hub-leave-body">
+                                <div class="hub-leave-overview">
+                                    <div class="hub-leave-hero">
+                                        <span class="hub-leave-hero-val" id="hubLeavePendingVal">1</span>
+                                        <span class="hub-leave-hero-label">Pending Approval</span>
+                                    </div>
+                                    <div class="hub-leave-substats">
+                                        <div class="leave-substat-row">
+                                            <span class="stat-name">On Leave Today</span>
+                                            <span class="stat-count text-amber" id="hubLeaveOnToday">0</span>
+                                        </div>
+                                        <div class="leave-substat-row">
+                                            <span class="stat-name">Approved Total</span>
+                                            <span class="stat-count text-emerald" id="hubLeaveApprovedVal">0</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="hub-emp-metrics">
-                                    <div class="emp-metric-tile">
-                                        <span class="tile-val text-cyan" id="hubRetentionRate">99.4%</span>
-                                        <span class="tile-label">Retention</span>
-                                    </div>
-                                    <div class="emp-metric-tile">
-                                        <span class="tile-val text-emerald" id="hubEfficiencyIndex">98.5%</span>
-                                        <span class="tile-label">Efficiency</span>
-                                    </div>
-                                    <div class="emp-metric-tile">
-                                        <span class="tile-val text-purple" id="hubActiveDeptCount">3</span>
-                                        <span class="tile-label">Depts</span>
-                                    </div>
+                                <div class="hub-leave-breakdown" id="hubLeaveBreakdown">
+                                    <!-- Populated dynamically with leave types (Annual, Sick, Casual) -->
                                 </div>
                             </div>
                             <div class="hub-card-footer">
                                 <div class="hub-footer-status">
-                                    <i class="fas fa-shield-heart" style="color:#5cb3ff;"></i>
-                                    <span>Workforce healthy with zero turnover alerts</span>
+                                    <i class="fas fa-hourglass-half" id="hubLeaveStatusIcon" style="color:#f59e0b;"></i>
+                                    <span id="hubLeaveStatusDesc">1 request requiring manager review</span>
                                 </div>
-                                <button type="button" class="helios-hub-action-btn" id="liveManageStaffBtn" title="Switch to Employee Directory">
-                                    <i class="fas fa-users"></i> Staff
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -472,11 +564,11 @@
                                 <span class="feed-ticker-item">● WebSocket connected: streaming live attendance and payroll events</span>
                                 <span class="feed-ticker-item">● Treasury runway stable at 6.9 months reserve</span>
                                 <span class="feed-ticker-item">● Aarav Sharma · Lead Developer · Attendance verified</span>
-                                <span class="feed-ticker-item">● Real-time currency conversions synchronized with ECB rates</span>
+                                <span class="feed-ticker-item">● Currency conversions synchronized with ECB rates</span>
                                 <span class="feed-ticker-item">● WebSocket connected: streaming live attendance and payroll events</span>
                                 <span class="feed-ticker-item">● Treasury runway stable at 6.9 months reserve</span>
                                 <span class="feed-ticker-item">● Aarav Sharma · Lead Developer · Attendance verified</span>
-                                <span class="feed-ticker-item">● Real-time currency conversions synchronized with ECB rates</span>
+                                <span class="feed-ticker-item">● Currency conversions synchronized with ECB rates</span>
                             </div>
                         </div>
                     </div>
@@ -554,19 +646,19 @@
         <section id="attendanceSection" class="tab-content hidden" role="tabpanel">
             <div class="section-head">
                 <h2 class="section-title"><i class="fas fa-calendar-days"></i> Attendance <span id="attDate"
-                        style="font-size:0.875rem;font-weight:500;color:var(--text-muted);"></span></h2>
+                        style="font-size:0.875rem;font-weight:500;color:var(--text-muted);display:inline-flex;align-items:center;flex-wrap:wrap;gap:0.35rem;"></span></h2>
                 <div style="display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap;">
                     <div class="date-nav">
-                        <button id="attPrevDay" class="date-nav-btn" aria-label="Previous day"><i
+                        <button id="attPrevDay" class="date-nav-btn" aria-label="Previous day" title="Previous day"><i
                                 class="fas fa-chevron-left"></i></button>
                         <input type="date" id="attDatePicker" class="date-nav-input" aria-label="Attendance date">
-                        <button id="attNextDay" class="date-nav-btn" aria-label="Next day"><i
+                        <button id="attNextDay" class="date-nav-btn" aria-label="Next day" title="Next day"><i
                                 class="fas fa-chevron-right"></i></button>
-                        <button id="attTodayBtn" class="btn btn-neutral" style="padding:0.4rem 0.75rem;"><i
+                        <button id="attTodayBtn" class="btn btn-neutral" style="padding:0.4rem 0.75rem;" title="Reset to current day"><i
                                 class="fas fa-calendar-day"></i> Today</button>
                     </div>
-                    <button id="exportAttCSVBtn" class="btn btn-neutral"><i class="fas fa-file-csv"></i> CSV</button>
-                    <button id="markAllPresentBtn" class="btn btn-neutral"><i class="fas fa-bolt"></i> Mark All
+                    <button id="exportAttCSVBtn" class="btn btn-neutral" title="Export attendance history as CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button id="markAllPresentBtn" class="btn btn-neutral" title="Mark all employees present for this date"><i class="fas fa-bolt"></i> Mark All
                         Present</button>
                 </div>
             </div>
@@ -733,6 +825,44 @@
     </div>
 
     <!-- ══════════════════════════════ MODALS ════════════════════════════════ -->
+
+    <!-- ══════════════════════════════ EMPLOYEE PROFILE MODAL ═══════════════════ -->
+    <div id="empProfileModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="empProfileFullName">
+        <div class="modal-card emp-profile-modal-card" style="max-width:44rem;width:95%;">
+            <div class="modal-header emp-profile-modal-header">
+                <div class="emp-profile-head-info">
+                    <div id="empProfileAvatar" class="emp-profile-avatar-lg">JD</div>
+                    <div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                            <h3 id="empProfileFullName" style="margin:0;font-size:1.25rem;font-weight:700;">Employee Name</h3>
+                            <span id="empProfileIdBadge" class="emp-badge-id font-mono font-semibold">EMP1001</span>
+                            <span id="empProfileStatusBadge" class="emp-status-badge active"><i class="fas fa-circle-check"></i> Active</span>
+                        </div>
+                        <div id="empProfileRoleDept" style="margin-top:3px;font-size:0.875rem;color:var(--text-secondary);">
+                            <span id="empProfilePos">Software Engineer</span> · <span id="empProfileDept" class="font-medium">Engineering</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.625rem;">
+                    <button type="button" class="btn btn-neutral btn-sm" id="empProfileEditBtn" title="Edit Employee Details">
+                        <i class="fas fa-pen-to-square"></i> Edit
+                    </button>
+                    <button type="button" class="modal-close" onclick="closeModal('empProfileModal')" aria-label="Close modal">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body emp-profile-body" id="empProfileModalBody" style="display:flex;flex-direction:column;gap:1.25rem;max-height:calc(85vh - 130px);overflow-y:auto;padding:1.25rem;">
+                <!-- Populated dynamically via renderEmployeeProfile(empId) -->
+            </div>
+            <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;">
+                <span id="empProfileSummaryFooter" style="font-size:0.75rem;color:var(--text-muted);">Employee Record Verified</span>
+                <div style="display:flex;gap:0.5rem;">
+                    <button type="button" class="btn btn-neutral" onclick="closeModal('empProfileModal')">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="empModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="empModalTitle">
         <div class="modal-card" style="max-width:38rem;">
@@ -918,6 +1048,48 @@
                     </div>
                 </div>
 
+                <!-- AI Assistant & Intelligence Section -->
+                <div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--h-text-dim);margin-bottom:0.6rem;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-sparkles" style="color:#b68cff;"></i> AI Assistant & Intelligence
+                    </div>
+
+                    <div class="settings-ai-card" style="background:var(--h-bg-card-elevated);border:1px solid var(--h-border-subtle);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <div class="settings-row-info">
+                                <div style="font-weight:600;font-size:13.5px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                                    Nexus AI Copilot Command
+                                </div>
+                                <div style="font-size:12px;color:var(--h-text-muted);">Live telemetry queries on payroll, headcount, and financial health</div>
+                            </div>
+                            <button type="button" class="btn btn-neutral btn-sm" id="settingsOpenFullAiBtn" style="font-size:11.5px;padding:4px 10px;white-space:nowrap;" title="Open full chat modal">
+                                <i class="fas fa-comments"></i> Full Chat
+                            </button>
+                        </div>
+
+                        <!-- Embedded AI Search Capsule in Settings -->
+                        <div class="helios-ai-search" id="settingsAiSearchCapsule" style="width:100%;box-sizing:border-box;">
+                            <input type="text" id="settingsAiInput" placeholder="Ask AI about payroll, attendance, or finance..." autocomplete="off">
+                            <button type="button" id="settingsAiBtn" class="helios-ai-send-btn" aria-label="Ask AI" title="Send to AI">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Quick suggestion prompt chips in settings -->
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:2px;">
+                            <button type="button" class="settings-ai-quick-chip" data-query="Analyze current payroll health and projected runway" style="background:rgba(255,255,255,0.05);border:1px solid var(--h-border-subtle);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                                <i class="fas fa-calculator" style="font-size:10px;color:#b68cff;"></i> Payroll Runway
+                            </button>
+                            <button type="button" class="settings-ai-quick-chip" data-query="How is our headcount and staff attendance performing today?" style="background:rgba(255,255,255,0.05);border:1px solid var(--h-border-subtle);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                                <i class="fas fa-users" style="font-size:10px;color:#62c88a;"></i> Attendance Rate
+                            </button>
+                            <button type="button" class="settings-ai-quick-chip" data-query="Give me a quick executive summary of our treasury and operations" style="background:rgba(255,255,255,0.05);border:1px solid var(--h-border-subtle);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                                <i class="fas fa-chart-pie" style="font-size:10px;color:#f59e0b;"></i> Executive Summary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tools & Currency -->
                 <div>
                     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--h-text-dim);margin-bottom:0.6rem;">Currency & Financial Tools</div>
@@ -1056,12 +1228,43 @@
     <aside class="pn-mobile-drawer" id="pnMobileDrawer" aria-label="Mobile Navigation & Controls">
         <div class="pn-drawer-head">
             <div class="pn-drawer-brand">
-                <svg viewBox="0 0 100 100" class="pn-logo-svg-sm" fill="none">
-                    <circle cx="50" cy="50" r="48" fill="#0c101d" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-                    <path d="M26 28h18c8.5 0 15 5.5 15 13.5S52.5 55 44 55H35v20H26V28zm9 18h8.5c4 0 7-2 7-5.5s-3-5.5-7-5.5H35v11z" fill="#0076fe"/>
-                    <path d="M50 75V48l22 27h9V28h-8v27L58 28h-8v47z" fill="#9333ea"/>
+                <svg viewBox="0 0 540 380" class="pn-logo-svg-sm" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Payroll Nexus Logo">
+                    <defs>
+                        <linearGradient id="pnDrwBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0094ff"/>
+                            <stop offset="35%" stop-color="#007efc"/>
+                            <stop offset="100%" stop-color="#0056e4"/>
+                        </linearGradient>
+                        <linearGradient id="pnDrwPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#008efc"/>
+                            <stop offset="50%" stop-color="#0076fa"/>
+                            <stop offset="100%" stop-color="#0056e0"/>
+                        </linearGradient>
+                        <linearGradient id="pnDrwUnderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0074f8"/>
+                            <stop offset="40%" stop-color="#0043c0"/>
+                            <stop offset="80%" stop-color="#002882"/>
+                            <stop offset="100%" stop-color="#001a60"/>
+                        </linearGradient>
+                        <linearGradient id="pnDrwFoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#00144c" stop-opacity="0.95"/>
+                            <stop offset="50%" stop-color="#002b90" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#005ce6" stop-opacity="0.1"/>
+                        </linearGradient>
+                        <filter id="pnDrwWhiteShadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="3" dy="9" stdDeviation="7" flood-color="#001038" flood-opacity="0.52"/>
+                        </filter>
+                    </defs>
+                    <g class="pn-blue-layer">
+                        <path d="M 140 176 H 232 L 194 236 H 140 Z" fill="url(#pnDrwBlueGrad)" />
+                        <path d="M 232 176 L 310 258 L 262 324 L 194 236 Z" fill="url(#pnDrwUnderGrad)" />
+                        <path d="M 262 324 L 310 258 L 378 324 Z" fill="url(#pnDrwFoldFacet)" />
+                        <path d="M 288 324 H 432 C 443 324 452 315 452 304 V 76 C 452 65 443 56 432 56 H 396 C 389 56 384 61 384 68 V 256 L 348 324 Z" fill="url(#pnDrwPillarGrad)" />
+                    </g>
+                    <path class="pn-white-layer" filter="url(#pnDrwWhiteShadow)" fill="#FFFFFF"
+                          d="M 72 306 V 116 C 72 83 98 56 132 56 H 250 C 272 56 292 68 305 88 L 394 236 C 400 246 397 258 387 264 L 352 286 C 342 292 330 289 324 279 L 248 152 C 240 139 226 124 206 124 H 156 C 147 124 140 131 140 140 V 324 H 90 C 80 324 72 316 72 306 Z" />
                 </svg>
-                <span><strong>Payroll</strong> Nexus</span>
+                <span><strong>Payroll</strong> <span class="pn-brand-nexus">Nexus</span></span>
             </div>
             <button type="button" class="pn-drawer-close" id="pnDrawerCloseBtn" aria-label="Close menu">
                 <i class="fas fa-xmark"></i>
@@ -1073,82 +1276,20 @@
             <img src="assets/images/avatar.jpg" alt="User Profile" class="pn-drawer-avatar">
             <div class="pn-drawer-profile-info">
                 <div class="pn-drawer-profile-name">Nadia Rachel <span class="helios-role-badge admin">Admin</span></div>
-                <div class="pn-drawer-profile-email">rachel_helios@gmail.com</div>
+                <div class="pn-drawer-profile-email">rachel_nexus@gmail.com</div>
             </div>
             <i class="fas fa-chevron-right pn-drawer-chevron"></i>
         </div>
 
         <div class="pn-drawer-body">
-            <!-- Navigation section -->
-            <div class="pn-drawer-section-title">Navigation Hub</div>
-            <div class="pn-drawer-nav">
-                <button class="pn-drawer-nav-item tab-btn" data-tab="dashboard">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
+            <!-- App Settings & Support Buttons -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button type="button" class="btn btn-neutral" id="pnMobileSettingsBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
+                    <i class="fas fa-gear" style="margin-right:6px;"></i> Settings
                 </button>
-                <button class="pn-drawer-nav-item tab-btn" data-tab="employees">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Employees</span>
+                <button type="button" class="btn btn-neutral" id="pnMobileSupportBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
+                    <i class="fas fa-circle-question" style="margin-right:6px;"></i> Support
                 </button>
-                <button class="pn-drawer-nav-item tab-btn" data-tab="attendance">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Attendance</span>
-                </button>
-                <button class="pn-drawer-nav-item tab-btn" data-tab="leaves">
-                    <i class="fas fa-calendar-minus"></i>
-                    <span>Leaves</span>
-                </button>
-                <button class="pn-drawer-nav-item tab-btn" data-tab="payroll">
-                    <i class="fas fa-wallet"></i>
-                    <span>Payroll</span>
-                </button>
-                <button class="pn-drawer-nav-item tab-btn" data-tab="reports">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reports</span>
-                </button>
-            </div>
-
-            <div class="pn-drawer-section-title" style="margin-top:16px;">Quick Tools & Preferences</div>
-            <div class="pn-drawer-tools">
-                <!-- Theme Switcher Card -->
-                <div class="pn-drawer-tool-card">
-                    <div class="pn-drawer-tool-label">
-                        <i class="fas fa-palette" style="color:#7c3aed;"></i>
-                        <span>Appearance Theme</span>
-                    </div>
-                    <div class="pn-drawer-theme-pills">
-                        <button type="button" class="pn-theme-pill active" id="pnThemeDarkPill">
-                            <i class="fas fa-moon"></i> Dark
-                        </button>
-                        <button type="button" class="pn-theme-pill" id="pnThemeLightPill">
-                            <i class="fas fa-sun"></i> Light
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Currency Selection & Converter -->
-                <div class="pn-drawer-tool-card">
-                    <div class="pn-drawer-tool-label">
-                        <i class="fas fa-coins" style="color:#b68cff;"></i>
-                        <span>Base Currency</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <select id="pnMobileCurrencySelect" class="pn-mobile-curr-select" aria-label="Mobile Base Currency"></select>
-                        <button type="button" class="btn btn-neutral btn-sm" id="pnMobileFxBtn" style="padding:6px 10px;font-size:12px;">
-                            <i class="fas fa-calculator"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- App Settings & Support Buttons -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
-                    <button type="button" class="btn btn-neutral" id="pnMobileSettingsBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
-                        <i class="fas fa-gear" style="margin-right:6px;"></i> Settings
-                    </button>
-                    <button type="button" class="btn btn-neutral" id="pnMobileSupportBtn" style="padding:10px;font-size:12.5px;justify-content:center;">
-                        <i class="fas fa-circle-question" style="margin-right:6px;"></i> Support
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -1173,7 +1314,7 @@
     <script defer src="assets/js/enhance8.js?v=20260901"></script>
     <script defer src="assets/js/enhance9.js?v=20260901"></script>
     <script defer src="assets/js/enhance10.js?v=20260903"></script>
-    <!-- Helios interactive intelligence layer -->
+    <!-- Payroll Nexus interactive intelligence layer -->
     <script defer src="assets/js/helios-dashboard.js?v=20260914"></script>
     <!-- Mobile experience layer (swipe-between-tabs, boost-FAB safety net) — loads last -->
     <script defer src="assets/js/mobile-v2.js?v=20260826c"></script>

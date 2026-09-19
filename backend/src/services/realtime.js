@@ -200,6 +200,13 @@ export async function getDashboardMetrics() {
         : 0;
 
     const pendingLeaves = leaves.filter(l => l.status === 'pending').length;
+    const approvedLeaves = leaves.filter(l => l.status === 'approved').length;
+    const onLeaveToday = leaves.filter(l => l.status === 'approved' && l.start_date <= today && l.end_date >= today).length;
+    const leaveBreakdown = leaves.reduce((acc, l) => {
+        const type = l.leave_type || 'General';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+    }, {});
 
     // Payroll computations
     const totalBasicSalary = employees.reduce((sum, e) => sum + (parseFloat(e.base_salary_usd) || 0), 0);
@@ -358,9 +365,17 @@ export async function getDashboardMetrics() {
             lateToday,
             absentToday,
             halfDayToday,
+            onLeaveToday,
             attendanceRate,
             pendingLeaves,
             logs: attendances.slice(0, 8)
+        },
+        leaves: {
+            total: leaves.length,
+            pending: pendingLeaves,
+            approved: approvedLeaves,
+            onLeaveToday,
+            breakdown: leaveBreakdown
         },
         payroll: {
             month: curMonth,

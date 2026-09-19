@@ -404,11 +404,35 @@ function updateFxStatusUI() {
     metaEls.forEach(el => { if (el) { el.innerHTML = label; el.className = 'fx-meta ' + cls; } });
 }
 
+function formatLocalDate(d) {
+    if (!(d instanceof Date) || isNaN(d.getTime())) d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function parseLocalDate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return new Date();
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) return new Date();
+    return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+}
+
 let employees = [], attendances = [], leaveReqs = [], payrolls = [];
 let runtimeTargetDeletionId = null;
 let trendChart = null, pieChart = null, deptChart = null, payrollBreakdownChart = null, attendanceTrendChart = null, leaveDistChart = null;
-let attendanceDate = new Date().toISOString().slice(0, 10);
+let attendanceDate = formatLocalDate(new Date());
 let tableSortState = {};
+
+window.getAppState = function() {
+    return {
+        employees: employees || [],
+        attendances: attendances || [],
+        leaveReqs: leaveReqs || [],
+        payrolls: payrolls || []
+    };
+};
 
 const MAX_STORAGE_BYTES = 4 * 1024 * 1024;
 
@@ -417,16 +441,77 @@ function saveAll() {
         const data = { employees, attendances, leaveReqs, payrolls };
         const str = JSON.stringify(data);
         if (str.length > MAX_STORAGE_BYTES) {
-            showToast('⚠️ Data too large to save. Consider exporting a backup.', 'error');
+            showToast('Data too large to save. Consider exporting a backup.', 'error');
             return;
         }
         localStorage.setItem('nexus_employees', JSON.stringify(employees));
         localStorage.setItem('nexus_attendance', JSON.stringify(attendances));
         localStorage.setItem('nexus_leaves', JSON.stringify(leaveReqs));
         localStorage.setItem('nexus_payroll', JSON.stringify(payrolls));
+        if (typeof window.syncHeliosOperationsHub === 'function') {
+            window.syncHeliosOperationsHub();
+        }
     } catch (err) {
         console.error('Save error:', err);
         showToast('Storage error — data may not be saved.', 'error');
+    }
+}
+
+function ensureHistoricalAttendanceData() {
+    if (!employees || employees.length === 0) return;
+
+    let hasChanges = false;
+    const today = new Date();
+    const todayStr = formatLocalDate(today);
+
+    // 1. Ensure current day record exists for each employee
+    employees.forEach(emp => {
+        const hasToday = attendances.some(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === todayStr);
+        if (!hasToday) {
+            attendances.push({
+                id: `att-${emp.id}-${todayStr}`,
+                employeeId: emp.id,
+                date: todayStr,
+                status: 'present',
+                updatedAt: new Date().toISOString()
+            });
+            hasChanges = true;
+        }
+    });
+
+    // 2. Backfill historical attendance records across the past 28 weekdays if history is sparse
+    const uniqueDates = new Set(attendances.map(a => a.date));
+    if (uniqueDates.size < 10) {
+        for (let i = 1; i <= 28; i++) {
+            const pastDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i, 12, 0, 0);
+            const dayOfWeek = pastDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip weekends
+
+            const dateStr = formatLocalDate(pastDate);
+            employees.forEach((emp, empIdx) => {
+                const exists = attendances.some(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === dateStr);
+                if (!exists) {
+                    const seedVal = (pastDate.getDate() * 19 + empIdx * 29 + (emp.firstName || '').length * 11) % 100;
+                    let status = 'present';
+                    if (seedVal > 90) status = 'absent';
+                    else if (seedVal > 80) status = 'late';
+                    else if (seedVal > 74) status = 'half-day';
+
+                    attendances.push({
+                        id: `att-${emp.id}-${dateStr}`,
+                        employeeId: emp.id,
+                        date: dateStr,
+                        status: status,
+                        updatedAt: new Date(pastDate.getTime() + 9 * 3600 * 1000).toISOString()
+                    });
+                    hasChanges = true;
+                }
+            });
+        }
+    }
+
+    if (hasChanges) {
+        saveAll();
     }
 }
 
@@ -442,7 +527,11 @@ function loadAll() {
         if (!Array.isArray(leaveReqs)) leaveReqs = [];
         if (!Array.isArray(payrolls)) payrolls = [];
 
-        if (employees.length === 0) seedData();
+        if (employees.length === 0) {
+            seedData();
+        } else {
+            ensureHistoricalAttendanceData();
+        }
 
         const now = new Date();
         const m = now.getMonth() + 1, y = now.getFullYear();
@@ -462,16 +551,20 @@ function seedData() {
         { id: 'emp_1002', employeeId: 'EMP1002', firstName: 'Bianca', lastName: 'Lopez', department: 'HR', position: 'Generalist', basicSalary: 5400, email: 'bianca@company.com', phone: '555-0102' },
         { id: 'emp_1003', employeeId: 'EMP1003', firstName: 'Chen', lastName: 'Wei', department: 'Sales', position: 'Manager', basicSalary: 6800, email: 'chen@company.com', phone: '555-0103' }
     ];
-    const today = new Date().toISOString().slice(0, 10);
-    attendances = employees.map(e => ({ id: 'att-' + e.id, employeeId: e.id, date: today, status: 'present' }));
+    attendances = [];
+    ensureHistoricalAttendanceData();
     leaveReqs = [{ id: 'leave1', employeeId: 'emp_1002', leaveType: 'Annual Leave', startDate: '2026-08-15', endDate: '2026-08-20', reason: 'Family trip', status: 'pending' }];
     saveAll();
 }
 
 let _toastTimer = null;
+function stripEmojis(text) {
+    if (!text || typeof text !== 'string') return text || '';
+    return text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2B55}\u{FE0F}\u{200D}❌✅⚠️✓✕✔✖★]/gu, '').trim();
+}
 function showToast(msg, type = 'info') {
     const el = document.getElementById('toast');
-    el.textContent = msg;
+    el.textContent = stripEmojis(msg);
     el.className = `show ${type}`;
     clearTimeout(_toastTimer);
     _toastTimer = setTimeout(() => { el.className = type; }, 3200);
@@ -498,7 +591,7 @@ function _backdropClose(e) {
 }
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        ['empModal', 'leaveModal', 'confirmModal', 'historyModal', 'currencyModal', 'settingsModal', 'supportModal', 'notifModal'].forEach(id => {
+        ['empProfileModal', 'empModal', 'leaveModal', 'confirmModal', 'historyModal', 'currencyModal', 'settingsModal', 'supportModal', 'notifModal'].forEach(id => {
             if (document.getElementById(id)?.classList.contains('open')) closeModal(id);
         });
     }
@@ -536,7 +629,7 @@ function runPayrollEngine(month, year, silent = false) {
         payrolls.push({ id: `pay-${emp.id}-${month}-${year}`, employeeId: emp.id, month, year, basic: c.basic, allowances: c.allowances, tax: c.tax, netSalary: c.net });
     });
     saveAll();
-    if (!silent) showToast(`✅ Payroll for ${month}/${year} processed`, 'success');
+    if (!silent) showToast(`Payroll for ${month}/${year} processed`, 'success');
 }
 
 // ★ FIX: chartTextColor returns darker text for light mode ★
@@ -602,6 +695,9 @@ function renderDashboard() {
     renderInsightsRow(presentCount);
     renderTopEarners('top-earners-list', 5);
     renderFxSnapshot();
+    if (typeof window.syncHeliosOperationsHub === 'function') {
+        window.syncHeliosOperationsHub();
+    }
 }
 
 function renderInsightsRow(presentCount) {
@@ -896,8 +992,21 @@ function renderEmployees() {
     }
     tbody.innerHTML = employees.map(e => `
         <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/30 transition-colors">
-            <td class="py-3 px-4 text-sm font-mono font-semibold text-slate-600 dark:text-slate-400">${esc(e.employeeId || 'N/A')}</td>
-            <td class="py-3 px-4 text-sm"><div class="td-name">${avatarChip(e.firstName, e.lastName)}<div class="td-name-stack"><span class="font-semibold text-slate-900 dark:text-white">${esc(e.firstName)} ${esc(e.lastName)}</span><span class="td-sub text-slate-500 dark:text-slate-400">${esc(e.email || '')}</span></div></div></td>
+            <td class="py-3 px-4 text-sm font-mono font-semibold text-slate-600 dark:text-slate-400">
+                <span class="emp-name-interactive cursor-pointer" data-action="view-profile" data-id="${esc(e.id)}" title="Click to view profile">${esc(e.employeeId || 'N/A')}</span>
+            </td>
+            <td class="py-3 px-4 text-sm">
+                <div class="td-name emp-name-interactive cursor-pointer" data-action="view-profile" data-id="${esc(e.id)}" title="Click to view ${esc(e.firstName)}'s full profile">
+                    ${avatarChip(e.firstName, e.lastName)}
+                    <div class="td-name-stack">
+                        <span class="font-semibold text-slate-900 dark:text-white" style="display:inline-flex;align-items:center;gap:4px;">
+                            ${esc(e.firstName)} ${esc(e.lastName)}
+                            <i class="fas fa-arrow-up-right-from-square emp-name-interactive-hint" title="View Profile"></i>
+                        </span>
+                        <span class="td-sub text-slate-500 dark:text-slate-400">${esc(e.email || '')}</span>
+                    </div>
+                </div>
+            </td>
             <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">${esc(e.department || 'General')}</td>
             <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">${esc(e.position || 'Staff')}</td>
             <td class="py-3 px-4 text-sm font-mono font-semibold text-slate-900 dark:text-white">${fmtCurrency(e.basicSalary || 0)}</td>
@@ -916,6 +1025,269 @@ function filterEmployeeRows(term) {
         row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
     });
 }
+
+window.openEmployeeProfileModal = function (id) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) { showToast('Employee not found', 'error'); return; }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const todayAtt = attendances.find(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === today);
+    const empAtts = attendances.filter(a => a.employeeId === emp.id || a.employeeId === emp.employeeId);
+    const presents = empAtts.filter(a => a.status === 'present').length;
+    const lates = empAtts.filter(a => a.status === 'late').length;
+    const absents = empAtts.filter(a => a.status === 'absent').length;
+    const halfDays = empAtts.filter(a => a.status === 'half-day').length;
+    const effectiveAttDays = presents + lates + (halfDays * 0.5);
+    const attRate = empAtts.length > 0 ? Math.round((effectiveAttDays / empAtts.length) * 100) : 100;
+
+    const empLeaves = leaveReqs.filter(l => l.employeeId === emp.id);
+    const pendingLeaves = empLeaves.filter(l => l.status === 'pending').length;
+    const approvedLeaves = empLeaves.filter(l => l.status === 'approved').length;
+    const rejectedLeaves = empLeaves.filter(l => l.status === 'rejected').length;
+    const onLeaveToday = empLeaves.find(l => l.status === 'approved' && l.startDate <= today && l.endDate >= today);
+
+    const empPayrolls = payrolls.filter(p => p.employeeId === emp.id);
+    const basicSalary = Number(emp.basicSalary || 0);
+    const estimatedAllowances = basicSalary * 0.20;
+    const estimatedGross = basicSalary + estimatedAllowances;
+    const estimatedTax = estimatedGross * 0.15;
+    const estimatedNet = estimatedGross - estimatedTax;
+
+    // Header updates
+    const initials = `${(emp.firstName || '').charAt(0)}${(emp.lastName || '').charAt(0)}`.toUpperCase() || 'EM';
+    const avatarEl = document.getElementById('empProfileAvatar');
+    if (avatarEl) avatarEl.textContent = initials;
+
+    const nameEl = document.getElementById('empProfileFullName');
+    if (nameEl) nameEl.textContent = `${emp.firstName || ''} ${emp.lastName || ''}`;
+
+    const idBadge = document.getElementById('empProfileIdBadge');
+    if (idBadge) idBadge.textContent = emp.employeeId || 'EMP-N/A';
+
+    const statusBadge = document.getElementById('empProfileStatusBadge');
+    if (statusBadge) {
+        if (onLeaveToday) {
+            statusBadge.className = 'emp-status-badge on-leave';
+            statusBadge.innerHTML = '<i class="fas fa-umbrella-beach"></i> On Leave Today';
+        } else {
+            statusBadge.className = 'emp-status-badge active';
+            statusBadge.innerHTML = '<i class="fas fa-circle-check"></i> Active Staff';
+        }
+    }
+
+    const posEl = document.getElementById('empProfilePos');
+    if (posEl) posEl.textContent = emp.position || 'Staff';
+
+    const deptEl = document.getElementById('empProfileDept');
+    if (deptEl) deptEl.textContent = emp.department || 'General';
+
+    const editBtn = document.getElementById('empProfileEditBtn');
+    if (editBtn) {
+        editBtn.onclick = () => {
+            closeModal('empProfileModal');
+            window.openEditEmpModal(emp.id);
+        };
+    }
+
+    const footerText = document.getElementById('empProfileSummaryFooter');
+    if (footerText) {
+        footerText.textContent = `Verified record for ${emp.employeeId || emp.id} · Department: ${emp.department || 'General'}`;
+    }
+
+    // Modal Body Content
+    const body = document.getElementById('empProfileModalBody');
+    if (body) {
+        let todayStatusHtml = '';
+        if (onLeaveToday) {
+            todayStatusHtml = `<span class="badge badge-warning" style="padding:2px 8px;font-size:11px;"><i class="fas fa-umbrella-beach"></i> On Leave (${esc(onLeaveToday.leaveType || 'Approved')})</span>`;
+        } else if (todayAtt) {
+            const statusClass = todayAtt.status === 'present' ? 'text-emerald-500' : todayAtt.status === 'late' ? 'text-amber-500' : todayAtt.status === 'absent' ? 'text-rose-500' : 'text-cyan-500';
+            todayStatusHtml = `<span class="font-bold ${statusClass}"><i class="fas fa-check-circle"></i> ${esc(todayAtt.status.toUpperCase())}</span>`;
+        } else {
+            todayStatusHtml = `<span style="color:var(--text-muted);"><i class="fas fa-clock"></i> Not Logged Yet</span>`;
+        }
+
+        // Recent leave items
+        const recentLeavesHtml = empLeaves.length === 0
+            ? `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;">No leave requests filed yet.</div>`
+            : empLeaves.slice(0, 3).map(l => {
+                const sColor = l.status === 'approved' ? 'text-emerald-500' : l.status === 'pending' ? 'text-amber-500' : 'text-rose-500';
+                return `
+                    <div class="profile-recent-item">
+                        <div class="profile-recent-meta">
+                            <span class="badge badge-neutral" style="font-size:10px;padding:1px 6px;">${esc(l.leaveType || 'General')}</span>
+                            <span style="font-size:11px;color:var(--text-secondary);">${esc(l.startDate)} → ${esc(l.endDate)}</span>
+                        </div>
+                        <span style="font-size:11px;font-weight:600;" class="${sColor}">${esc(l.status.toUpperCase())}</span>
+                    </div>
+                `;
+            }).join('');
+
+        // Recent payroll items
+        const recentPayHtml = empPayrolls.length === 0
+            ? `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;">No past payroll disbursement records found.</div>`
+            : empPayrolls.slice(-3).reverse().map(p => `
+                <div class="profile-recent-item">
+                    <div class="profile-recent-meta">
+                        <i class="fas fa-receipt" style="color:#b68cff;font-size:11px;"></i>
+                        <span style="font-weight:600;font-size:11px;">Cycle ${String(p.month).padStart(2, '0')}/${p.year}</span>
+                    </div>
+                    <span class="font-mono font-bold text-emerald-500" style="font-size:11px;">${fmtCurrency(parseFloat(p.netSalary))}</span>
+                </div>
+            `).join('');
+
+        body.innerHTML = `
+            <!-- Top Metric Tiles -->
+            <div class="emp-profile-stats-grid">
+                <div class="profile-stat-box">
+                    <span class="stat-label"><i class="fas fa-money-bill-wave"></i> Basic Salary</span>
+                    <span class="stat-val font-mono text-emerald-500">${fmtCurrency(basicSalary)}</span>
+                </div>
+                <div class="profile-stat-box">
+                    <span class="stat-label"><i class="fas fa-wallet"></i> Net Estimate</span>
+                    <span class="stat-val font-mono text-cyan-400">${fmtCurrency(estimatedNet)}</span>
+                </div>
+                <div class="profile-stat-box">
+                    <span class="stat-label"><i class="fas fa-calendar-check"></i> Attendance</span>
+                    <span class="stat-val ${attRate >= 90 ? 'text-emerald-500' : 'text-amber-500'}">${attRate}%</span>
+                </div>
+                <div class="profile-stat-box">
+                    <span class="stat-label"><i class="fas fa-umbrella-beach"></i> Leaves</span>
+                    <span class="stat-val text-purple-400">${empLeaves.length} <small style="font-size:11px;font-weight:normal;color:var(--text-muted);">(${pendingLeaves} pend.)</small></span>
+                </div>
+            </div>
+
+            <!-- Details Section Grid -->
+            <div class="emp-profile-details-grid">
+                <!-- Card 1: Personal & Contact Information -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="fas fa-user-circle" style="color:#5cb3ff;"></i> Personal & Contact Info
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-envelope"></i> Work Email</span>
+                        <span class="profile-info-val"><a href="mailto:${esc(emp.email || '')}">${esc(emp.email || 'Not provided')}</a></span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-phone"></i> Phone Number</span>
+                        <span class="profile-info-val">${emp.phone ? `<a href="tel:${esc(emp.phone)}">${esc(emp.phone)}</a>` : '<span style="color:var(--text-muted);">None</span>'}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-building"></i> Department</span>
+                        <span class="profile-info-val">${esc(emp.department || 'General')}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-briefcase"></i> Designation</span>
+                        <span class="profile-info-val">${esc(emp.position || 'Staff')}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-id-badge"></i> Employee ID</span>
+                        <span class="profile-info-val font-mono">${esc(emp.employeeId || emp.id)}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label"><i class="fas fa-sun"></i> Today's Status</span>
+                        <span class="profile-info-val">${todayStatusHtml}</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Compensation & Breakdown -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="fas fa-calculator" style="color:#b68cff;"></i> Compensation & Payroll
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Base Monthly Salary</span>
+                        <span class="profile-info-val font-mono">${fmtCurrency(basicSalary)}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Standard Allowances (20%)</span>
+                        <span class="profile-info-val font-mono text-cyan-400">+${fmtCurrency(estimatedAllowances)}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Total Gross Liability</span>
+                        <span class="profile-info-val font-mono font-bold">${fmtCurrency(estimatedGross)}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Estimated Tax & Escrow (15%)</span>
+                        <span class="profile-info-val font-mono text-rose-400">-${fmtCurrency(estimatedTax)}</span>
+                    </div>
+                    <div class="profile-info-row" style="border-top:1px dashed rgba(255,255,255,0.08);padding-top:6px;margin-top:2px;">
+                        <span class="profile-info-label" style="font-weight:700;color:var(--text-primary);">Estimated Take-Home</span>
+                        <span class="profile-info-val font-mono font-bold text-emerald-500" style="font-size:14px;">${fmtCurrency(estimatedNet)}</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Total Disbursements On File</span>
+                        <span class="profile-info-val">${empPayrolls.length} Cycle(s)</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Attendance Performance -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="fas fa-clock" style="color:#62c88a;"></i> Attendance Performance
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Overall On-Duty Rate</span>
+                        <span class="profile-info-val ${attRate >= 90 ? 'text-emerald-500' : 'text-amber-500'} font-bold">${attRate}%</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Present Days Logged</span>
+                        <span class="profile-info-val text-emerald-400">${presents} day(s)</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Late Arrivals</span>
+                        <span class="profile-info-val text-amber-400">${lates} day(s)</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Unscheduled Absences</span>
+                        <span class="profile-info-val text-rose-400">${absents} day(s)</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Half-Day Records</span>
+                        <span class="profile-info-val text-cyan-400">${halfDays} day(s)</span>
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Total Logged Days</span>
+                        <span class="profile-info-val">${empAtts.length} date entries</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Leaves & Recent Activity -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="fas fa-umbrella-beach" style="color:#f59e0b;"></i> Leave Records & History
+                    </div>
+                    <div class="profile-info-row">
+                        <span class="profile-info-label">Leave Status Breakdown</span>
+                        <span class="profile-info-val" style="font-size:11px;">
+                            <span class="text-emerald-400">${approvedLeaves} Appr.</span> · 
+                            <span class="text-amber-400">${pendingLeaves} Pend.</span> · 
+                            <span class="text-rose-400">${rejectedLeaves} Rej.</span>
+                        </span>
+                    </div>
+                    <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">
+                        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);">Recent Requests:</span>
+                        <div class="profile-recent-list">
+                            ${recentLeavesHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Recent Payroll Disbursements -->
+            <div class="profile-card" style="margin-top:2px;">
+                <div class="profile-card-title">
+                    <i class="fas fa-receipt" style="color:#b68cff;"></i> Recent Payroll Cycles
+                </div>
+                <div class="profile-recent-list">
+                    ${recentPayHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    openModal('empProfileModal');
+};
 
 window.openEditEmpModal = function (id) {
     const emp = employees.find(e => e.id === id);
@@ -938,11 +1310,70 @@ window.deleteEmployee = function (id) {
     openModal('confirmModal');
 };
 
+function formatAttendanceDisplayDate(dateStr) {
+    const targetDate = parseLocalDate(dateStr);
+    const today = new Date();
+    const todayTarget = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+    const diffMs = targetDate.getTime() - todayTarget.getTime();
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    const dayName = targetDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthName = targetDate.toLocaleDateString('en-US', { month: 'short' });
+    const fullDate = `${dayName}, ${monthName} ${targetDate.getDate()}, ${targetDate.getFullYear()}`;
+
+    let relativeLabel = '';
+    let badgeClass = 'badge-neutral';
+    if (diffDays === 0) {
+        relativeLabel = 'Today';
+        badgeClass = 'badge-emerald';
+    } else if (diffDays === -1) {
+        relativeLabel = 'Yesterday';
+        badgeClass = 'badge-blue';
+    } else if (diffDays === 1) {
+        relativeLabel = 'Tomorrow';
+        badgeClass = 'badge-amber';
+    } else if (diffDays < 0) {
+        relativeLabel = `${Math.abs(diffDays)}d ago`;
+        badgeClass = 'badge-gray';
+    } else {
+        relativeLabel = `In ${diffDays}d`;
+        badgeClass = 'badge-gray';
+    }
+
+    const isWeekend = targetDate.getDay() === 0 || targetDate.getDay() === 6;
+
+    return {
+        iso: dateStr,
+        dayName,
+        monthName,
+        day: targetDate.getDate(),
+        year: targetDate.getFullYear(),
+        fullDate,
+        relativeLabel,
+        badgeClass,
+        isWeekend,
+        friendly: `${dayName}, ${monthName} ${targetDate.getDate()}`
+    };
+}
+
 function renderAttendance() {
     const today = attendanceDate;
-    document.getElementById('attDate').textContent = `— ${today}`;
+    const dateInfo = formatAttendanceDisplayDate(today);
+
+    const attDateEl = document.getElementById('attDate');
+    if (attDateEl) {
+        attDateEl.innerHTML = `
+            <span class="badge ${dateInfo.badgeClass}" style="margin-left:8px;font-size:0.75rem;padding:3px 9px;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                <i class="fas ${dateInfo.relativeLabel === 'Today' ? 'fa-calendar-check' : 'fa-clock-rotate-left'}"></i> ${dateInfo.relativeLabel}
+            </span>
+            <span style="margin-left:6px;font-size:0.875rem;font-weight:600;color:var(--text-primary);">${dateInfo.fullDate}</span>
+            ${dateInfo.isWeekend ? '<span class="badge badge-amber" style="margin-left:6px;font-size:0.72rem;padding:2px 7px;"><i class="fas fa-mug-hot" style="margin-right:3px;"></i>Weekend</span>' : ''}
+        `;
+    }
+
     const picker = document.getElementById('attDatePicker');
     if (picker) picker.value = today;
+
     if (employees.length === 0) {
         document.getElementById('attendanceList').innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i>No employees to track.</div>';
         document.getElementById('attSummaryRow').innerHTML = '';
@@ -957,18 +1388,18 @@ function renderAttendance() {
     ];
 
     document.getElementById('attendanceList').innerHTML = employees.map(emp => {
-        const rec = attendances.find(a => a.employeeId === emp.id && a.date === today);
+        const rec = attendances.find(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === today);
         const s = rec?.status || 'present';
         const pills = statusDefs.map(d => `
-            <div class="att-pill ${d.key} ${s === d.key ? 'active' : ''}" data-emp="${esc(emp.id)}" data-status="${d.key}" role="button" tabindex="0">
+            <div class="att-pill ${d.key} ${s === d.key ? 'active' : ''}" data-emp="${esc(emp.id)}" data-status="${d.key}" role="button" tabindex="0" title="Mark as ${d.label}">
                 <i class="fas ${d.icon}"></i><span>${d.label}</span>
             </div>`).join('');
-        return `<div class="att-card">
+        return `<div class="att-card" data-emp-id="${esc(emp.id)}">
             <div class="att-card-top">
                 ${avatarChip(emp.firstName, emp.lastName)}
                 <div>
                     <div class="att-card-name">${esc(emp.firstName)} ${esc(emp.lastName)}</div>
-                    <div class="att-card-id">${esc(emp.employeeId)}</div>
+                    <div class="att-card-id">${esc(emp.employeeId || emp.id)} · <span style="color:var(--text-secondary);font-size:0.75rem;">${esc(emp.department || 'General')}</span></div>
                 </div>
             </div>
             <div class="att-pills">${pills}</div>
@@ -980,7 +1411,7 @@ function renderAttendance() {
 
 function renderAttSummary(today) {
     const todayLogs = employees.map(emp => {
-        const rec = attendances.find(a => a.employeeId === emp.id && a.date === today);
+        const rec = attendances.find(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === today);
         return rec?.status || 'present';
     });
     const counts = { present: 0, absent: 0, late: 0, 'half-day': 0 };
@@ -1000,12 +1431,37 @@ function renderAttSummary(today) {
     `).join('');
 }
 
-window.setAttendanceStatus = function (empId, status) {
-    const safeId = (window.CSS && CSS.escape) ? CSS.escape(empId) : empId.replace(/[^a-zA-Z0-9_-]/g, '');
+window.setAttendanceStatus = function (empId, status, targetDate) {
+    const d = targetDate || attendanceDate;
+    const allowed = ['present', 'absent', 'late', 'half-day'];
+    if (!allowed.includes(status)) return;
+
+    const safeId = (window.CSS && CSS.escape) ? CSS.escape(empId) : String(empId).replace(/[^a-zA-Z0-9_-]/g, '');
     document.querySelectorAll(`.att-pill[data-emp="${safeId}"]`).forEach(p => {
         p.classList.toggle('active', p.dataset.status === status);
     });
-    renderAttSummary(attendanceDate);
+
+    // Automatically persist this attendance status for the selected date
+    let rec = attendances.find(a => (a.employeeId === empId || a.employeeId === String(empId)) && a.date === d);
+    if (rec) {
+        rec.status = status;
+        rec.updatedAt = new Date().toISOString();
+    } else {
+        attendances.push({
+            id: `att-${empId}-${d}`,
+            employeeId: empId,
+            date: d,
+            status: status,
+            updatedAt: new Date().toISOString()
+        });
+    }
+
+    saveAll();
+    renderAttSummary(d);
+
+    if (typeof window.syncHeliosOperationsHub === 'function') {
+        window.syncHeliosOperationsHub();
+    }
 };
 
 function renderLeaves() {
@@ -1052,7 +1508,7 @@ window.updateLeaveStatus = function (id, status) {
     if (!lv) return;
     lv.status = status;
     saveAll(); renderLeaves(); renderDashboard(); renderPayroll();
-    showToast(status === 'approved' ? '✅ Leave approved' : '❌ Leave rejected', 'success');
+    showToast(status === 'approved' ? 'Leave approved' : 'Leave rejected', 'success');
 };
 
 function renderPayroll() {
@@ -1665,7 +2121,7 @@ if (settingsAnimOn) {
             globalAnimsEnabled = true;
             localStorage.setItem('globalAnimsEnabled', 'true');
             applyGlobalAnimState();
-            showToast('✓ Motion & animations enabled', 'info');
+            showToast('Motion & animations enabled', 'info');
         }
     });
 }
@@ -1675,7 +2131,7 @@ if (settingsAnimOff) {
             globalAnimsEnabled = false;
             localStorage.setItem('globalAnimsEnabled', 'false');
             applyGlobalAnimState();
-            showToast('✓ Motion & animations disabled', 'info');
+            showToast('Motion & animations disabled', 'info');
         }
     });
 }
@@ -1702,8 +2158,8 @@ document.getElementById('empForm').addEventListener('submit', function (e) {
     const salary = parseFloat(document.getElementById('empBasicSalary').value);
     const email = document.getElementById('empEmail').value.trim();
 
-    if (!validateSalary(salary)) { showToast('❌ Invalid salary value.', 'error'); return; }
-    if (!validateEmail(email)) { showToast('❌ Invalid email format.', 'error'); return; }
+    if (!validateSalary(salary)) { showToast('Invalid salary value.', 'error'); return; }
+    if (!validateEmail(email)) { showToast('Invalid email format.', 'error'); return; }
 
     const data = {
         id: targetId || 'emp_' + Date.now(),
@@ -1718,7 +2174,7 @@ document.getElementById('empForm').addEventListener('submit', function (e) {
     };
 
     if (!data.employeeId || !data.firstName || !data.lastName) {
-        showToast('❌ ID, first and last name are required.', 'error'); return;
+        showToast('ID, first and last name are required.', 'error'); return;
     }
 
     if (targetId) {
@@ -1726,7 +2182,7 @@ document.getElementById('empForm').addEventListener('submit', function (e) {
         if (idx !== -1) { employees[idx] = data; showToast('Employee updated', 'success'); }
     } else {
         if (employees.some(e => e.employeeId === data.employeeId)) {
-            showToast('❌ Employee ID already exists.', 'error'); return;
+            showToast('Employee ID already exists.', 'error'); return;
         }
         employees.push(data);
         showToast('Employee added', 'success');
@@ -1762,12 +2218,12 @@ document.getElementById('leaveAttachment').addEventListener('change', function (
 
     const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
     if (!ALLOWED_ATTACHMENT_EXT.includes(ext)) {
-        showToast('❌ Unsupported file type. Use PDF, JPG, PNG, DOC, or DOCX.', 'error');
+        showToast('Unsupported file type. Use PDF, JPG, PNG, DOC, or DOCX.', 'error');
         this.value = '';
         return;
     }
     if (file.size > MAX_ATTACHMENT_BYTES) {
-        showToast(`❌ File too large (max ${formatFileSize(MAX_ATTACHMENT_BYTES)}).`, 'error');
+        showToast(`File too large (max ${formatFileSize(MAX_ATTACHMENT_BYTES)}).`, 'error');
         this.value = '';
         return;
     }
@@ -1785,7 +2241,7 @@ document.getElementById('leaveAttachment').addEventListener('change', function (
         document.getElementById('leaveAttachDropzone').classList.add('hidden');
         document.getElementById('leaveAttachChip').classList.remove('hidden');
     };
-    reader.onerror = () => showToast('❌ Could not read file.', 'error');
+    reader.onerror = () => showToast('Could not read file.', 'error');
     reader.readAsDataURL(file);
 });
 
@@ -1802,10 +2258,10 @@ document.getElementById('leaveForm').addEventListener('submit', e => {
     e.preventDefault();
     const start = document.getElementById('leaveStart').value;
     const end = document.getElementById('leaveEnd').value;
-    if (!start || !end) { showToast('❌ Both dates are required.', 'error'); return; }
-    if (start > end) { showToast('❌ End date must be after start date.', 'error'); return; }
+    if (!start || !end) { showToast('Both dates are required.', 'error'); return; }
+    if (start > end) { showToast('End date must be after start date.', 'error'); return; }
     const empId = document.getElementById('leaveEmpId').value;
-    if (!employees.find(e => e.id === empId)) { showToast('❌ Invalid employee.', 'error'); return; }
+    if (!employees.find(e => e.id === empId)) { showToast('Invalid employee.', 'error'); return; }
 
     const leaveRecord = {
         id: 'leave' + Date.now(),
@@ -1847,33 +2303,65 @@ document.getElementById('executeConfirmBtn').addEventListener('click', () => {
     showToast('Employee permanently deleted', 'success');
 });
 
-document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
+document.getElementById('saveAttendanceBtn')?.addEventListener('click', () => {
     const today = attendanceDate;
     const allowed = ['present', 'absent', 'late', 'half-day'];
     employees.forEach(emp => {
-        const safeId = (window.CSS && CSS.escape) ? CSS.escape(emp.id) : emp.id.replace(/[^a-zA-Z0-9_-]/g, '');
+        const safeId = (window.CSS && CSS.escape) ? CSS.escape(emp.id) : String(emp.id).replace(/[^a-zA-Z0-9_-]/g, '');
         const activePill = document.querySelector(`.att-pill.active[data-emp="${safeId}"]`);
         const val = (activePill && allowed.includes(activePill.dataset.status)) ? activePill.dataset.status : 'present';
-        const existing = attendances.find(a => a.employeeId === emp.id && a.date === today);
-        if (existing) existing.status = val;
-        else attendances.push({ id: `att-${emp.id}-${today}`, employeeId: emp.id, date: today, status: val });
+        const existing = attendances.find(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === today);
+        if (existing) {
+            existing.status = val;
+            existing.updatedAt = new Date().toISOString();
+        } else {
+            attendances.push({
+                id: `att-${emp.id}-${today}`,
+                employeeId: emp.id,
+                date: today,
+                status: val,
+                updatedAt: new Date().toISOString()
+            });
+        }
     });
-    saveAll(); renderDashboard(); renderAttendance();
-    showToast('Attendance saved', 'success');
+    saveAll();
+    renderDashboard();
+    renderAttendance();
+    const dateInfo = formatAttendanceDisplayDate(today);
+    showToast(`Attendance records saved for ${dateInfo.friendly}`, 'success');
 });
 
-document.getElementById('markAllPresentBtn').addEventListener('click', () => {
+document.getElementById('markAllPresentBtn')?.addEventListener('click', () => {
+    const today = attendanceDate;
+    employees.forEach(emp => {
+        const existing = attendances.find(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === today);
+        if (existing) {
+            existing.status = 'present';
+            existing.updatedAt = new Date().toISOString();
+        } else {
+            attendances.push({
+                id: `att-${emp.id}-${today}`,
+                employeeId: emp.id,
+                date: today,
+                status: 'present',
+                updatedAt: new Date().toISOString()
+            });
+        }
+    });
+    saveAll();
     document.querySelectorAll('.att-pill').forEach(p => {
         p.classList.toggle('active', p.dataset.status === 'present');
     });
-    renderAttSummary(attendanceDate);
-    showToast('All marked present — click Save to confirm', 'info');
+    renderAttSummary(today);
+    renderDashboard();
+    const dateInfo = formatAttendanceDisplayDate(today);
+    showToast(`All marked present for ${dateInfo.friendly}`, 'success');
 });
 
 document.getElementById('runPayrollBtn').addEventListener('click', () => {
     const m = parseInt(document.getElementById('payMonth').value);
     const y = parseInt(document.getElementById('payYear').value);
-    if (isNaN(m) || isNaN(y) || y < 1900 || y > 2200) { showToast('❌ Invalid month/year.', 'error'); return; }
+    if (isNaN(m) || isNaN(y) || y < 1900 || y > 2200) { showToast('Invalid month/year.', 'error'); return; }
     runPayrollEngine(m, y); renderPayroll(); renderDashboard();
 });
 
@@ -2005,7 +2493,7 @@ document.getElementById('animToggle')?.addEventListener('click', () => {
     globalAnimsEnabled = !globalAnimsEnabled;
     localStorage.setItem('globalAnimsEnabled', String(globalAnimsEnabled));
     applyGlobalAnimState();
-    showToast(globalAnimsEnabled ? '✓ Motion & animations enabled' : '✓ Motion & animations disabled', 'info');
+    showToast(globalAnimsEnabled ? 'Motion & animations enabled' : 'Motion & animations disabled', 'info');
 });
 
 // ── Report year filter ──
@@ -2041,23 +2529,23 @@ document.getElementById('backupBtn').addEventListener('click', () => {
 document.getElementById('importFile').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast('❌ File too large (max 5 MB).', 'error'); this.value = ''; return; }
+    if (file.size > 5 * 1024 * 1024) { showToast('File too large (max 5 MB).', 'error'); this.value = ''; return; }
     const reader = new FileReader();
     reader.onload = function (ev) {
         const parsed = safeParse(ev.target.result);
-        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) { showToast('❌ Invalid backup file.', 'error'); return; }
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) { showToast('Invalid backup file.', 'error'); return; }
         const sEmp = sanitizeImportedArray(parsed.employees, IMPORT_SPECS.employees);
         const sAtt = sanitizeImportedArray(parsed.attendances, IMPORT_SPECS.attendances);
         const sLv = sanitizeImportedArray(parsed.leaveReqs, IMPORT_SPECS.leaveReqs);
         const sPay = sanitizeImportedArray(parsed.payrolls, IMPORT_SPECS.payrolls);
-        if (!sEmp && !sAtt && !sLv && !sPay) { showToast('❌ Backup contains no recognizable data.', 'error'); return; }
+        if (!sEmp && !sAtt && !sLv && !sPay) { showToast('Backup contains no recognizable data.', 'error'); return; }
         if (sEmp) employees = sEmp;
         if (sAtt) attendances = sAtt;
         if (sLv) leaveReqs = sLv;
         if (sPay) payrolls = sPay;
         saveAll();
         renderDashboard(); renderEmployees(); renderAttendance(); renderLeaves(); renderPayroll(); renderReports();
-        showToast('✅ Data restored successfully', 'success');
+        showToast('Data restored successfully', 'success');
     };
     reader.readAsText(file);
     this.value = '';
@@ -2111,43 +2599,129 @@ function updateClockForCurrency() {
 }
 
 function updateAttendanceDate(newDate) {
+    if (!newDate) return;
     attendanceDate = newDate;
     renderAttendance();
 }
 
 document.getElementById('attPrevDay')?.addEventListener('click', () => {
-    const d = new Date(attendanceDate + 'T00:00:00');
+    const d = parseLocalDate(attendanceDate);
     d.setDate(d.getDate() - 1);
-    updateAttendanceDate(d.toISOString().slice(0, 10));
+    updateAttendanceDate(formatLocalDate(d));
 });
 document.getElementById('attNextDay')?.addEventListener('click', () => {
-    const d = new Date(attendanceDate + 'T00:00:00');
+    const d = parseLocalDate(attendanceDate);
     d.setDate(d.getDate() + 1);
-    updateAttendanceDate(d.toISOString().slice(0, 10));
+    updateAttendanceDate(formatLocalDate(d));
 });
 document.getElementById('attTodayBtn')?.addEventListener('click', () => {
-    updateAttendanceDate(new Date().toISOString().slice(0, 10));
+    updateAttendanceDate(formatLocalDate(new Date()));
 });
 document.getElementById('attDatePicker')?.addEventListener('change', (e) => {
     if (e.target.value) updateAttendanceDate(e.target.value);
 });
 
 function exportAttendanceCSV() {
-    const rows = [['Employee ID', 'First Name', 'Last Name', 'Department', 'Date', 'Status']];
+    if (!employees || employees.length === 0) {
+        showToast('No employee records available to export', 'error');
+        return;
+    }
+
+    // Ensure all employees have records for the currently selected day
     employees.forEach(emp => {
-        const rec = attendances.find(a => a.employeeId === emp.id && a.date === attendanceDate);
-        rows.push([emp.employeeId, emp.firstName, emp.lastName, emp.department || 'General', attendanceDate, rec?.status || 'present']);
+        const exists = attendances.some(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && a.date === attendanceDate);
+        if (!exists) {
+            attendances.push({
+                id: `att-${emp.id}-${attendanceDate}`,
+                employeeId: emp.id,
+                date: attendanceDate,
+                status: 'present',
+                updatedAt: new Date().toISOString()
+            });
+        }
     });
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    saveAll();
+
+    const headers = [
+        'Record ID',
+        'Employee ID',
+        'First Name',
+        'Last Name',
+        'Full Name',
+        'Department',
+        'Position',
+        'Attendance Date',
+        'Day of Week',
+        'Attendance Status',
+        'Effective Units',
+        'Logged At'
+    ];
+
+    const empMap = new Map();
+    employees.forEach(e => {
+        empMap.set(String(e.id), e);
+        if (e.employeeId) empMap.set(String(e.employeeId), e);
+    });
+
+    // Sort by Date descending (newest dates at top), then Employee ID ascending
+    const sortedAttendances = [...attendances].sort((a, b) => {
+        if (b.date !== a.date) return b.date.localeCompare(a.date);
+        const empA = empMap.get(String(a.employeeId))?.employeeId || a.employeeId || '';
+        const empB = empMap.get(String(b.employeeId))?.employeeId || b.employeeId || '';
+        return empA.localeCompare(empB);
+    });
+
+    const rows = [headers];
+    sortedAttendances.forEach((rec, idx) => {
+        const emp = empMap.get(String(rec.employeeId)) || {
+            id: rec.employeeId,
+            employeeId: rec.employeeId,
+            firstName: 'Employee',
+            lastName: '#' + rec.employeeId,
+            department: 'General',
+            position: 'Staff'
+        };
+
+        const targetDate = parseLocalDate(rec.date);
+        const dayOfWeek = targetDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+        let effectiveUnits = '1.0';
+        if (rec.status === 'half-day') effectiveUnits = '0.5';
+        else if (rec.status === 'absent') effectiveUnits = '0.0';
+
+        const statusFormatted = (rec.status || 'present').charAt(0).toUpperCase() + (rec.status || 'present').slice(1);
+        const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim();
+
+        rows.push([
+            rec.id || `ATT-${idx + 1}`,
+            emp.employeeId || emp.id || 'N/A',
+            emp.firstName || '',
+            emp.lastName || '',
+            fullName,
+            emp.department || 'General',
+            emp.position || 'Staff',
+            rec.date,
+            dayOfWeek,
+            statusFormatted,
+            effectiveUnits,
+            rec.updatedAt || `${rec.date}T09:00:00Z`
+        ]);
+    });
+
+    const csvContent = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `attendance_${attendanceDate}.csv`;
+    const nowStr = formatLocalDate(new Date());
+    a.download = `payroll_nexus_attendance_history_${nowStr}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('Attendance CSV downloaded', 'success');
+    showToast(`Attendance history (${sortedAttendances.length} records) downloaded as CSV`, 'success');
 }
+
 document.getElementById('exportAttCSVBtn')?.addEventListener('click', exportAttendanceCSV);
 
 /* ── Sortable tables ── */
@@ -2557,6 +3131,7 @@ function populateMonths() {
         if (!btn) return;
         const id = btn.dataset.id;
         switch (btn.dataset.action) {
+            case 'view-profile': window.openEmployeeProfileModal(id); break;
             case 'edit-emp': window.openEditEmpModal(id); break;
             case 'del-emp': window.deleteEmployee(id); break;
             case 'leave-status': window.updateLeaveStatus(id, btn.dataset.status); break;
@@ -2648,7 +3223,7 @@ if (qaRefreshBtn) {
         })).then(() => {
             this.classList.remove('refreshing');
             this.style.opacity = '1';
-            showToast('✓ Dashboard refreshed', 'success');
+            showToast('Dashboard refreshed', 'success');
         }).catch(err => {
             this.classList.remove('refreshing');
             this.style.opacity = '1';

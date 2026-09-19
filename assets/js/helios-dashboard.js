@@ -203,17 +203,20 @@
         svg.innerHTML = `
             <defs>
                 <linearGradient id="heliosAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="${gradStart}" stop-opacity="${isLight ? '0.22' : '0.32'}" />
-                    <stop offset="60%" stop-color="${gradStart}" stop-opacity="${isLight ? '0.04' : '0.08'}" />
-                    <stop offset="100%" stop-color="${gradEndColor}" stop-opacity="0.0" />
+                    <stop offset="0%" stop-color="${gradStart}" stop-opacity="${isLight ? '0.18' : '0.25'}" />
+                    <stop offset="65%" stop-color="${gradStart}" stop-opacity="${isLight ? '0.03' : '0.05'}" />
+                    <stop offset="100%" stop-color="${gradStart}" stop-opacity="0.0" />
                 </linearGradient>
+                <filter id="heliosLineShadow" x="-10%" y="-10%" width="120%" height="130%">
+                    <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="${strokeColor}" flood-opacity="${isLight ? '0.2' : '0.45'}" />
+                </filter>
                 <filter id="heliosDotGlow" x="-50%" y="-50%" width="200%" height="200%">
                     <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="${strokeColor}" flood-opacity="0.9" />
                 </filter>
             </defs>
             ${gridY}
             <path d="${areaD}" fill="url(#heliosAreaGrad)" />
-            <path d="${pathD}" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="${pathAnimClass}" />
+            <path d="${pathD}" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#heliosLineShadow)" class="${pathAnimClass}" />
             <!-- Vertical guideline -->
             <line x1="${activePt.x}" y1="${activePt.y}" x2="${activePt.x}" y2="${height - 18}" stroke="${strokeColor}" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6" />
             <!-- Glowing Pin dot -->
@@ -233,7 +236,7 @@
         const ttVal = document.getElementById('heliosTtVal');
         const ttBadge = document.getElementById('heliosTtBadge');
 
-        if (ttDate) ttDate.textContent = `${pt.date} · Realtime`;
+        if (ttDate) ttDate.textContent = `${pt.date} · Verified`;
         if (ttVal) {
             if (activeMetric === 'attendance') {
                 ttVal.textContent = `${pt.v}% Attendance`;
@@ -398,17 +401,19 @@
 
     function getPlatformContext() {
         const holdingVal = document.getElementById('heliosHoldingVal')?.textContent || '$ 12,304.11';
-        const totalEmp = document.getElementById('totalEmployees')?.textContent || '12';
+        const totalEmp = document.getElementById('totalEmployees')?.textContent || (window.employees?.length ? String(window.employees.length) : '12');
         const presentToday = document.getElementById('presentToday')?.textContent || '11';
         const pendingLeaves = document.getElementById('pendingLeaves')?.textContent || '3';
         const currency = document.getElementById('settingsCurrencySelect')?.value || document.getElementById('currencySelect')?.value || window.appCurrency || 'USD';
+        const totalPayroll = document.getElementById('totalPayrollMonthly')?.textContent || '$ 84,500';
 
         return {
             totalHolding: holdingVal,
             totalEmployees: totalEmp,
             attendanceRate: `${presentToday}/${totalEmp} Present`,
             pendingLeaves: pendingLeaves,
-            currency: currency
+            currency: currency,
+            monthlyPayroll: totalPayroll
         };
     }
 
@@ -437,7 +442,7 @@
                 <div class="helios-chat-avatar ai"><i class="fas fa-sparkles"></i></div>
                 <div class="helios-chat-bubble ai" style="display:flex;align-items:center;gap:6px;color:#b68cff;">
                     <i class="fas fa-circle-notch fa-spin"></i>
-                    <span>Helios AI is analyzing telemetry...</span>
+                    <span>Nexus AI is analyzing telemetry...</span>
                 </div>
             `;
             streamEl.appendChild(typingBubble);
@@ -467,7 +472,7 @@
         } catch (err) {
             const typingBubble = document.getElementById(typingId);
             if (typingBubble) typingBubble.remove();
-            renderChatMessage('ai', 'Connection issue reaching Helios AI backend service. Using cached intelligence: Operational costs are currently steady with healthy runway.');
+            renderChatMessage('ai', 'Connection issue reaching Nexus AI backend service. Using cached intelligence: Operational costs are currently steady with healthy runway.');
         } finally {
             if (sendBtn) sendBtn.disabled = false;
             if (inputEl) inputEl.focus();
@@ -546,7 +551,7 @@
                                 <i class="fas fa-sparkles" style="font-size:16px;"></i>
                             </div>
                             <div>
-                                <h3 style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Helios AI Assistant</h3>
+                                <h3 style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Nexus AI Assistant</h3>
                                 <div style="font-size:11.5px;color:#8f8d99;display:flex;align-items:center;gap:6px;">
                                     <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#62c88a;box-shadow:0 0 6px #62c88a;"></span>
                                     Gemini AI • Connected to live portfolio & platform data
@@ -571,7 +576,7 @@
                             <div class="helios-chat-msg ai">
                                 <div class="helios-chat-avatar ai"><i class="fas fa-sparkles"></i></div>
                                 <div class="helios-chat-bubble ai">
-                                    <div style="font-weight:600;color:#f4f3f6;margin-bottom:4px;">Hey Nadia, I'm Helios AI.</div>
+                                    <div style="font-weight:600;color:#f4f3f6;margin-bottom:4px;">Hey Nadia, I'm Nexus AI.</div>
                                     <p style="margin:0;">I'm connected to your live portfolio ($12,304.11) and workforce telemetry. Ask me anything about your platform finances, crypto allocations, hiring, code, or general strategy!</p>
                                 </div>
                             </div>
@@ -666,7 +671,7 @@
             modal.innerHTML = `
                 <div class="modal-card" style="max-width:34rem;">
                     <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;">
-                        <h3 style="margin:0;font-size:16px;font-weight:700;"><i class="fas fa-circle-question" style="color:#b68cff;margin-right:8px;"></i> Helios Support & Community</h3>
+                        <h3 style="margin:0;font-size:16px;font-weight:700;"><i class="fas fa-circle-question" style="color:#b68cff;margin-right:8px;"></i> Payroll Nexus Support & Community</h3>
                         <button class="modal-close" id="closeHeliosSupportModal" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
                     </div>
                     <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;font-size:13px;color:#b6b4bc;line-height:1.6;max-height:75vh;overflow-y:auto;">
@@ -850,7 +855,7 @@
             modal.innerHTML = `
                 <div class="modal-card" style="max-width:30rem;">
                     <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;">
-                        <h3 style="margin:0;font-size:16px;font-weight:700;"><i class="fas fa-bell" style="color:#b68cff;margin-right:8px;"></i> Real-Time Alerts</h3>
+                        <h3 style="margin:0;font-size:16px;font-weight:700;"><i class="fas fa-bell" style="color:#b68cff;margin-right:8px;"></i> Live Alerts</h3>
                         <button class="modal-close" id="closeHeliosNotifModal" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
                     </div>
                     <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:10px;">
@@ -1006,7 +1011,7 @@
                             </div>
                             <div class="helios-auth-title-group">
                                 <div class="helios-auth-title-row">
-                                    <h3 class="helios-auth-title">Helios Identity & Access Gateway</h3>
+                                    <h3 class="helios-auth-title">Payroll Nexus Identity & Access Gateway</h3>
                                     <span class="helios-security-pill"><i class="fas fa-lock"></i> TLS 1.3</span>
                                 </div>
                                 <div class="helios-auth-subtitle">
@@ -1650,13 +1655,14 @@
             toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
             document.body.appendChild(toast);
         }
+        const cleanMsg = (message || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2B55}\u{FE0F}\u{200D}❌✅⚠️✓✕✔✖]/gu, '').trim();
         const bg = type === 'success' ? '#143823' : (type === 'error' ? '#3d1616' : '#1c1d29');
         const color = type === 'success' ? '#62c88a' : (type === 'error' ? '#ff6b6b' : '#b68cff');
         const border = type === 'success' ? 'rgba(98,200,138,0.4)' : (type === 'error' ? 'rgba(255,107,107,0.4)' : 'rgba(182,140,255,0.4)');
         toast.style.background = bg;
         toast.style.color = color;
         toast.style.border = `1px solid ${border}`;
-        toast.innerHTML = message;
+        toast.textContent = cleanMsg;
         toast.style.opacity = '1';
         toast.style.transform = 'translateY(0)';
         setTimeout(() => {
@@ -1683,9 +1689,9 @@
             if (m) m.classList.remove('open');
             const c = document.getElementById('oauthConsentModal');
             if (c) c.classList.remove('open');
-            showToastNotification(`✓ Authenticated via ${provider.toUpperCase()} Gateway!`, 'success');
+            showToastNotification(`Authenticated via ${provider.toUpperCase()} Gateway!`, 'success');
         } else if (event.data?.type === 'OAUTH_AUTH_FAILURE') {
-            showToastNotification(`✕ OAuth Error: ${event.data.error || 'Authentication aborted'}`, 'error');
+            showToastNotification(`OAuth Error: ${event.data.error || 'Authentication aborted'}`, 'error');
         }
     });
 
@@ -1725,7 +1731,7 @@
 
         const callbackUrl = meta?.callbackUri || `${window.location.origin}/auth/callback/${provider}`;
         let providerTitle = 'Sign In';
-        let providerSubtitle = 'Authorize Helios Nexus to access your profile';
+        let providerSubtitle = 'Authorize Payroll Nexus to access your profile';
         let iconHtml = '';
         let defaultEmail = 'sattubeb777@gmail.com';
         let defaultName = 'Sattu Admin';
@@ -1735,20 +1741,20 @@
 
         if (provider === 'google') {
             providerTitle = 'Sign in with Google';
-            providerSubtitle = 'Choose an account to continue to Helios Nexus';
+            providerSubtitle = 'Choose an account to continue to Payroll Nexus';
             iconHtml = `<svg viewBox="0 0 24 24" width="28" height="28" style="vertical-align:middle;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>`;
             defaultEmail = 'sattubeb777@gmail.com';
             defaultName = 'Sattu Admin';
             scopes = [
                 { icon: 'fa-envelope', label: 'View your primary Google Account email address (sattubeb777@gmail.com)' },
                 { icon: 'fa-id-badge', label: 'See your personal info, including profile name and picture' },
-                { icon: 'fa-shield-halved', label: 'Associate your verified Google account with your Helios role' }
+                { icon: 'fa-shield-halved', label: 'Associate your verified Google account with your Nexus role' }
             ];
             devConsoleUrl = 'https://console.cloud.google.com/apis/credentials';
             devDocName = 'Google Cloud Console OAuth 2.0 Client';
         } else if (provider === 'github') {
-            providerTitle = 'Authorize Helios Nexus';
-            providerSubtitle = 'Helios Nexus by @nexus-tech wants to access your GitHub account';
+            providerTitle = 'Authorize Payroll Nexus';
+            providerSubtitle = 'Payroll Nexus by @nexus-tech wants to access your GitHub account';
             iconHtml = `<i class="fab fa-github" style="font-size:28px;color:#ffffff;"></i>`;
             defaultEmail = 'dev_octocat@nexus.dev';
             defaultName = 'GitHub Staff';
@@ -1760,7 +1766,7 @@
             devDocName = 'GitHub Developer Settings > OAuth Apps';
         } else if (provider === 'discord') {
             providerTitle = 'Authorize with Discord';
-            providerSubtitle = 'Helios Nexus wants to access your Discord profile and servers';
+            providerSubtitle = 'Payroll Nexus wants to access your Discord profile and servers';
             iconHtml = `<i class="fab fa-discord" style="font-size:28px;color:#5865f2;"></i>`;
             defaultEmail = 'discord_mod@nexus.dev';
             defaultName = 'Discord Staff';
@@ -1772,7 +1778,7 @@
             devDocName = 'Discord Developer Portal > OAuth2';
         } else if (provider === 'facebook') {
             providerTitle = 'Log in with Facebook';
-            providerSubtitle = 'Helios Nexus is requesting access to your Meta account';
+            providerSubtitle = 'Payroll Nexus is requesting access to your Meta account';
             iconHtml = `<i class="fab fa-facebook" style="font-size:28px;color:#1877f2;"></i>`;
             defaultEmail = 'nadia_exec@nexus.dev';
             defaultName = 'Nadia Rachel';
@@ -1888,7 +1894,7 @@
         const copyPill = document.getElementById('copyCallbackPill');
         copyPill.addEventListener('click', () => {
             navigator.clipboard.writeText(callbackUrl).then(() => {
-                showToastNotification('✓ Callback URL copied to clipboard!', 'success');
+                showToastNotification('Callback URL copied to clipboard!', 'success');
             }).catch(() => {
                 showToastNotification(`Copied: ${callbackUrl}`, 'info');
             });
@@ -1925,7 +1931,7 @@
                     modal.classList.remove('open');
                     const authModal = document.getElementById('heliosAuthModal');
                     if (authModal) authModal.classList.remove('open');
-                    showToastNotification(`✓ Authenticated via ${provider.toUpperCase()} as ${role.toUpperCase()}!`, 'success');
+                    showToastNotification(`Authenticated via ${provider.toUpperCase()} as ${role.toUpperCase()}!`, 'success');
                 } else {
                     throw new Error(data.error || 'Unable to authenticate');
                 }
@@ -1940,7 +1946,7 @@
                 modal.classList.remove('open');
                 const authModal = document.getElementById('heliosAuthModal');
                 if (authModal) authModal.classList.remove('open');
-                showToastNotification(`✓ Signed in via ${provider.toUpperCase()} (${role})`, 'success');
+                showToastNotification(`Signed in via ${provider.toUpperCase()} (${role})`, 'success');
             }
         });
     }
@@ -1956,13 +1962,13 @@
         const aiBtn = document.getElementById('exploreAiInsightsBtn');
         if (aiBtn) aiBtn.addEventListener('click', () => openAiInsightsModal());
 
-        // Ask AI input enter key and submit button
+        // Ask AI input enter key and submit button (Topbar)
         const aiInput = document.getElementById('heliosAiInput');
         const aiSendBtn = document.getElementById('heliosAiBtn');
         const aiBadge = document.getElementById('heliosAiStatusBadge');
 
-        const triggerAiModal = () => {
-            const val = aiInput ? aiInput.value : '';
+        const triggerAiModal = (customQuery) => {
+            const val = customQuery !== undefined ? customQuery : (aiInput ? aiInput.value : '');
             openAiInsightsModal(val);
             if (aiInput) aiInput.value = '';
         };
@@ -1975,8 +1981,45 @@
                 }
             });
         }
-        if (aiSendBtn) aiSendBtn.addEventListener('click', triggerAiModal);
-        if (aiBadge) aiBadge.addEventListener('click', triggerAiModal);
+        if (aiSendBtn) aiSendBtn.addEventListener('click', () => triggerAiModal());
+        if (aiBadge) aiBadge.addEventListener('click', () => triggerAiModal());
+
+        // Settings Section: Embedded AI Search Capsule & Quick Chips
+        const settingsAiInput = document.getElementById('settingsAiInput');
+        const settingsAiBtn = document.getElementById('settingsAiBtn');
+        const settingsOpenFullAiBtn = document.getElementById('settingsOpenFullAiBtn');
+
+        const triggerSettingsAiModal = (promptText) => {
+            const val = promptText !== undefined ? promptText : (settingsAiInput ? settingsAiInput.value : '');
+            if (typeof window.closeModal === 'function') {
+                window.closeModal('settingsModal');
+            }
+            openAiInsightsModal(val);
+            if (settingsAiInput) settingsAiInput.value = '';
+        };
+
+        if (settingsAiInput) {
+            settingsAiInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    triggerSettingsAiModal();
+                }
+            });
+        }
+        if (settingsAiBtn) {
+            settingsAiBtn.addEventListener('click', () => triggerSettingsAiModal());
+        }
+        if (settingsOpenFullAiBtn) {
+            settingsOpenFullAiBtn.addEventListener('click', () => triggerSettingsAiModal());
+        }
+
+        // Quick suggestion chips inside Settings AI section
+        document.querySelectorAll('.settings-ai-quick-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const query = chip.dataset.query;
+                triggerSettingsAiModal(query);
+            });
+        });
 
         // Support button
         const supBtn = document.getElementById('sidebarSupportBtn');
@@ -2361,7 +2404,7 @@
         // 2. AI Decision Summary
         const aiDesc = document.getElementById('aiDecisionSummary');
         if (aiDesc && m.attendance && m.totalHolding) {
-            aiDesc.textContent = `Real-time attendance at ${m.attendance.attendanceRate}% with ${m.totalHolding.runwayMonths} months treasury reserve runway. Stable payroll liquidity across operational departments.`;
+            aiDesc.textContent = `Attendance currently at ${m.attendance.attendanceRate}% with ${m.totalHolding.runwayMonths} months treasury reserve runway. Stable payroll liquidity across operational departments.`;
         }
 
         // 3. Operational Portfolio (Departments analyzing headcount, spend, attendance)
@@ -2411,11 +2454,19 @@
             const rate = Number(att.attendanceRate || 0);
 
             setTxt('hubAttBadge', `${rate}% Rate`);
+            const attBadge = document.getElementById('hubAttBadge');
+            if (attBadge) {
+                attBadge.className = 'hub-card-badge ' + (rate >= 90 ? 'positive' : rate >= 70 ? 'warning' : 'negative');
+            }
             setTxt('hubAttPct', `${rate}%`);
             setTxt('hubAttPresent', String(att.presentToday ?? 0));
             setTxt('hubAttLate', String(att.lateToday ?? 0));
             setTxt('hubAttAbsent', String(att.absentToday ?? 0));
+            setTxt('hubAttHalfDay', String(att.halfDayToday ?? 0));
             setTxt('hubAttLeaves', String(att.pendingLeaves ?? 0));
+            if (att.onLeaveToday !== undefined) {
+                setTxt('hubLeaveOnToday', String(att.onLeaveToday));
+            }
 
             // Radial progress circle arc
             const radialArc = document.getElementById('hubRadialArc');
@@ -2423,13 +2474,22 @@
                 const circumference = 201.06; // 2 * Math.PI * 32
                 const offset = circumference - (circumference * (rate / 100));
                 radialArc.style.strokeDashoffset = String(offset);
+                radialArc.style.stroke = rate >= 90 ? '#62c88a' : rate >= 70 ? '#f59e0b' : '#ef4444';
             }
 
             const statusDesc = document.getElementById('hubAttStatusDesc');
             if (statusDesc) {
-                statusDesc.textContent = rate >= 95
-                    ? 'All departments meeting punctuality baseline'
-                    : `${att.absentToday} staff absent today · review required`;
+                const absent = Number(att.absentToday ?? 0);
+                const late = Number(att.lateToday ?? 0);
+                if (absent === 0 && late === 0) {
+                    statusDesc.textContent = 'All departments meeting punctuality baseline';
+                } else if (absent > 0 && late > 0) {
+                    statusDesc.textContent = `${absent} absent · ${late} late arrival today`;
+                } else if (absent > 0) {
+                    statusDesc.textContent = `${absent} staff absent today · review required`;
+                } else {
+                    statusDesc.textContent = `${late} late arrival(s) recorded today`;
+                }
             }
 
             // Compatibility counters
@@ -2449,6 +2509,39 @@
             setTxt('hubPayrollGross', fmt(pay.totalGrossUsd));
             setTxt('hubPayrollTax', fmt(pay.totalTaxUsd));
             setTxt('hubPayrollAvg', fmt(pay.avgSalaryUsd));
+
+            // Proportional progress bar segments
+            const gross = Number(pay.totalGrossUsd || 0);
+            const allow = Number(pay.totalAllowancesUsd || 0);
+            const tax = Number(pay.totalTaxUsd || 0);
+            const basic = Math.max(0, gross - allow);
+
+            const basicPct = gross > 0 ? Math.round((basic / gross) * 100) : 70;
+            const allowPct = gross > 0 ? Math.round((allow / gross) * 100) : 15;
+            const taxPct = Math.max(5, 100 - basicPct - allowPct);
+
+            const segBasic = document.getElementById('hubPaySegBasic');
+            const segAllow = document.getElementById('hubPaySegAllow');
+            const segTax = document.getElementById('hubPaySegTax');
+            if (segBasic) {
+                segBasic.style.width = `${basicPct}%`;
+                segBasic.title = `Basic: ${fmt(basic)} (${basicPct}%)`;
+            }
+            if (segAllow) {
+                segAllow.style.width = `${allowPct}%`;
+                segAllow.title = `Allowances: ${fmt(allow)} (${allowPct}%)`;
+            }
+            if (segTax) {
+                segTax.style.width = `${taxPct}%`;
+                segTax.title = `Tax & Deductions: ${fmt(tax)} (${taxPct}%)`;
+            }
+
+            const payStatusDesc = document.getElementById('hubPayrollStatusDesc');
+            if (payStatusDesc) {
+                payStatusDesc.textContent = pay.disbursementStatus 
+                    ? `Disbursement status: ${pay.disbursementStatus}`
+                    : 'Payroll cycle verified & ready for disbursement';
+            }
         }
 
         // 7. Operations Hub: Employee Workforce Analysis
@@ -2458,7 +2551,7 @@
 
             const deptList = document.getElementById('hubDeptList');
             if (deptList && emp.departments) {
-                const colors = ['#b68cff', '#62c88a', '#5cb3ff', '#f59e0b'];
+                const colors = ['#b68cff', '#62c88a', '#5cb3ff', '#f59e0b', '#ec4899'];
                 deptList.innerHTML = emp.departments.map((d, i) => {
                     const color = colors[i % colors.length];
                     const pct = emp.total > 0 ? Math.round((d.headcount / emp.total) * 100) : 33;
@@ -2480,13 +2573,77 @@
             setTxt('hubEfficiencyIndex', `${emp.departments?.[0]?.efficiencyScore || 98.5}%`);
             setTxt('hubActiveDeptCount', String(emp.departments?.length || 3));
 
+            const empStatusDesc = document.getElementById('hubEmpStatusDesc');
+            if (empStatusDesc) {
+                empStatusDesc.textContent = `${emp.total} staff across ${emp.departments?.length || 3} department(s) with zero turnover alerts`;
+            }
+
             // Compatibility counters
             setTxt('totalEmployees', String(emp.total ?? 0));
             setTxt('ks-staff', String(emp.total ?? 0));
             setTxt('chipStaffDash', String(emp.total ?? 0));
         }
 
-        // 8. Sync Timestamp in Geographical Currency Time
+        // 8. Operations Hub: Leaves & Absence Analysis
+        if (m.leaves) {
+            const lvs = m.leaves;
+            const pending = Number(lvs.pending ?? 0);
+            const approved = Number(lvs.approved ?? 0);
+            const onToday = Number(lvs.onLeaveToday ?? 0);
+
+            setTxt('hubLeavePendingVal', String(pending));
+            setTxt('hubLeaveApprovedVal', String(approved));
+            setTxt('hubLeaveOnToday', String(onToday));
+
+            const leaveBadge = document.getElementById('hubLeaveBadge');
+            if (leaveBadge) {
+                if (pending > 0) {
+                    leaveBadge.textContent = `${pending} Pending`;
+                    leaveBadge.className = 'hub-card-badge warning';
+                } else {
+                    leaveBadge.textContent = 'All Clear';
+                    leaveBadge.className = 'hub-card-badge positive';
+                }
+            }
+
+            const leaveBreakdownEl = document.getElementById('hubLeaveBreakdown');
+            if (leaveBreakdownEl && lvs.breakdown) {
+                const types = Object.entries(lvs.breakdown);
+                if (types.length === 0) {
+                    leaveBreakdownEl.innerHTML = '<span class="text-muted" style="font-size:11px;">No active leave categories</span>';
+                } else {
+                    leaveBreakdownEl.innerHTML = types.map(([name, count]) => {
+                        let cls = 'other';
+                        const lower = name.toLowerCase();
+                        if (lower.includes('annual')) cls = 'annual';
+                        else if (lower.includes('sick')) cls = 'sick';
+                        else if (lower.includes('casual')) cls = 'casual';
+                        else if (lower.includes('maternity') || lower.includes('paternity')) cls = 'maternity';
+                        return `<span class="leave-type-chip ${cls}"><strong>${count}</strong> ${escapeHtml(name)}</span>`;
+                    }).join('');
+                }
+            }
+
+            const leaveStatusDesc = document.getElementById('hubLeaveStatusDesc');
+            const leaveStatusIcon = document.getElementById('hubLeaveStatusIcon');
+            if (leaveStatusDesc) {
+                if (pending > 0) {
+                    leaveStatusDesc.textContent = `${pending} request(s) awaiting manager review`;
+                    if (leaveStatusIcon) {
+                        leaveStatusIcon.className = 'fas fa-hourglass-half text-amber';
+                    }
+                } else {
+                    leaveStatusDesc.textContent = onToday > 0
+                        ? `${onToday} employee(s) currently on approved leave`
+                        : 'Zero backlog · All leave requests handled';
+                    if (leaveStatusIcon) {
+                        leaveStatusIcon.className = 'fas fa-circle-check text-emerald';
+                    }
+                }
+            }
+        }
+
+        // 9. Sync Timestamp in Geographical Currency Time
         const curCode = document.getElementById('settingsCurrencySelect')?.value || document.getElementById('currencySelect')?.value || window.appCurrency || 'USD';
         if (typeof window.updateGeographicalSyncTime === 'function') {
             window.updateGeographicalSyncTime(curCode, false);
@@ -2532,7 +2689,7 @@
                         const data = await res.json();
                         if (data.metrics) applyRealtimeMetrics(data.metrics);
                     }
-                    showToastNotification('✓ Realtime Attendance verified & broadcast', 'success');
+                    showToastNotification('Attendance verified & broadcast', 'success');
                 } catch (err) {
                     showToastNotification('Notice: Attendance verified locally', 'info');
                 } finally {
@@ -2570,7 +2727,7 @@
                         const data = await res.json();
                         if (data.metrics) applyRealtimeMetrics(data.metrics);
                     }
-                    showToastNotification('✓ Realtime Payroll cycle recalculated & broadcast', 'success');
+                    showToastNotification('Payroll cycle recalculated & broadcast', 'success');
                 } catch (err) {
                     showToastNotification('Notice: Payroll recalculated locally', 'info');
                 } finally {
@@ -2582,13 +2739,31 @@
             });
         }
 
-        // Manage Staff Button
-        const manageStaffBtn = document.getElementById('liveManageStaffBtn');
-        if (manageStaffBtn) {
-            manageStaffBtn.addEventListener('click', () => {
+        // Hub Audit / Employee Management Action Button (if present)
+        const auditBtn = document.getElementById('hubAuditActionBtn');
+        if (auditBtn) {
+            auditBtn.addEventListener('click', () => {
                 if (typeof window.switchToTab === 'function') {
                     window.switchToTab('employees');
                 }
+            });
+        }
+
+        // Operations Hub Refresh / Sync Button
+        const hubRefreshBtn = document.getElementById('liveRefreshHubBtn');
+        if (hubRefreshBtn) {
+            hubRefreshBtn.addEventListener('click', () => {
+                hubRefreshBtn.disabled = true;
+                const icon = hubRefreshBtn.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+
+                syncHeliosOperationsHub();
+
+                setTimeout(() => {
+                    hubRefreshBtn.disabled = false;
+                    if (icon) icon.classList.remove('fa-spin');
+                    showToastNotification('Operations telemetry synchronized with records', 'success');
+                }, 350);
             });
         }
 
@@ -2599,6 +2774,8 @@
                 refreshBtn.disabled = true;
                 const icon = refreshBtn.querySelector('i');
                 if (icon) icon.classList.add('fa-spin');
+
+                syncHeliosOperationsHub();
 
                 const curCode = document.getElementById('settingsCurrencySelect')?.value || document.getElementById('currencySelect')?.value || window.appCurrency || 'USD';
                 if (typeof window.updateGeographicalSyncTime === 'function') {
@@ -2618,7 +2795,7 @@
                 setTimeout(() => {
                     refreshBtn.disabled = false;
                     if (icon) icon.classList.remove('fa-spin');
-                    showToastNotification('✓ Live telemetry stream synchronized', 'success');
+                    showToastNotification('Live telemetry stream synchronized', 'success');
                 }, 400);
             });
         }
@@ -2628,14 +2805,287 @@
         setInterval(updateDashboardGreeting, 30000);
     }
 
+    // ── LIVE OPERATIONS HUB DATA SYNCHRONIZATION & ANALYSIS ──
+    function syncHeliosOperationsHub() {
+        let appState = null;
+        if (typeof window.getAppState === 'function') {
+            appState = window.getAppState();
+        } else {
+            try {
+                const emps = JSON.parse(localStorage.getItem('nexus_employees') || '[]');
+                const atts = JSON.parse(localStorage.getItem('nexus_attendance') || '[]');
+                const lvs = JSON.parse(localStorage.getItem('nexus_leaves') || '[]');
+                const pays = JSON.parse(localStorage.getItem('nexus_payroll') || '[]');
+                appState = { employees: emps, attendances: atts, leaveReqs: lvs, payrolls: pays };
+            } catch (_) {}
+        }
+
+        if (!appState) return;
+
+        const employees = Array.isArray(appState.employees) ? appState.employees : [];
+        const attendances = Array.isArray(appState.attendances) ? appState.attendances : [];
+        const leaveReqs = Array.isArray(appState.leaveReqs) ? appState.leaveReqs : [];
+        const payrolls = Array.isArray(appState.payrolls) ? appState.payrolls : [];
+
+        const fmt = typeof window.fmtCurrency === 'function' 
+            ? window.fmtCurrency 
+            : (v) => '$ ' + Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        const setTxt = (id, txt) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = txt;
+        };
+
+        const today = new Date().toISOString().slice(0, 10);
+        const totalEmployees = employees.length;
+
+        // 1. Attendance Analysis
+        const todayAtt = attendances.filter(a => a.date === today);
+        const presentCount = todayAtt.filter(a => a.status === 'present').length;
+        const lateCount = todayAtt.filter(a => a.status === 'late').length;
+        const absentCount = todayAtt.filter(a => a.status === 'absent').length;
+        const halfDayCount = todayAtt.filter(a => a.status === 'half-day').length;
+
+        // Approved leaves on today's date
+        const onLeaveTodayList = leaveReqs.filter(l => l.status === 'approved' && l.startDate <= today && l.endDate >= today);
+        const onLeaveCount = onLeaveTodayList.length;
+
+        const effectiveOnDuty = presentCount + lateCount + (halfDayCount * 0.5);
+        const attRate = totalEmployees > 0 ? Math.min(100, Math.round((effectiveOnDuty / totalEmployees) * 100)) : 100;
+
+        setTxt('hubAttBadge', `${attRate}% Rate`);
+        const attBadge = document.getElementById('hubAttBadge');
+        if (attBadge) {
+            attBadge.className = 'hub-card-badge ' + (attRate >= 90 ? 'positive' : attRate >= 70 ? 'warning' : 'negative');
+        }
+        setTxt('hubAttPct', `${attRate}%`);
+        setTxt('hubAttPresent', String(presentCount));
+        setTxt('hubAttLate', String(lateCount));
+        setTxt('hubAttAbsent', String(absentCount));
+        setTxt('hubAttHalfDay', String(halfDayCount));
+        setTxt('hubAttLeaves', String(leaveReqs.filter(l => l.status === 'pending').length));
+        setTxt('hubLeaveOnToday', String(onLeaveCount));
+
+        const radialArc = document.getElementById('hubRadialArc');
+        if (radialArc) {
+            const circumference = 201.06;
+            const offset = circumference - (circumference * (attRate / 100));
+            radialArc.style.strokeDashoffset = String(offset);
+            radialArc.style.stroke = attRate >= 90 ? '#62c88a' : attRate >= 70 ? '#f59e0b' : '#ef4444';
+        }
+
+        const statusDesc = document.getElementById('hubAttStatusDesc');
+        if (statusDesc) {
+            if (absentCount === 0 && lateCount === 0) {
+                statusDesc.textContent = onLeaveCount > 0 
+                    ? `All active staff accounted for (${onLeaveCount} on approved leave)`
+                    : 'All departments meeting punctuality baseline';
+            } else if (absentCount > 0 && lateCount > 0) {
+                statusDesc.textContent = `${absentCount} absent · ${lateCount} late arrival today`;
+            } else if (absentCount > 0) {
+                statusDesc.textContent = `${absentCount} unscheduled absence(s) detected`;
+            } else {
+                statusDesc.textContent = `${lateCount} delayed check-in recorded`;
+            }
+        }
+
+        // 2. Employee Workforce Analysis
+        setTxt('hubEmployeeBadge', `${totalEmployees} Active Staff`);
+
+        const deptMap = {};
+        employees.forEach(emp => {
+            const dept = (emp.department || 'General').trim();
+            if (!deptMap[dept]) {
+                deptMap[dept] = { name: dept, headcount: 0, totalSalary: 0, presentCount: 0 };
+            }
+            deptMap[dept].headcount += 1;
+            deptMap[dept].totalSalary += (emp.basicSalary || 0);
+
+            const isPresent = todayAtt.some(a => (a.employeeId === emp.id || a.employeeId === emp.employeeId) && (a.status === 'present' || a.status === 'late'));
+            if (isPresent) {
+                deptMap[dept].presentCount += 1;
+            }
+        });
+
+        const deptList = document.getElementById('hubDeptList');
+        if (deptList) {
+            const depts = Object.values(deptMap);
+            if (depts.length === 0) {
+                deptList.innerHTML = '<div class="text-muted" style="font-size:12px;padding:8px 0;">No department records found</div>';
+            } else {
+                const colors = ['#b68cff', '#62c88a', '#5cb3ff', '#f59e0b', '#ec4899'];
+                deptList.innerHTML = depts.map((d, i) => {
+                    const color = colors[i % colors.length];
+                    const pct = totalEmployees > 0 ? Math.round((d.headcount / totalEmployees) * 100) : 100;
+                    const deptAttRate = d.headcount > 0 ? Math.round((d.presentCount / d.headcount) * 100) : 100;
+                    return `
+                        <div class="hub-dept-row">
+                            <div class="hub-dept-info">
+                                <span class="hub-dept-name"><i class="fas fa-circle-dot" style="color:${color};font-size:9px;margin-right:4px;"></i> ${escapeHtml(d.name)}</span>
+                                <span class="hub-dept-meta">${d.headcount} Staff · ${deptAttRate}% Present</span>
+                            </div>
+                            <div class="hub-dept-bar-track">
+                                <div class="hub-dept-bar-fill" style="background:${color};width:${pct}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        const activeDeptCount = Object.keys(deptMap).length;
+        setTxt('hubActiveDeptCount', String(activeDeptCount || 1));
+        setTxt('hubRetentionRate', totalEmployees > 0 ? '100%' : '0%');
+        const efficiencyScore = attRate >= 95 ? 99.2 : attRate >= 80 ? 94.5 : 88.0;
+        setTxt('hubEfficiencyIndex', `${efficiencyScore}%`);
+
+        const empStatusDesc = document.getElementById('hubEmpStatusDesc');
+        if (empStatusDesc) {
+            empStatusDesc.textContent = totalEmployees > 0
+                ? `${totalEmployees} staff across ${activeDeptCount} department(s) with zero turnover alerts`
+                : 'No employees enrolled in roster';
+        }
+
+        // 3. Payroll Analysis
+        const now = new Date();
+        const curM = now.getMonth() + 1, curY = now.getFullYear();
+        setTxt('hubPayrollMonthBadge', `Cycle ${curM}/${curY}`);
+
+        const curPayrolls = payrolls.filter(p => p.month === curM && p.year === curY);
+        let totalBasic = 0, totalAllow = 0, totalTaxDeduct = 0, totalNet = 0;
+
+        if (curPayrolls.length > 0) {
+            curPayrolls.forEach(p => {
+                totalBasic += (p.basicSalary || 0);
+                totalAllow += (p.allowances || 0);
+                totalTaxDeduct += ((p.tax || 0) + (p.deductions || 0));
+                totalNet += (p.netSalary || 0);
+            });
+        } else {
+            employees.forEach(e => {
+                const b = e.basicSalary || 0;
+                const a = b * 0.20;
+                const g = b + a;
+                const t = g * 0.15;
+                const n = g - t;
+                totalBasic += b;
+                totalAllow += a;
+                totalTaxDeduct += t;
+                totalNet += n;
+            });
+        }
+
+        const totalGross = totalBasic + totalAllow;
+        const avgNet = totalEmployees > 0 ? totalNet / totalEmployees : 0;
+
+        setTxt('hubPayrollNetVal', fmt(totalNet));
+        setTxt('hubPayrollGross', fmt(totalGross));
+        setTxt('hubPayrollTax', fmt(totalTaxDeduct));
+        setTxt('hubPayrollAvg', fmt(avgNet));
+
+        const basicPct = totalGross > 0 ? Math.round((totalBasic / totalGross) * 100) : 70;
+        const allowPct = totalGross > 0 ? Math.round((totalAllow / totalGross) * 100) : 15;
+        const taxPct = Math.max(5, 100 - basicPct - allowPct);
+
+        const segBasic = document.getElementById('hubPaySegBasic');
+        const segAllow = document.getElementById('hubPaySegAllow');
+        const segTax = document.getElementById('hubPaySegTax');
+        if (segBasic) {
+            segBasic.style.width = `${basicPct}%`;
+            segBasic.title = `Basic: ${fmt(totalBasic)} (${basicPct}%)`;
+        }
+        if (segAllow) {
+            segAllow.style.width = `${allowPct}%`;
+            segAllow.title = `Allowances: ${fmt(totalAllow)} (${allowPct}%)`;
+        }
+        if (segTax) {
+            segTax.style.width = `${taxPct}%`;
+            segTax.title = `Tax & Deductions: ${fmt(totalTaxDeduct)} (${taxPct}%)`;
+        }
+
+        const payStatusDesc = document.getElementById('hubPayrollStatusDesc');
+        if (payStatusDesc) {
+            payStatusDesc.textContent = curPayrolls.length > 0
+                ? `Disbursement cycle verified · ${curPayrolls.length} employee records finalized`
+                : `Projected liability estimated from ${totalEmployees} active contracts`;
+        }
+
+        // 4. Leaves Analysis
+        const pendingLeaves = leaveReqs.filter(l => l.status === 'pending');
+        const approvedLeaves = leaveReqs.filter(l => l.status === 'approved');
+        const pendingCount = pendingLeaves.length;
+        const approvedCount = approvedLeaves.length;
+
+        setTxt('hubLeavePendingVal', String(pendingCount));
+        setTxt('hubLeaveApprovedVal', String(approvedCount));
+
+        const leaveBadge = document.getElementById('hubLeaveBadge');
+        if (leaveBadge) {
+            if (pendingCount > 0) {
+                leaveBadge.textContent = `${pendingCount} Pending`;
+                leaveBadge.className = 'hub-card-badge warning';
+            } else {
+                leaveBadge.textContent = 'All Clear';
+                leaveBadge.className = 'hub-card-badge positive';
+            }
+        }
+
+        const leaveBreakdownEl = document.getElementById('hubLeaveBreakdown');
+        if (leaveBreakdownEl) {
+            const typesCount = {};
+            leaveReqs.forEach(l => {
+                const t = (l.leaveType || 'General').trim();
+                typesCount[t] = (typesCount[t] || 0) + 1;
+            });
+
+            const types = Object.entries(typesCount);
+            if (types.length === 0) {
+                leaveBreakdownEl.innerHTML = '<span class="text-muted" style="font-size:11px;">No active leave categories</span>';
+            } else {
+                leaveBreakdownEl.innerHTML = types.map(([name, count]) => {
+                    let cls = 'other';
+                    const lower = name.toLowerCase();
+                    if (lower.includes('annual')) cls = 'annual';
+                    else if (lower.includes('sick')) cls = 'sick';
+                    else if (lower.includes('casual')) cls = 'casual';
+                    else if (lower.includes('maternity') || lower.includes('paternity')) cls = 'maternity';
+                    return `<span class="leave-type-chip ${cls}"><strong>${count}</strong> ${escapeHtml(name)}</span>`;
+                }).join('');
+            }
+        }
+
+        const leaveStatusDesc = document.getElementById('hubLeaveStatusDesc');
+        const leaveStatusIcon = document.getElementById('hubLeaveStatusIcon');
+        if (leaveStatusDesc) {
+            if (pendingCount > 0) {
+                leaveStatusDesc.textContent = `${pendingCount} request(s) awaiting manager review`;
+                if (leaveStatusIcon) {
+                    leaveStatusIcon.className = 'fas fa-hourglass-half text-amber';
+                }
+            } else {
+                leaveStatusDesc.textContent = onLeaveCount > 0
+                    ? `${onLeaveCount} employee(s) currently on approved leave`
+                    : 'Zero backlog · All leave requests handled';
+                if (leaveStatusIcon) {
+                    leaveStatusIcon.className = 'fas fa-circle-check text-emerald';
+                }
+            }
+        }
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHelios);
+        document.addEventListener('DOMContentLoaded', () => {
+            initHelios();
+            syncHeliosOperationsHub();
+        });
     } else {
         initHelios();
+        syncHeliosOperationsHub();
     }
 
     // Expose for global triggers and currency changes
     window.heliosRenderChart = renderSvgChart;
     window.heliosSyncHolding = syncTotalHolding;
     window.heliosApplyMetrics = applyRealtimeMetrics;
+    window.syncHeliosOperationsHub = syncHeliosOperationsHub;
 })();

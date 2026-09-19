@@ -331,8 +331,8 @@
             { key: 'payroll', view: 'payroll', cls: 'ov-blue', ico: '▥', label: 'Payroll Trend', value: fmtFull(payrollTotal), sub: `6-mo avg ${fmtFull(payrollAvg)}`, spark: payrollSpark },
             { key: 'attendance', view: 'attendance', cls: 'ov-green', ico: '▤', label: 'Attendance Today', value: fmtPct(attendPct), sub: `${todayAtt?.present || 0} / ${EMPLOYEES.length} present`, spark: currAtt.days.slice(-7).map(d => d.present / EMPLOYEES.length) },
             { key: 'salary', view: 'salary', cls: 'ov-purple', ico: '▦', label: 'Salary by Dept', value: fmtFull(topDept[1]), sub: `Top: ${topDept[0]}`, spark: Object.values(deptTotals).sort((a, b) => b - a).slice(0, 8) },
-            { key: 'activity', view: 'activity', cls: 'ov-red', ico: '⚡', label: 'Live Activity', value: activityCount + '+', sub: 'Events in feed', spark: range(8, () => rng()) },
-            { key: 'earners', view: 'earners', cls: 'ov-amber', ico: '♛', label: 'Top Earner', value: fmtFull(topEarner.gross), sub: `${topEarner.name} (${topEarner.dept})`, spark: range(8, () => rng()) },
+            { key: 'activity', view: 'activity', cls: 'ov-red', ico: '~', label: 'Live Activity', value: activityCount + '+', sub: 'Events in feed', spark: range(8, () => rng()) },
+            { key: 'earners', view: 'earners', cls: 'ov-amber', ico: 'E', label: 'Top Earner', value: fmtFull(topEarner.gross), sub: `${topEarner.name} (${topEarner.dept})`, spark: range(8, () => rng()) },
             { key: 'fx', view: 'fx', cls: 'ov-teal', ico: '⇄', label: 'EUR / USD Rate', value: eurRate.toFixed(4), sub: 'Live from Frankfurter', spark: fxRates.EUR.history.slice(-8).map(h => h.rate) }
         ];
 
@@ -911,7 +911,7 @@
         // Pause/Resume
         document.getElementById('act-pause').addEventListener('click', (e) => {
             state.activity.paused = !state.activity.paused;
-            e.currentTarget.textContent = state.activity.paused ? '▶ Resume' : '❚❚ Pause';
+            e.currentTarget.textContent = state.activity.paused ? 'Resume' : 'Pause';
             e.currentTarget.classList.toggle('active', state.activity.paused);
             if (state.activity.paused) {
                 clearInterval(activityTimer);
@@ -947,7 +947,7 @@
         return type === 'payroll' ? '#3b82f6' : type === 'attendance' ? '#10b981' : type === 'leave' ? '#f59e0b' : '#64748b';
     }
     function typeIcon(type) {
-        return type === 'payroll' ? '$' : type === 'attendance' ? '✓' : type === 'leave' ? '📝' : '⚙';
+        return type === 'payroll' ? '$' : type === 'attendance' ? 'A' : type === 'leave' ? 'L' : 'S';
     }
 
     // ═══════════════════════════════════════════════════════════

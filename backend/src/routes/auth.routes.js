@@ -87,6 +87,80 @@ async function loadUserById(id) {
     return rows[0];
 }
 
+/** POST /api/auth/register */
+router.post('/register', async (req, res, next) => {
+    try {
+        const email = String(req.body.email || '').trim().toLowerCase();
+        const password = String(req.body.password || '');
+        const fullName = String(req.body.fullName || '').trim() || (email.split('@')[0]);
+        const requestedRole = String(req.body.role || 'employee').toLowerCase();
+
+        if (!email || !password) {
+            throw new AppError(422, 'Email and password are required.');
+        }
+        if (password.length < 6) {
+            throw new AppError(422, 'Password must be at least 6 characters long.');
+        }
+
+        const { rows: existing } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (existing.length > 0) {
+            throw new AppError(409, 'An account with this email already exists. Please sign in instead.');
+        }
+
+        const roleCode = ['admin', 'manager', 'employee'].includes(requestedRole) ? requestedRole : 'employee';
+        const { rows: roles } = await pool.query('SELECT id FROM roles WHERE code = $1', [roleCode]);
+        const roleId = roles[0]?.id || (await pool.query('SELECT id FROM roles LIMIT 1')).rows[0]?.id;
+
+        const hash = await bcrypt.hash(password, 12);
+        const { rows: [newUser] } = await pool.query(
+            `INSERT INTO users (email, full_name, password_hash, role_id)
+             VALUES ($1, $2, $3, $4)
+             RETURNING id, email, full_name`,
+            [email, fullName, hash, roleId]
+        );
+
+        // Also create matching employee record so they appear in employee roster
+        try {
+            const empNo = 'EMP' + Math.floor(1000 + Math.random() * 9000);
+            const { rows: depts } = await pool.query('SELECT id FROM departments LIMIT 1');
+            const deptId = depts[0]?.id || null;
+            const names = fullName.split(' ');
+            const firstName = names[0] || 'User';
+            const lastName = names.slice(1).join(' ') || 'Nexus';
+
+            await pool.query(
+                `INSERT INTO employees (user_id, department_id, employee_no, first_name, last_name, position, email, base_salary_usd)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                 ON CONFLICT (email) DO NOTHING`,
+                [newUser.id, deptId, empNo, firstName, lastName, `${roleCode.toUpperCase()} Specialist`, email, 5000]
+            );
+        } catch (_) {}
+
+        const userObj = {
+            id: newUser.id,
+            email: newUser.email,
+            full_name: newUser.full_name,
+            role: roleCode
+        };
+
+        const accessToken = signAccessToken(userObj);
+        const refreshToken = signRefreshToken(userObj, crypto.randomUUID());
+        await persistRefreshToken(userObj.id, refreshToken);
+
+        setAuthCookies(res, accessToken, refreshToken);
+        res.status(201).json({
+            user: {
+                id: userObj.id,
+                email: userObj.email,
+                fullName: userObj.full_name,
+                role: userObj.role
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
 /** POST /api/auth/login */
 router.post('/login', async (req, res, next) => {
     try {
@@ -583,7 +657,7 @@ export async function handleOAuthCallback(req, res) {
                 const userRes = await fetch('https://api.github.com/user', {
                     headers: {
                         Authorization: `Bearer ${tokenData.access_token}`,
-                        'User-Agent': 'Helios-Nexus-App',
+                        'User-Agent': 'Payroll-Nexus-App',
                     },
                 });
                 const userData = await userRes.json();
@@ -595,7 +669,7 @@ export async function handleOAuthCallback(req, res) {
                     const emailsRes = await fetch('https://api.github.com/user/emails', {
                         headers: {
                             Authorization: `Bearer ${tokenData.access_token}`,
-                            'User-Agent': 'Helios-Nexus-App',
+                            'User-Agent': 'Payroll-Nexus-App',
                         },
                     });
                     const emails = await emailsRes.json();
@@ -648,7 +722,7 @@ export async function handleOAuthCallback(req, res) {
         }
 
         // Fallback email/name if test code or partial provider scopes
-        const normalizedEmail = (email || `${provider}_verified@helios.nexus`).toLowerCase().trim();
+        const normalizedEmail = (email || `${provider}_verified@payroll.nexus`).toLowerCase().trim();
         const displayName = fullName || `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`;
 
         const { rows: existing } = await pool.query(
@@ -747,9 +821,9 @@ function renderOAuthResultPage(res, data) {
 </head>
 <body>
   <div class="auth-card">
-    <div class="auth-icon">${data.success ? '✓' : '✕'}</div>
+    <div class="auth-icon">${data.success ? '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'}</div>
     <h2>${data.success ? 'Authentication Successful' : 'Authentication Failed'}</h2>
-    <p>${data.success ? 'Your account has been verified. Syncing with Helios Nexus...' : (data.error || 'Unable to authenticate.')}</p>
+    <p>${data.success ? 'Your account has been verified. Syncing with Payroll Nexus...' : (data.error || 'Unable to authenticate.')}</p>
   </div>
   <script>
     const payload = ${JSON.stringify(data.success ? {

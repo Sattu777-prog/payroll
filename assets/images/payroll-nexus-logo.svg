@@ -1,35 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 380" fill="none" class="pn-logo-svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 380" fill="none" class="pn-logo-svg">
   <defs>
-    <!-- Vibrant electric blue gradient matching image -->
+    <!-- Vibrant electric blue gradient for the front-facing blue ribbon -->
     <linearGradient id="pnBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0080ff"/>
-      <stop offset="60%" stop-color="#006aff"/>
-      <stop offset="100%" stop-color="#0050ee"/>
+      <stop offset="0%" stop-color="#0094ff"/>
+      <stop offset="35%" stop-color="#007efc"/>
+      <stop offset="100%" stop-color="#0056e4"/>
     </linearGradient>
-    <!-- Fold 3D shading gradient on ribbon tuck -->
-    <linearGradient id="pnFoldShadow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#002d80" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#0044b3" stop-opacity="0.2"/>
+
+    <!-- Right vertical stem gradient with soft top highlight -->
+    <linearGradient id="pnPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#008efc"/>
+      <stop offset="50%" stop-color="#0076fa"/>
+      <stop offset="100%" stop-color="#0056e0"/>
     </linearGradient>
+
+    <!-- Under-diagonal shadow gradient on blue ribbon passing beneath white -->
+    <linearGradient id="pnUnderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0074f8"/>
+      <stop offset="40%" stop-color="#0043c0"/>
+      <stop offset="80%" stop-color="#002882"/>
+      <stop offset="100%" stop-color="#001a60"/>
+    </linearGradient>
+
+    <!-- 3D Origami fold facet shadow on the corner crease -->
+    <linearGradient id="pnFoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00144c" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#002b90" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#005ce6" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Realistic soft ambient drop shadow cast by white ribbon onto blue ribbon -->
+    <filter id="pnWhiteShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="9" stdDeviation="7" flood-color="#001038" flood-opacity="0.52"/>
+    </filter>
   </defs>
 
-  <!-- Left Glyph: Letter 'P' (Stylized rounded arch with inner counter) -->
-  <path class="pn-glyph-p" fill-rule="evenodd" clip-rule="evenodd" 
-    d="M110 50 C82.3858 50 60 72.3858 60 100 V270 C60 286.569 73.4315 300 90 300 C106.569 300 120 286.569 120 270 V210 H220 C264.183 210 300 174.183 300 130 C300 85.8172 264.183 50 220 50 H110 Z M120 110 H220 C231.046 110 240 118.954 240 130 C240 141.046 231.046 150 220 150 H120 V110 Z" 
-    fill="currentColor"/>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       1. BLUE INTERLOCKING RIBBON (P Crossbar + Under-loop + Right Stem of N)
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <g class="pn-blue-layer">
+    <!-- Visible horizontal crossbar inside the P counter -->
+    <path d="M 140 176 
+             H 232 
+             L 194 236 
+             H 140 
+             Z" 
+          fill="url(#pnBlueGrad)" />
 
-  <!-- Lower blue ribbon wing emerging through the counter of P -->
-  <path d="M120 210 L195 150 H240 L120 250 H90 V210 H120 Z" fill="url(#pnBlueGrad)"/>
+    <!-- Diagonal loop travelling under the white diagonal stroke -->
+    <path d="M 232 176 
+             L 310 258 
+             L 262 324 
+             L 194 236 
+             Z" 
+          fill="url(#pnUnderGrad)" />
 
-  <!-- Main Diagonal of 'N' crossing down to right leg -->
-  <path d="M165 174 L308 300 H360 L235 150 H195 L165 174 Z" fill="url(#pnBlueGrad)"/>
+    <!-- 3D Ribbon fold crease shadow facet at the bottom right turn -->
+    <path d="M 262 324 
+             L 310 258 
+             L 378 324 
+             Z" 
+          fill="url(#pnFoldFacet)" />
 
-  <!-- Right Vertical Column of 'N' -->
-  <path class="pn-glyph-n-pillar" 
-    d="M300 50 H360 C376.569 50 390 63.4315 390 80 V270 C390 286.569 376.569 300 360 300 C343.431 300 330 286.569 330 270 V110 H300 V50 Z" 
-    fill="url(#pnBlueGrad)"/>
+    <!-- Front-facing fold sweeping into the vertical right stem of 'N' -->
+    <path d="M 288 324 
+             H 432 
+             C 443 324 452 315 452 304 
+             V 76 
+             C 452 65 443 56 432 56 
+             H 396 
+             C 389 56 384 61 384 68 
+             V 256 
+             L 348 324 
+             Z" 
+          fill="url(#pnPillarGrad)" />
+  </g>
 
-  <!-- 3D Ribbon fold crease shadow beneath the white arch -->
-  <path d="M225 150 L275 195 L300 170 V150 H225 Z" fill="url(#pnFoldShadow)" opacity="0.8"/>
-  <path d="M300 230 L330 270 V200 L300 230 Z" fill="url(#pnFoldShadow)" opacity="0.6"/>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       2. WHITE PRIMARY RIBBON ('P' Vertical Pillar, Top Arch & 'N' Diagonal)
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <path class="pn-white-layer"
+        filter="url(#pnWhiteShadow)"
+        fill="#FFFFFF"
+        d="M 72 306 
+           V 116 
+           C 72 83 98 56 132 56 
+           H 250 
+           C 272 56 292 68 305 88 
+           L 394 236 
+           C 400 246 397 258 387 264 
+           L 352 286 
+           C 342 292 330 289 324 279 
+           L 248 152 
+           C 240 139 226 124 206 124 
+           H 156 
+           C 147 124 140 131 140 140 
+           V 324 
+           H 90 
+           C 80 324 72 316 72 306 
+           Z" />
 </svg>

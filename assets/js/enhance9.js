@@ -72,7 +72,7 @@
     }
     persist();
     var emp = findEmp(ls('nexus_employees'), empId);
-    toast('✓ ' + empName(emp) + ' · ' + colOf(status).label);
+    toast(empName(emp) + ' · ' + colOf(status).label);
     renderBoard();
   }
   // trigger the base Save button but swallow its generic toast
