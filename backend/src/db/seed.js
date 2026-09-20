@@ -4,9 +4,10 @@ import { fileURLToPath } from 'node:url';
 import { pool } from './pool.js';
 
 const SEED_USERS = [
-    { email: 'admin@nexus.dev', full_name: 'Alex Admin', role: 'admin', employeeNo: 'EMP1001', firstName: 'sattu', lastName: 'sattu ', position: 'Lead Developer', dept: 'Engineering', salary: 7200 },
-    { email: 'manager@nexus.dev', full_name: 'Maria Manager', role: 'manager', employeeNo: 'EMP1002', firstName: 'Bianca', lastName: 'Lopez', position: 'HR Generalist', dept: 'Human Resources', salary: 5400 },
-    { email: 'employee@nexus.dev', full_name: 'Owen Employee', role: 'employee', employeeNo: 'EMP1003', firstName: 'Chen', lastName: 'Wei', position: 'Sales Manager', dept: 'Sales', salary: 6800 },
+    { email: 'rachel_nexus@gmail.com', full_name: 'Nadia Rachel', role: 'admin', employeeNo: 'EMP1000', firstName: 'Nadia', lastName: 'Rachel', position: 'Executive Director', dept: 'Engineering', salary: 9800 },
+    { email: 'admin@nexus.dev', full_name: 'Alex Admin', role: 'admin', employeeNo: 'EMP1001', firstName: 'Alex', lastName: 'Admin', position: 'Lead Developer', dept: 'Engineering', salary: 7200 },
+    { email: 'manager@nexus.dev', full_name: 'Maria Manager', role: 'manager', employeeNo: 'EMP1002', firstName: 'Maria', lastName: 'Lopez', position: 'HR Generalist', dept: 'Human Resources', salary: 5400 },
+    { email: 'employee@nexus.dev', full_name: 'Chen Wei', role: 'employee', employeeNo: 'EMP1003', firstName: 'Chen', lastName: 'Wei', position: 'Sales Specialist', dept: 'Sales', salary: 6800 },
 ];
 
 export async function seed(shouldClosePool = false) {

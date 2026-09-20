@@ -16,8 +16,7 @@ function getAiClient() {
 // Resilient models pool in order of preference (official models from @google/genai SDK)
 const MODEL_CANDIDATES = [
     'gemini-3.1-flash-lite',
-    'gemini-flash-latest',
-    'gemini-3.8-flash'
+    'gemini-flash-latest'
 ];
 
 /**
@@ -53,7 +52,7 @@ Keep answers punchy, helpful, insightful, and friendly without fluff or emojis.`
     // Try candidate models with automatic failover in case of traffic spikes
     for (const modelName of MODEL_CANDIDATES) {
         try {
-            // Fast 6-second timeout per attempt to ensure ultra-snappy UX
+            // 20-second timeout per attempt to allow deep reasoning while staying responsive
             const generatePromise = ai.models.generateContent({
                 model: modelName,
                 contents: [
@@ -74,7 +73,7 @@ Keep answers punchy, helpful, insightful, and friendly without fluff or emojis.`
             });
 
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('AI generation timed out after 6s')), 6000);
+                setTimeout(() => reject(new Error('AI generation timed out after 20s')), 20000);
             });
 
             const response = await Promise.race([generatePromise, timeoutPromise]);

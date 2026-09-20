@@ -1,0 +1,1311 @@
+/* ═══════════════════════════════════════════════════════════════════ */
+/* ✦ PAYROLL NEXUS — CONSOLIDATED ENHANCE CSS BUNDLE                 */
+/* Consolidated from enhance2.css through enhance11.css              */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─── SECTION: enhance2.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance2.css
+   Second additive layer (loaded after mobile-enhance.css). Adds: accessibility
+   affordances (skip link, focus rings, sr-only), a scroll-to-top control,
+   inline form-validation styling, and the employee profile quick-view drawer.
+   Uses the app's existing CSS custom properties so it themes automatically.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────── ACCESSIBILITY PRIMITIVES ─────────────────── */
+.sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.skip-link {
+    position: fixed;
+    top: -60px;
+    left: 12px;
+    z-index: 9999;
+    padding: 10px 18px;
+    border-radius: 0 0 12px 12px;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    box-shadow: 0 10px 26px rgba(59, 130, 246, 0.5);
+    transition: top 0.2s ease;
+}
+.skip-link:focus { top: 0; outline: 2px solid #fff; outline-offset: 2px; }
+
+/* A single, consistent keyboard focus ring app-wide (only for keyboard users) */
+.btn:focus-visible,
+.tab-btn:focus-visible,
+.action-link:focus-visible,
+.qa-card:focus-visible,
+.field-input:focus-visible,
+.search-input:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--accent, #3b82f6);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* ─────────────────── SCROLL-TO-TOP BUTTON ─────────────────── */
+.scroll-top-btn {
+    position: fixed;
+    left: 16px;
+    bottom: 24px;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--bg-card-border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0, 0, 0, 0.18));
+    opacity: 0;
+    transform: translateY(14px) scale(0.9);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, background 0.2s ease;
+    z-index: 54;
+}
+.scroll-top-btn.show { opacity: 1; transform: none; pointer-events: auto; }
+.scroll-top-btn:hover { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+/* Lift it above the fixed mobile bottom-nav */
+@media (max-width: 640px) {
+    .scroll-top-btn { bottom: calc(var(--mob-nav-h, 66px) + var(--safe-b, 0px) + 14px); }
+}
+
+/* ─────────────────── INLINE FORM VALIDATION ─────────────────── */
+.field-input.field-invalid {
+    border-color: var(--danger, #ef4444) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+}
+.field-input.field-valid { border-color: rgba(16, 185, 129, 0.55) !important; }
+.field-error {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--danger, #ef4444);
+}
+.field-error.show { display: flex; animation: fieldErrIn 0.18s ease; }
+.field-error i { font-size: 0.7rem; }
+@keyframes fieldErrIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* ─────────────────── EMPLOYEE PROFILE DRAWER ─────────────────── */
+#employeesTbody tr[role="button"] { cursor: pointer; }
+#employeesTbody tr[role="button"]:hover { background: rgba(59, 130, 246, 0.06); }
+
+.drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 210;
+    display: none;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.drawer-backdrop.open { display: block; animation: cmdkFade 0.16s ease; }
+
+.drawer-panel {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: min(420px, 92vw);
+    background: var(--bg-card);
+    border-left: 1px solid var(--bg-card-border);
+    box-shadow: -30px 0 80px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.34, 1.3, 0.5, 1);
+    overflow-y: auto;
+}
+.drawer-backdrop.open .drawer-panel { transform: none; }
+body.no-anim .drawer-panel { transition: none; }
+
+.drawer-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--bg-card-border);
+    position: sticky; top: 0;
+    background: var(--bg-card);
+    z-index: 2;
+}
+.drawer-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 36px; height: 36px;
+    border-radius: 9px;
+}
+.drawer-close:hover { background: rgba(127, 127, 127, 0.14); color: var(--text-primary); }
+.drawer-name { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+.drawer-role { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.drawer-body { padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+.drawer-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.drawer-stat {
+    background: rgba(127, 127, 127, 0.06);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 13px;
+    padding: 12px 13px;
+}
+.drawer-stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; }
+.drawer-stat-val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+.drawer-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
+
+.drawer-att { display: flex; align-items: center; gap: 16px; }
+.drawer-att-legend { display: flex; flex-direction: column; gap: 5px; font-size: 0.74rem; color: var(--text-secondary); flex: 1; }
+.drawer-att-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+.drawer-att-legend .val { float: right; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
+
+.drawer-info-row { display: flex; align-items: center; gap: 11px; font-size: 0.82rem; color: var(--text-secondary); padding: 7px 0; }
+.drawer-info-row i { width: 18px; text-align: center; color: var(--accent, #3b82f6); }
+.drawer-info-row .lbl { color: var(--text-muted); min-width: 74px; }
+.drawer-info-row .val { color: var(--text-primary); font-weight: 600; word-break: break-word; }
+
+.drawer-actions { display: flex; gap: 10px; margin-top: 4px; }
+.drawer-actions .btn { flex: 1; justify-content: center; }
+
+
+
+/* ─── SECTION: enhance3.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance3.css
+   Third additive layer (loaded after enhance2.css). Makes the Dashboard and
+   Reports sections interactive & dynamic:
+     • "Payroll Pulse" canvas chart with a range switcher + hover crosshair
+     • Floating value tooltips on the dashboard trend/department bars
+     • Reports "Metric Explorer" — clickable chips → animated readout + sparkline
+     • A live ticking clock in the header
+   Uses the app's existing CSS custom properties so it themes automatically and
+   honours the global `body.no-anim` animation toggle.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────── PAYROLL PULSE PANEL ─────────────────── */
+.px-panel {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 18px;
+    padding: 18px 18px 10px;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0, 0, 0, 0.14));
+    position: relative;
+    overflow: hidden;
+}
+.px-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+.px-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.px-title i { color: #3b82f6; }
+.px-title .px-live {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #10b981;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.px-live .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pxPulse 1.6s ease-in-out infinite; }
+body.no-anim .px-live .dot { animation: none; }
+@keyframes pxPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+
+.px-range { margin-left: auto; display: inline-flex; background: rgba(127,127,127,0.1); border-radius: 11px; padding: 3px; gap: 2px; }
+.px-seg {
+    border: none; background: transparent; cursor: pointer;
+    font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+    padding: 6px 12px; border-radius: 9px; transition: color 0.16s ease, background 0.16s ease;
+}
+.px-seg:hover { color: var(--text-primary); }
+.px-seg.active { background: var(--bg-card); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+.px-metricbar { display: flex; gap: 18px; flex-wrap: wrap; margin: 4px 0 10px; }
+.px-metric { display: flex; flex-direction: column; }
+.px-metric .lbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; }
+.px-metric .val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.px-metric .val small { font-size: 0.7rem; font-weight: 700; }
+.px-up { color: #10b981; }
+.px-down { color: #ef4444; }
+
+.px-canvas-wrap { position: relative; width: 100%; height: 210px; }
+.px-canvas-wrap canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+.px-tooltip {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: var(--text-primary); color: var(--bg-card);
+    padding: 6px 9px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+    white-space: nowrap; transform: translate(-50%, -130%); opacity: 0;
+    transition: opacity 0.12s ease; box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+}
+.px-tooltip.show { opacity: 1; }
+.px-tooltip .t-month { display: block; font-size: 0.6rem; opacity: 0.7; font-weight: 600; }
+@media (max-width: 640px) { .px-canvas-wrap { height: 180px; } .px-metricbar { gap: 12px; } }
+
+/* ─────────────────── FLOATING VALUE TOOLTIP (dashboard bars) ─────────────── */
+.viz-tip {
+    position: fixed; z-index: 400; pointer-events: none;
+    background: var(--text-primary); color: var(--bg-card);
+    padding: 6px 10px; border-radius: 8px;
+    font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    transform: translate(-50%, -140%); opacity: 0;
+    transition: opacity 0.12s ease; box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+.viz-tip.show { opacity: 1; }
+.viz-tip .vt-sub { display: block; font-size: 0.6rem; font-weight: 600; opacity: 0.72; }
+/* invite interaction on the existing static bars */
+#trend-bars > *, #dept-list > *, #reportDeptBars > * { transition: filter 0.15s ease, transform 0.15s ease; }
+#trend-bars > *:hover, #dept-list > *:hover, #reportDeptBars > *:hover { filter: brightness(1.12); cursor: pointer; }
+
+/* ─────────────────── REPORTS: METRIC EXPLORER ─────────────────── */
+.mx-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--shadow-card, 0 8px 24px rgba(0,0,0,0.14));
+    margin-bottom: 1.25rem;
+}
+.mx-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.mx-chip {
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.05);
+    border-radius: 12px; padding: 8px 14px; cursor: pointer;
+    font-size: 0.76rem; font-weight: 700; color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.mx-chip:hover { transform: translateY(-2px); color: var(--text-primary); }
+.mx-chip i { font-size: 0.72rem; }
+.mx-chip.active { color: #fff; border-color: transparent; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.mx-chip.active[data-metric="headcount"] { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+.mx-chip.active[data-metric="avgpay"] { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
+.mx-chip.active[data-metric="attendance"] { background: linear-gradient(135deg,#10b981,#059669); }
+.mx-chip.active[data-metric="leaveload"] { background: linear-gradient(135deg,#f59e0b,#d97706); }
+body.no-anim .mx-chip:hover { transform: none; }
+
+.mx-stage { display: grid; grid-template-columns: minmax(0,0.9fr) minmax(0,1.6fr); gap: 22px; align-items: center; }
+@media (max-width: 720px) { .mx-stage { grid-template-columns: 1fr; gap: 16px; } }
+.mx-readout .mx-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; }
+.mx-big { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; line-height: 1.05; margin: 4px 0 8px; }
+.mx-delta { font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.mx-delta.up { color: #10b981; } .mx-delta.down { color: #ef4444; } .mx-delta.flat { color: var(--text-muted); }
+.mx-desc { font-size: 0.76rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+.mx-spark-wrap { position: relative; height: 130px; }
+.mx-spark-wrap canvas { display: block; width: 100%; height: 100%; }
+
+/* ─────────────────── HEADER LIVE CLOCK ─────────────────── */
+.live-clock {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.74rem; font-weight: 700; color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 5px 11px; border-radius: 10px;
+    background: rgba(127,127,127,0.08); border: 1px solid var(--bg-card-border);
+    white-space: nowrap;
+}
+.live-clock i { color: #3b82f6; font-size: 0.7rem; }
+.live-clock .lc-time { color: var(--text-primary); }
+@media (max-width: 900px) { .live-clock { display: none; } }
+
+
+
+/* ─── SECTION: enhance4.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance4.css
+   Fourth additive layer. Brings four "management" surfaces that tie the app's
+   scattered features together, all themed via existing CSS variables and
+   honouring body.no-anim:
+     1. Notification & Insights Center   (header bell → slide-over)
+     2. Payroll What-If Simulator        (modal with live sliders + canvas)
+     3. Settings & Data Hub              (header gear → slide-over)
+     4. Spotlight augmentation           (employee + math results in ⌘K)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── shared header icon button ─────────────── */
+.hx-iconbtn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.hx-badge {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 17px; height: 17px; padding: 0 4px;
+    border-radius: 9px; background: #ef4444; color: #fff;
+    font-size: 0.62rem; font-weight: 800; line-height: 17px; text-align: center;
+    box-shadow: 0 0 0 2px var(--bg-card, #fff);
+    transform: scale(0); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+}
+.hx-badge.show { transform: scale(1); }
+body.no-anim .hx-badge { transition: none; }
+
+/* ─────────────── generic right-side slide-over ─────────────── */
+.hx-over {
+    position: fixed; inset: 0; z-index: 240; display: none;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.hx-over.open { display: block; animation: hxFade 0.16s ease; }
+@keyframes hxFade { from { opacity: 0; } to { opacity: 1; } }
+.hx-panel {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: min(440px, 94vw);
+    background: var(--bg-card); border-left: 1px solid var(--bg-card-border);
+    box-shadow: -30px 0 80px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(.34,1.3,.5,1);
+}
+.hx-over.open .hx-panel { transform: none; }
+body.no-anim .hx-panel { transition: none; }
+.hx-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 20px 16px; border-bottom: 1px solid var(--bg-card-border);
+    position: sticky; top: 0; background: var(--bg-card); z-index: 2;
+}
+.hx-head h3 { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px; }
+.hx-head h3 i { color: var(--accent, #3b82f6); }
+.hx-close {
+    margin-left: auto; background: transparent; border: none; color: var(--text-muted);
+    font-size: 1.1rem; cursor: pointer; width: 36px; height: 36px; border-radius: 9px;
+}
+.hx-close:hover { background: rgba(127,127,127,0.14); color: var(--text-primary); }
+.hx-body { padding: 16px 18px 26px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─────────────── Notification Center items ─────────────── */
+.hx-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.hx-filter button {
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.05);
+    color: var(--text-secondary); border-radius: 999px; padding: 5px 12px;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer;
+}
+.hx-filter button.active { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+.noti {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 13px 14px; border-radius: 13px;
+    border: 1px solid var(--bg-card-border); background: rgba(127,127,127,0.04);
+    transition: transform 0.14s ease, border-color 0.14s ease;
+}
+.noti:hover { transform: translateX(-3px); border-color: var(--accent, #3b82f6); }
+body.no-anim .noti:hover { transform: none; }
+.noti-ic { width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.noti-ic.crit { background: rgba(239,68,68,.14); color: #ef4444; }
+.noti-ic.warn { background: rgba(245,158,11,.14); color: #f59e0b; }
+.noti-ic.info { background: rgba(59,130,246,.14); color: #3b82f6; }
+.noti-ic.ok   { background: rgba(16,185,129,.14); color: #10b981; }
+.noti-main { flex: 1; min-width: 0; }
+.noti-title { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.noti-sub { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+.noti-act {
+    margin-top: 8px; border: none; background: var(--accent, #3b82f6); color: #fff;
+    border-radius: 8px; padding: 5px 11px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+}
+.noti-act:hover { filter: brightness(1.08); }
+.hx-empty { text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 40px 10px; }
+.hx-empty i { font-size: 2rem; color: #10b981; display: block; margin-bottom: 12px; }
+
+/* ─────────────── Settings Hub ─────────────── */
+.set-group { border: 1px solid var(--bg-card-border); border-radius: 14px; overflow: hidden; }
+.set-group-h { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 800; color: var(--text-muted); padding: 12px 14px 6px; }
+.set-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--bg-card-border); }
+.set-row:first-of-type { border-top: none; }
+.set-row .si { width: 30px; height: 30px; border-radius: 9px; background: rgba(127,127,127,.08); display: flex; align-items: center; justify-content: center; color: var(--accent,#3b82f6); font-size: 0.82rem; }
+.set-row .st { flex: 1; min-width: 0; }
+.set-row .st .t { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.set-row .st .d { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
+.set-row .sc { margin-left: auto; }
+.set-btn { border: 1px solid var(--bg-card-border); background: rgba(127,127,127,.05); color: var(--text-primary); border-radius: 9px; padding: 7px 13px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+.set-btn:hover { border-color: var(--accent,#3b82f6); }
+.set-btn.danger { color: #ef4444; border-color: rgba(239,68,68,.4); }
+.set-btn.danger:hover { background: #ef4444; color: #fff; border-color: transparent; }
+.storage-meter { height: 8px; border-radius: 6px; background: rgba(127,127,127,.15); overflow: hidden; margin-top: 8px; }
+.storage-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#10b981,#3b82f6); transition: width 0.6s cubic-bezier(.34,1.3,.5,1); }
+body.no-anim .storage-fill { transition: none; }
+
+/* ─────────────── What-If Simulator ─────────────── */
+.wf-modal .modal-card, .wf-card { max-width: 720px; }
+.wf-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: 22px; }
+@media (max-width: 720px) { .wf-grid { grid-template-columns: 1fr; } }
+.wf-control { margin-bottom: 18px; }
+.wf-control label { display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; }
+.wf-control label .wf-v { color: var(--accent,#3b82f6); font-family: 'JetBrains Mono', monospace; }
+.wf-control input[type=range] { width: 100%; accent-color: #3b82f6; cursor: pointer; }
+.wf-control input[type=number] { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--text-primary); }
+.wf-out { display: flex; flex-direction: column; gap: 12px; }
+.wf-big-row { display: flex; gap: 12px; }
+.wf-big { flex: 1; background: rgba(127,127,127,.06); border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 13px; }
+.wf-big .l { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 700; }
+.wf-big .v { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+.wf-delta { font-size: 0.9rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
+.wf-delta.up { color: #ef4444; } /* higher cost = red */
+.wf-delta.down { color: #10b981; }
+.wf-delta.flat { color: var(--text-muted); }
+.wf-canvas-wrap { height: 150px; position: relative; }
+.wf-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+.wf-reset { font-size: 0.72rem; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+/* ─────────────── Spotlight augmentation ─────────────── */
+.cmdk-aug-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--text-muted); padding: 8px 14px 4px; }
+.cmdk-item .cmdk-sub { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.cmdk-math { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.cmdk-math .eq { color: var(--text-muted); font-size: 0.8rem; }
+.cmdk-math .res { font-size: 1.1rem; font-weight: 800; color: var(--accent,#3b82f6); font-family: 'JetBrains Mono', monospace; }
+
+/* centered variant of the overlay (What-If simulator) */
+.hx-over.center { display: none; }
+.hx-over.center.open { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.hx-over.center .hx-panel {
+    position: relative; top: auto; right: auto; bottom: auto;
+    width: min(760px, 96vw); max-height: 92vh; border-radius: 18px;
+    border: 1px solid var(--bg-card-border); border-left: 1px solid var(--bg-card-border);
+    transform: translateY(24px) scale(0.97); box-shadow: 0 40px 100px rgba(0,0,0,0.45);
+}
+.hx-over.center.open .hx-panel { transform: none; }
+.hx-head .wf-reset { margin-left: auto; }
+.hx-head .hx-close { margin-left: 8px; }
+
+/* ─────────────── v2: toggle switch (Settings) ─────────────── */
+.set-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer; }
+.set-switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 2; }
+.set-switch .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(127,127,127,0.32); transition: background 0.2s ease; }
+.set-switch .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.22s cubic-bezier(.34,1.56,.64,1); }
+.set-switch input:checked ~ .track { background: var(--accent, #3b82f6); }
+.set-switch input:checked ~ .thumb { transform: translateX(20px); }
+.set-switch input:focus-visible ~ .track { box-shadow: 0 0 0 3px rgba(59,130,246,0.35); }
+body.no-anim .set-switch .track, body.no-anim .set-switch .thumb { transition: none; }
+
+/* ─────────────── v2: notification center polish ─────────────── */
+.noti-summary { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; padding: 2px 2px 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.noti-summary .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.noti-restore { border: none; background: none; color: var(--accent, #3b82f6); font-size: 0.73rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; }
+.hx-filter button .cnt { display: inline-block; margin-left: 4px; font-weight: 800; opacity: 0.85; }
+.hx-filter button.active .cnt { opacity: 1; }
+.noti.dismissable .noti-main { padding-right: 22px; }
+.noti-dismiss { position: absolute; top: 9px; right: 9px; width: 24px; height: 24px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 7px; font-size: 0.78rem; opacity: 0.55; transition: opacity 0.14s ease, background 0.14s ease; display: flex; align-items: center; justify-content: center; }
+.noti-dismiss:hover { background: rgba(127,127,127,0.16); color: var(--text-primary); opacity: 1; }
+body.no-anim .noti-dismiss { transition: none; }
+.noti-enter { animation: notiIn 0.32s cubic-bezier(.22,1,.36,1) both; }
+@keyframes notiIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+body.no-anim .noti-enter { animation: none; }
+.hx-badge.sev-crit { background: #ef4444; }
+.hx-badge.sev-warn { background: #f59e0b; }
+.hx-badge.sev-info { background: #3b82f6; }
+
+/* ─────────────── v3: currency row + settings row hardening ─────────────── */
+.set-row { min-width: 0; }
+.set-row .st { flex: 1 1 auto; min-width: 0; }
+.set-row .st .t,
+.set-row .st .d { overflow: hidden; text-overflow: ellipsis; }
+.set-row .sc { flex-shrink: 0; margin-left: auto; }
+#setCurrencyMount { flex-shrink: 0; }
+.set-currency-sel {
+    max-width: 120px; padding: 7px 10px; border-radius: 9px;
+    border: 1px solid var(--bg-card-border); background: var(--bg-card);
+    color: var(--text-primary); font-size: 0.78rem; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; cursor: pointer;
+    text-overflow: ellipsis;
+}
+.set-currency-sel:hover { border-color: var(--accent, #3b82f6); }
+.set-currency-sel:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.32); }
+
+/* ─────────────── v3: notification hero banner ─────────────── */
+.noti-hero {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 16px; border-radius: 16px; color: #fff;
+    position: relative; overflow: hidden;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+}
+.noti-hero::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); pointer-events: none;
+}
+.noti-hero.ok   { background: linear-gradient(135deg, #10b981, #059669); }
+.noti-hero.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.noti-hero.warn { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.noti-hero.crit { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.noti-hero-ring {
+    width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,0.22); display: flex; align-items: center;
+    justify-content: center; font-size: 1.35rem; font-weight: 800;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+}
+.noti-hero-txt { min-width: 0; }
+.noti-hero-title { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+.noti-hero-sub { font-size: 0.76rem; opacity: 0.92; margin-top: 3px; }
+.noti-hero-sub b { font-weight: 800; }
+.noti-hero .noti-restore { color: #fff; opacity: 0.95; text-decoration: underline; }
+.noti-hero.pulse .noti-hero-ring { animation: notiPulse 1.6s ease-in-out infinite; }
+@keyframes notiPulse {
+    0%, 100% { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 0 rgba(255,255,255,0.4); }
+    50% { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 10px rgba(255,255,255,0); }
+}
+body.no-anim .noti-hero.pulse .noti-hero-ring { animation: none; }
+
+/* severity accent on each alert card */
+.noti.sev-crit { border-left: 3px solid #ef4444; }
+.noti.sev-warn { border-left: 3px solid #f59e0b; }
+.noti.sev-info { border-left: 3px solid #3b82f6; }
+.noti.sev-ok   { border-left: 3px solid #10b981; }
+
+
+
+/* ─── SECTION: enhance5.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance5.css
+   Fifth additive layer: a "Motion & Interaction" layer that makes the whole app
+   feel alive. All effects are purely additive, theme via existing CSS variables,
+   and fully disable under body.no-anim / prefers-reduced-motion.
+     1. Scroll progress bar (top of viewport)
+     2. Global click ripple on buttons
+     3. Staggered section-enter transition on tab switch
+     4. Floating Action Button speed-dial (quick actions, mobile-friendly)
+     5. Animated circular theme-reveal flourish
+     6. Confetti burst on payroll success
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── 1. scroll progress bar ─────────────── */
+.mx5-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 300;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.55);
+    transition: width 0.1s linear; pointer-events: none;
+}
+body.no-anim .mx5-progress { transition: none; }
+
+/* ─────────────── 2. ripple ─────────────── */
+.mx5-ripple-host { position: relative; overflow: hidden; }
+.mx5-ripple {
+    position: absolute; border-radius: 50%; transform: scale(0);
+    background: rgba(255, 255, 255, 0.45); pointer-events: none;
+    animation: mx5Ripple 0.6s ease-out forwards;
+}
+@keyframes mx5Ripple { to { transform: scale(2.4); opacity: 0; } }
+body.no-anim .mx5-ripple { display: none; }
+
+/* ─────────────── 3. section-enter stagger ─────────────── */
+.tab-content.mx5-enter > * {
+    opacity: 0; transform: translateY(16px);
+    animation: mx5In 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes mx5In { to { opacity: 1; transform: none; } }
+body.no-anim .tab-content.mx5-enter > * { animation: none; opacity: 1; transform: none; }
+
+/* ─────────────── 4. FAB speed-dial ─────────────── */
+.fab5, .fab5-backdrop { display: none !important; }
+.fab5-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none; }
+.fab5-item { display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(14px) scale(0.8); pointer-events: none; transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.fab5.open .fab5-item { opacity: 1; transform: none; pointer-events: auto; }
+body.no-anim .fab5-item { transition: none; }
+.fab5-item .lbl { background: var(--text-primary); color: var(--bg-card); font-size: 0.72rem; font-weight: 700; padding: 5px 10px; border-radius: 8px; white-space: nowrap; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
+.fab5-btn { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--accent, #3b82f6); font-size: 1rem; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; transition: background 0.16s ease, color 0.16s ease; }
+.fab5-btn:hover { color: #fff; background: var(--accent, #3b82f6); }
+.fab5-main { width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer; color: #fff; font-size: 1.35rem; background: linear-gradient(135deg, #3b82f6, #6d28d9); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; pointer-events: auto; }
+.fab5-main i { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.fab5.open .fab5-main { transform: rotate(135deg); }
+.fab5-main:hover { box-shadow: 0 14px 38px rgba(59, 130, 246, 0.65); }
+body.no-anim .fab5-main, body.no-anim .fab5-main i { transition: none; }
+.fab5-backdrop { position: fixed; inset: 0; z-index: 231; background: rgba(15, 23, 42, 0.28); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+.fab5-backdrop.show { opacity: 1; pointer-events: auto; }
+body.no-anim .fab5-backdrop { transition: none; }
+@media (max-width: 640px) { .fab5 { right: 16px; bottom: 16px; } }
+
+/* ─────────────── 5. theme-reveal flourish ─────────────── */
+.mx5-theme-veil { position: fixed; inset: 0; z-index: 9998; pointer-events: none; will-change: clip-path; }
+
+/* ─────────────── 6. confetti ─────────────── */
+.mx5-confetti { position: fixed; inset: 0; z-index: 9999; pointer-events: none; }
+
+/* ─────────────── 7. de-duplication ───────────────
+   These controls now live ONLY in the Settings & Data hub. The real elements
+   stay in the DOM (hidden) so the hub's proxies / currency mirror keep working;
+   they are just removed from the header top bar and the dashboard. */
+#themeToggle,
+#animToggle,
+.currency-select-wrap { display: none !important; }
+#dashDataGroup { display: none !important; }
+#dashCoreGroup { display: none !important; }
+
+
+
+/* ─── SECTION: enhance6.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance6.css
+   Sixth additive layer: header "Live Clock" refinement.
+   The clock used to float in the dead-center of the header. This layer:
+     1. Relocates it (via enhance6.js) into the right-hand action cluster.
+     2. Restyles it from a tall vertical block into a sleek horizontal pill
+        that lines up with the action buttons.
+   Theme via existing CSS variables; honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── relocated horizontal pill ─────────────── */
+.live-clock.lc6 {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.13), rgba(139, 92, 246, 0.08));
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.live-clock.lc6:hover {
+    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.42);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+body.no-anim .live-clock.lc6 { transition: none; }
+body.no-anim .live-clock.lc6:hover { transform: none; }
+
+/* LIVE label + pulsing dot, kept compact on the left */
+.live-clock.lc6 .live-status {
+    order: 1;
+    margin-bottom: 0;
+    gap: 5px;
+    font-size: 0.5rem;
+}
+
+/* time is the hero */
+.live-clock.lc6 .live-clock-time {
+    order: 2;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+/* date sits to the right of the time, separated by a hairline */
+.live-clock.lc6 .live-clock-date {
+    order: 3;
+    padding-left: 10px;
+    margin-left: 1px;
+    border-left: 1px solid var(--bg-card-border);
+    font-size: 0.62rem;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+/* vertical divider that separates the clock from the action buttons */
+.lc6-divider {
+    width: 1px;
+    height: 26px;
+    align-self: center;
+    background: var(--bg-card-border);
+    margin: 0 4px 0 2px;
+    flex-shrink: 0;
+}
+
+/* on narrow / mobile the base already hides .live-clock; keep the divider hidden too */
+@media (max-width: 640px) {
+    .lc6-divider { display: none; }
+}
+
+
+
+/* ─── SECTION: enhance7.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance7.css
+   Seventh additive layer: interactive / dynamic surfaces.
+     1. Kanban leave board       (drag between Pending / Approved / Rejected)
+     2. Inline-edit table cells  (dbl-click Dept / Position / Salary)
+     3. Live activity feed        (real logged actions, streaming)
+     4. Reactive filter counts    (live "X of Y" on search)
+     5. Interactive chart callouts(click a segment → detail popover)
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── 1. Kanban leave board ─────────────── */
+.lc7-viewtoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 10px; overflow: hidden; }
+.lc7-viewtoggle button { border: none; background: transparent; color: var(--text-secondary); padding: 7px 13px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.lc7-viewtoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+.lc7-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+@media (max-width: 820px) { .lc7-board { grid-template-columns: 1fr; } }
+.lc7-col { background: rgba(127,127,127,0.05); border: 1px solid var(--bg-card-border); border-radius: 14px; padding: 12px; min-height: 120px; display: flex; flex-direction: column; transition: background 0.16s ease, border-color 0.16s ease; }
+.lc7-col.drag-over { border-color: var(--accent, #3b82f6); background: rgba(59,130,246,0.09); }
+.lc7-col-h { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; color: var(--text-secondary); }
+.lc7-col-h .dot { width: 9px; height: 9px; border-radius: 50%; }
+.lc7-col-h .cnt { margin-left: auto; background: rgba(127,127,127,0.16); border-radius: 999px; padding: 1px 8px; font-size: 0.7rem; }
+.lc7-col.pending .dot { background: #f59e0b; }
+.lc7-col.approved .dot { background: #10b981; }
+.lc7-col.rejected .dot { background: #ef4444; }
+.lc7-card { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-left: 3px solid var(--accent, #3b82f6); border-radius: 11px; padding: 11px 12px; margin-bottom: 10px; cursor: grab; transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease; }
+.lc7-card:active { cursor: grabbing; }
+.lc7-card.dragging { opacity: 0.5; transform: scale(0.98); }
+.lc7-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.14); }
+.lc7-card.pending { border-left-color: #f59e0b; }
+.lc7-card.approved { border-left-color: #10b981; }
+.lc7-card.rejected { border-left-color: #ef4444; }
+.lc7-card .nm { font-weight: 700; font-size: 0.82rem; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
+.lc7-card .meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+.lc7-card .type { display: inline-block; margin-top: 7px; font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(127,127,127,0.1); color: var(--text-secondary); }
+.lc7-card.enter { animation: lc7In 0.3s cubic-bezier(.22,1,.36,1) both; }
+@keyframes lc7In { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lc7-col-empty { font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 18px 6px; border: 1px dashed var(--bg-card-border); border-radius: 10px; }
+body.no-anim .lc7-card, body.no-anim .lc7-col { transition: none; }
+body.no-anim .lc7-card.enter { animation: none; }
+.lc7-card-actions { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+.lc7-card-actions button { border: 1px solid var(--bg-card-border); background: var(--bg-card); border-radius: 8px; padding: 5px 10px; font-size: 0.66rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease; }
+.lc7-card-actions button:hover { border-color: var(--accent, #3b82f6); }
+.lc7-card-actions button.approve:hover { background: #10b981; color: #fff; border-color: #10b981; }
+.lc7-card-actions button.reject:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+.lc7-card-actions button.reopen:hover { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+body.no-anim .lc7-card-actions button { transition: none; }
+
+/* ── scale: cap column height so the board never stretches the page ── */
+.lc7-col-body { display: flex; flex-direction: column; flex: 1; overflow-y: auto; max-height: clamp(240px, 56vh, 520px); padding-right: 3px; }
+.lc7-col-body::-webkit-scrollbar { width: 6px; }
+.lc7-col-body::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+.lc7-col-body::-webkit-scrollbar-track { background: transparent; }
+/* ── card details (replaced the approve/reject/reopen buttons) ── */
+.lc7-det { font-size: 0.68rem; color: var(--text-muted); margin-top: 7px; display: flex; align-items: flex-start; gap: 6px; line-height: 1.35; }
+.lc7-det i { margin-top: 2px; opacity: 0.7; font-size: 0.62rem; flex-shrink: 0; }
+.lc7-det-reason { font-style: italic; }
+/* ─────────────── 2. Inline-edit table cells ─────────────── */
+.lc7-editable { cursor: pointer; }
+.lc7-editable:hover { text-decoration: underline dotted; text-underline-offset: 3px; text-decoration-color: var(--accent, #3b82f6); }
+.lc7-cell-input { width: 100%; box-sizing: border-box; padding: 5px 7px; border: 1px solid var(--accent, #3b82f6); border-radius: 7px; background: var(--bg-card); color: var(--text-primary); font: inherit; }
+.lc7-flash { animation: lc7Flash 1s ease; }
+@keyframes lc7Flash { 0% { background: rgba(16,185,129,0.35); } 100% { background: transparent; } }
+body.no-anim .lc7-flash { animation: none; }
+body.lc7-suppressmodal #empModal { display: none !important; }
+
+/* ─────────────── 3. Live activity feed ─────────────── */
+#lc7-activity { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+.lc7-feed-head { display: flex; align-items: center; gap: 7px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+.lc7-feed-head .live-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+.lc7-feed-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border: 1px solid var(--bg-card-border); border-radius: 11px; background: rgba(127,127,127,0.04); }
+.lc7-feed-item.new { animation: lc7FeedIn 0.4s cubic-bezier(.22,1,.36,1) both; }
+@keyframes lc7FeedIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+.lc7-feed-ic { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; }
+.lc7-feed-b { flex: 1; min-width: 0; }
+.lc7-feed-t { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
+.lc7-feed-time { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+.lc7-feed-empty { font-size: 0.74rem; color: var(--text-muted); padding: 6px 2px; }
+body.no-anim .lc7-feed-item.new { animation: none; }
+
+/* ─────────────── 4. Reactive filter counts ─────────────── */
+.lc7-count { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); background: rgba(127,127,127,0.08); border: 1px solid var(--bg-card-border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; margin-left: 8px; vertical-align: middle; }
+.lc7-count b { color: var(--accent, #3b82f6); }
+.lc7-count.filtering { border-color: var(--accent, #3b82f6); }
+
+/* ─────────────── 5. Interactive chart callouts ─────────────── */
+.lc7-chart-pop { position: fixed; z-index: 400; pointer-events: none; background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: 11px; box-shadow: 0 14px 40px rgba(0,0,0,0.28); padding: 11px 13px; min-width: 150px; transform: translateY(6px); opacity: 0; transition: opacity 0.14s ease, transform 0.14s ease; }
+.lc7-chart-pop.show { opacity: 1; transform: none; }
+.lc7-chart-pop .lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 800; }
+.lc7-chart-pop .val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; margin-top: 3px; }
+.lc7-chart-pop .pct { font-size: 0.72rem; color: var(--accent, #3b82f6); font-weight: 700; margin-top: 2px; }
+canvas#deptBarChart, canvas#payrollBreakdownChart, canvas#attendanceTrendChart, canvas#leaveDistChart { cursor: pointer; }
+body.no-anim .lc7-chart-pop { transition: none; }
+
+/* ─────────────── 6. mobile floating-button click clearance ───────────────
+   On phones the fixed "New leave" FAB (mobile-enhance.css .fab) floats in the
+   bottom-right corner. It lives in the root stacking context (z-index:55) while
+   all page content sits inside #mainContent.page-wrap (z-index:3) — so the FAB
+   always paints on top and z-index on the buttons themselves can't win. The
+   reliable fix is spatial: left-align in-card action buttons so Reject/delete/
+   payslip never sit under the bottom-right FAB, plus extra scroll clearance. */
+@media (max-width: 640px) {
+    #leavesTable tbody td[data-label="Actions"],
+    #employeesTable tbody td[data-label="Actions"],
+    #payrollTable tbody td[data-label="Payslip"] {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    /* extra scroll room so the last card can clear the floating buttons */
+    .page-wrap { padding-bottom: calc(var(--mob-nav-h) + var(--safe-b) + 96px) !important; }
+}
+
+
+
+/* ─── SECTION: enhance8.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance8.css
+   Eighth additive layer: the "Insights hub". The three flat dashboard panels
+   (Live activity / Top earners / Exchange rates) are merged into ONE full-width
+   card with an animated segmented control and swappable panels. Also removes the
+   duplicate "Live activity" header the base + enhance7 feeds produced together.
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* the merged card spans the whole bottom row */
+.ins8-card { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 14px; }
+
+/* ─────────────── header: title + segmented control ─────────────── */
+.ins8-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ins8-head .chart-title { margin: 0; }
+.ins8-seg { position: relative; display: inline-flex; margin-left: auto; background: rgba(127, 127, 127, 0.09); border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 4px; gap: 2px; }
+.ins8-seg-ind { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 10px; background: var(--bg-card); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 0; }
+.ins8-tab { position: relative; z-index: 1; border: none; background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.76rem; font-weight: 700; padding: 7px 15px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: color 0.18s ease; }
+.ins8-tab i { font-size: 0.8rem; }
+.ins8-tab.active { color: var(--text-primary); }
+.ins8-tab:hover:not(.active) { color: var(--text-primary); }
+body.no-anim .ins8-seg-ind { transition: none; }
+
+/* ─────────────── body / panels ─────────────── */
+.ins8-body { position: relative; min-height: 156px; }
+.ins8-panel { display: none; }
+.ins8-panel.active { display: block; animation: ins8Swap 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ins8Swap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+body.no-anim .ins8-panel.active { animation: none; }
+
+/* ─────────────── activity panel: kill the duplicate header + base feed ─────────────── */
+.ins8-panel[data-panel="activity"] #activity-feed { display: none !important; }
+.ins8-panel[data-panel="activity"] .lc7-feed-head { display: none; }
+.ins8-panel[data-panel="activity"] #lc7-activity { max-height: 268px; overflow-y: auto; padding-right: 4px; }
+.ins8-panel[data-panel="activity"] #lc7-activity::-webkit-scrollbar { width: 5px; }
+.ins8-panel[data-panel="activity"] #lc7-activity::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+/* shared little segmented toggle used inside panels (Top 3 / Top 5) */
+.ins8-minitoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 9px; overflow: hidden; }
+.ins8-minitoggle button { border: none; background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.68rem; font-weight: 700; padding: 5px 11px; cursor: pointer; }
+.ins8-minitoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+
+/* ─────────────── leaders panel ─────────────── */
+.ins8-panel[data-panel="leaders"] .ins8-tools { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ins8-panel[data-panel="leaders"] .ins8-tools .ins8-hint { font-size: 0.7rem; color: var(--text-muted); margin-left: auto; }
+/* two-column leaderboard on wide screens (beats the inline display:flex) */
+#top-earners-list.ins8-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px 20px !important; }
+@media (max-width: 760px) { #top-earners-list.ins8-grid { grid-template-columns: 1fr !important; } }
+/* Top-3 mode hides ranks 4+ */
+#top-earners-list.ins8-top3 .earner-row:nth-child(n+4) { display: none; }
+.earner-row { cursor: default; }
+
+/* ─────────────── currency panel ─────────────── */
+.ins8-conv-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.ins8-conv-field { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--bg-card-border); border-radius: 11px; padding: 6px 12px; background: rgba(127, 127, 127, 0.05); }
+.ins8-conv-field input { border: none; background: transparent; outline: none; font: inherit; font-weight: 800; font-size: 1rem; color: var(--text-primary); width: 108px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.ins8-conv-field .cur { font-size: 0.72rem; font-weight: 800; color: var(--accent, #3b82f6); letter-spacing: 0.04em; }
+/* base-currency picker inside the amount field */
+.ins8-cur-sel { border: none; border-left: 1px solid var(--bg-card-border); background: transparent; outline: none; font: inherit; font-weight: 800; font-size: 0.78rem; color: var(--accent, #3b82f6); letter-spacing: 0.04em; padding: 2px 4px 2px 10px; cursor: pointer; }
+.ins8-cur-sel option { color: var(--text-primary); background: var(--bg-card); font-weight: 700; }
+/* manual refresh button */
+.ins8-fxrefresh { border: 1px solid var(--bg-card-border); background: rgba(127, 127, 127, 0.05); color: var(--text-secondary); border-radius: 10px; width: 34px; height: 34px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.15s ease, border-color 0.15s ease, transform 0.4s ease; }
+.ins8-fxrefresh:hover { color: var(--accent, #3b82f6); border-color: var(--accent, #3b82f6); }
+.ins8-fxrefresh:active { transform: rotate(180deg); }
+body.no-anim .ins8-fxrefresh { transition: none; }
+.ins8-conv-eq { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; }
+.ins8-fxgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; }
+.ins8-fx-card { border: 1px solid var(--bg-card-border); border-radius: 13px; padding: 11px 13px; background: rgba(127, 127, 127, 0.04); transition: transform 0.14s ease, border-color 0.14s ease; }
+.ins8-fx-card:hover { transform: translateY(-2px); border-color: var(--accent, #3b82f6); }
+body.no-anim .ins8-fx-card { transition: none; }
+.ins8-fx-pair { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.ins8-fx-pair .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent, #3b82f6); }
+.ins8-fx-conv { font-size: 1.18rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; margin-top: 6px; }
+.ins8-fx-rate { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.ins8-fx-empty { grid-column: 1 / -1; font-size: 0.78rem; color: var(--text-muted); }
+/* offline-estimate styling + status note */
+.ins8-fx-card.ins8-fx-est .ins8-fx-rate { color: #f59e0b; }
+.ins8-conv-note { margin-top: 12px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+.ins8-conv-note:empty { display: none; }
+.ins8-conv-note.live { color: #10b981; }
+.ins8-conv-note.est { color: #f59e0b; }
+/* keep the raw base list around as a hidden data source */
+.ins8-panel[data-panel="currency"] #fx-snapshot-list { display: none !important; }
+/* the base meta ("Rates unavailable offline") would contradict our own note */
+.ins8-panel[data-panel="currency"] #fx-snapshot-meta { display: none !important; }
+
+/* ─────────────── hide the three original source cards once merged ─────────────── */
+.ins8-merged-src { display: none !important; }
+
+@media (max-width: 640px) {
+    .ins8-seg { margin-left: 0; width: 100%; justify-content: space-between; }
+    .ins8-tab { flex: 1 1 0; justify-content: center; padding: 8px 6px; }
+}
+
+
+
+/* ─── SECTION: enhance9.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance9.css
+   Ninth additive layer: the Attendance "roster board". A drag-and-drop board
+   (like the Leaves Kanban, but for 4 states) where you drag employees between
+   Present / Late / Half-day / Absent columns for the selected date. Changes
+   persist instantly through the base Save path. Tap fallback for touch.
+   Theme via existing CSS variables; all motion honours body.no-anim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── toolbar: view toggle + rate meter + quick action ─────────────── */
+#att9-wrap { margin-bottom: 16px; }
+.att9-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.att9-viewtoggle { display: inline-flex; border: 1px solid var(--bg-card-border); border-radius: 10px; overflow: hidden; }
+.att9-viewtoggle button { border: none; background: transparent; color: var(--text-secondary); padding: 7px 13px; font: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.att9-viewtoggle button.active { background: var(--accent, #3b82f6); color: #fff; }
+.att9-rate { display: inline-flex; align-items: center; gap: 10px; font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); }
+.att9-rate-bar { width: 120px; height: 8px; border-radius: 999px; background: rgba(127, 127, 127, 0.16); overflow: hidden; }
+.att9-rate-bar > span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+body.no-anim .att9-rate-bar > span { transition: none; }
+.att9-rate-pct { color: var(--text-primary); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.att9-allpresent { margin-left: auto; border: 1px solid var(--bg-card-border); background: var(--bg-card); color: var(--text-secondary); border-radius: 10px; padding: 7px 13px; font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: color 0.15s ease, border-color 0.15s ease; }
+.att9-allpresent:hover { color: #10b981; border-color: #10b981; }
+body.no-anim .att9-allpresent { transition: none; }
+
+/* ─────────────── the board ─────────────── */
+.att9-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 1000px) { .att9-board { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .att9-board { grid-template-columns: 1fr; } }
+.att9-col { background: rgba(127, 127, 127, 0.05); border: 1px solid var(--bg-card-border); border-radius: 14px; padding: 12px; min-height: 130px; display: flex; flex-direction: column; transition: background 0.16s ease, border-color 0.16s ease; }
+.att9-col.drag-over { border-color: var(--c, #3b82f6); background: color-mix(in srgb, var(--c, #3b82f6) 12%, transparent); }
+.att9-col-h { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: var(--text-secondary); }
+.att9-col-h .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c, #3b82f6); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c, #3b82f6) 18%, transparent); }
+.att9-col-h .cnt { margin-left: auto; background: rgba(127, 127, 127, 0.16); border-radius: 999px; padding: 1px 9px; font-size: 0.72rem; color: var(--text-primary); }
+.att9-col-body { display: flex; flex-direction: column; gap: 9px; flex: 1; overflow-y: auto; max-height: clamp(240px, 56vh, 520px); padding-right: 3px; }
+.att9-col-body::-webkit-scrollbar { width: 6px; }
+.att9-col-body::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 99px; }
+.att9-col-body::-webkit-scrollbar-track { background: transparent; }
+.att9-col-empty { font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 16px 6px; border: 1px dashed var(--bg-card-border); border-radius: 10px; }
+/* ── scale: quick filter to find employees when the roster is large ── */
+.att9-filter { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--bg-card-border); border-radius: 10px; padding: 6px 11px; background: rgba(127, 127, 127, 0.05); color: var(--text-muted); }
+.att9-filter i { font-size: 0.72rem; }
+.att9-filter input { border: none; background: transparent; outline: none; font: inherit; font-size: 0.75rem; color: var(--text-primary); width: 130px; }
+.att9-card.att9-hidden { display: none; }
+.att9-col-body.att9-nomatch::after { content: 'No matches'; display: block; font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 14px 6px; }
+
+/* ─────────────── employee cards ─────────────── */
+.att9-card { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-left: 3px solid var(--c, #3b82f6); border-radius: 11px; padding: 10px 11px; cursor: grab; display: flex; align-items: center; gap: 10px; transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease; }
+.att9-card:active { cursor: grabbing; }
+.att9-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14); }
+.att9-card.dragging { opacity: 0.5; transform: scale(0.98); }
+.att9-card.enter { animation: att9In 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes att9In { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+body.no-anim .att9-card { transition: none; }
+body.no-anim .att9-card.enter { animation: none; }
+.att9-ava { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: #fff; letter-spacing: 0.02em; }
+.att9-b { flex: 1; min-width: 0; }
+.att9-nm { font-weight: 700; font-size: 0.82rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.att9-id { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+/* touch fallback: quick "move to" buttons (the other three states) */
+.att9-quick { display: flex; gap: 5px; flex-shrink: 0; }
+.att9-quick button { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--bg-card-border); background: transparent; color: var(--qc, #3b82f6); font-size: 0.68rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease; }
+.att9-quick button:hover { background: var(--qc, #3b82f6); color: #fff; border-color: var(--qc, #3b82f6); }
+body.no-anim .att9-quick button { transition: none; }
+
+/* ─────────────── view switching ─────────────── */
+body.att9-board-view .att9-listwrap { display: none; }
+
+/* ─────────────── remove all "LIVE"/"live" status badges site-wide ───────────────
+   Keeps the header clock (date + time); only the LIVE label/pills are dropped. */
+.live-status,            /* header clock "● LIVE" */
+.live-badge,             /* card-title "live" pills (dashboard + Insights hub) */
+.px-live,                /* Metric Explorer "live" pill */
+.report-podium-live {    /* Reports podium "live" pill */
+  display: none !important;
+}
+
+
+
+/* ─── SECTION: enhance10.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance10.css
+   Tenth additive layer:
+     1. Dashboard greeting band — one live, animated gradient strip carrying the
+        greeting and the real-time chips (flowing gradient, drifting light orbs,
+        a slow sheen sweep, pulsing avatar ring, staggered entrance).
+     2. Insights relocated into Reports as a collapsible, managed panel.
+   Theme via existing CSS variables; every animation is disabled under
+   body.no-anim and prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* the old hero is emptied into the band, then hidden */
+.dash-hero.dc10-off { display: none !important; }
+
+/* ─────────────── the band shell ─────────────── */
+#dc10-card {
+    position: relative; overflow: hidden; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px; margin-bottom: 18px;
+    box-shadow: 0 20px 44px -20px rgba(79, 70, 229, 0.6), 0 2px 8px rgba(0, 0, 0, 0.12);
+    animation: dc10In 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dc10In { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+.dc10-band {
+    position: relative; isolation: isolate;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 20px 24px; color: #fff;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3730a3 40%, #5b21b6 100%);
+}
+
+/* Subtle static light accents */
+.dc10-band::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+        radial-gradient(40% 70% at 20% 20%, rgba(255, 255, 255, 0.18), transparent 70%),
+        radial-gradient(35% 60% at 80% 80%, rgba(56, 189, 248, 0.22), transparent 70%);
+}
+
+.dc10-band::after {
+    display: none;
+}
+
+/* ─────────────── avatar ─────────────── */
+.dc10-ava, .dc10-hi, .dc10-right { position: relative; z-index: 1; }
+.dc10-ava {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.dc10-ava::after {
+    display: none;
+}
+
+/* ─────────────── greeting text ─────────────── */
+.dc10-hi { flex: 1; min-width: 200px; }
+.dc10-hi #dashHello {
+    font-size: 1.34rem; font-weight: 800; letter-spacing: -0.015em; color: #fff; margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+    animation: dc10Up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dc10-hi #dashSub {
+    font-size: 0.77rem; font-weight: 500; color: rgba(255, 255, 255, 0.88); margin-top: 4px;
+    animation: dc10Up 0.55s 0.07s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dc10Up { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+/* ─────────────── live chips (glass pills) ─────────────── */
+.dc10-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dc10-right .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.dc10-right .hero-cta { display: none !important; }  /* "View Reports" lives in the tab bar */
+.dc10-right .hero-chip {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    color: #fff !important;
+    border-radius: 999px !important; padding: 8px 16px !important;
+    font-size: 0.76rem !important; font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease, box-shadow 0.2s ease;
+    animation: dc10Up 0.55s both;
+}
+.dc10-right .hero-chip i, .dc10-right .hero-chip span, .dc10-right .hero-chip * { color: #fff !important; }
+.dc10-right .hero-chip span { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.88rem; font-weight: 800; }
+.dc10-right .hero-chip:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(255, 255, 255, 0.27) !important;
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.dc10-right .hero-chip:nth-child(1) { animation-delay: 0.12s; }
+.dc10-right .hero-chip:nth-child(2) { animation-delay: 0.2s; }
+.dc10-right .hero-chip:nth-child(3) { animation-delay: 0.28s; }
+
+/* ─────────────── motion off switch ─────────────── */
+body.no-anim #dc10-card,
+body.no-anim .dc10-band,
+body.no-anim .dc10-band::before,
+body.no-anim .dc10-band::after,
+body.no-anim .dc10-ava::after,
+body.no-anim .dc10-hi #dashHello,
+body.no-anim .dc10-hi #dashSub,
+body.no-anim .dc10-right .hero-chip { animation: none !important; }
+body.no-anim .dc10-band { background-position: 0% 50%; }
+body.no-anim .dc10-band::after { display: none; }
+body.no-anim .dc10-right .hero-chip { transition: none; }
+body.no-anim .dc10-right .hero-chip:hover { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    #dc10-card, .dc10-band, .dc10-band::before, .dc10-band::after, .dc10-ava::after,
+    .dc10-hi #dashHello, .dc10-hi #dashSub, .dc10-right .hero-chip { animation: none !important; }
+    .dc10-band::after { display: none; }
+}
+
+@media (max-width: 640px) {
+    #dc10-card { border-radius: 16px; }
+    .dc10-band { padding: 16px 15px; gap: 13px; }
+    .dc10-ava { width: 42px; height: 42px; border-radius: 12px; font-size: 1rem; }
+    .dc10-hi { min-width: 0; }
+    .dc10-hi #dashHello { font-size: 1.08rem; }
+    .dc10-hi #dashSub { font-size: 0.72rem; }
+    .dc10-right { width: 100%; }
+    .dc10-right .hero-chips { width: 100%; }
+    .dc10-right .hero-chip { flex: 1; justify-content: center; padding: 8px 10px !important; }
+}
+
+
+
+/* ─── SECTION: enhance11.css ─── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PAYROLL NEXUS — enhance11.css
+   Eleventh additive layer: a COHESIVE POLISH PASS across the whole app.
+   Fills the gaps the base + earlier layers left, without duplicating them:
+     1. One themed scrollbar everywhere (base only styled a few containers).
+     2. Branded ::selection.
+     3. Consistent soft focus glow on every input / select / textarea.
+     4. A unified, gentle hover-lift for card-like .glass panels
+        (deliberately excludes sticky headers, tab bar, modals, the greeting
+         band, and the 3D-tilt KPI cards so nothing fights an existing effect).
+     5. A hairline top-sheen on cards for crisper depth.
+     6. A light sweep across solid buttons on hover.
+     7. Crisper badges with a subtle hover.
+   All colours come from the existing CSS variables, so light + dark both work.
+   The base `body.no-anim *` rule already neutralises animation/transition; the
+   continuous / decorative bits are additionally guarded here and under
+   prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── 1. themed scrollbar (whole app) ─────────────── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-card-border) transparent;
+}
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.55), rgba(139, 92, 246, 0.55));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ─────────────── 2. branded selection ─────────────── */
+::selection { background: rgba(99, 102, 241, 0.28); color: var(--text-primary); }
+::-moz-selection { background: rgba(99, 102, 241, 0.28); color: var(--text-primary); }
+
+/* ─────────────── 3. consistent focus glow on all form controls ───────────────
+   Base only shifts border-color on .field-input:focus. This adds a soft accent
+   halo to every control uniformly (mouse + keyboard); enhance2's :focus-visible
+   ring still handles crisp keyboard outlines on top. */
+.field-input:focus,
+.search-input:focus,
+.report-select:focus,
+.currency-select:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16), 0 2px 10px -4px rgba(99, 102, 241, 0.4);
+    outline: none;
+}
+
+/* ─────────────── 4. unified card hover-lift ───────────────
+   New behaviour — base .glass:hover only changes shadow + border. A small,
+   consistent rise ties every panel together. Excludes structural / already-
+   animated glass so nothing conflicts (sticky header, tab bar, modal card,
+   greeting band, and the JS 3D-tilt KPI cards). */
+.glass:not(.top-header):not(.tab-bar):not(.modal-card):not(.dc10-card):not(.tilt-card):not(.kpi-card):not(.dash-hero):hover {
+    transform: translateY(-3px);
+}
+
+/* ─────────────── 5. hairline top-sheen for depth ───────────────
+   A thin light line along the top edge of card-like glass makes the glass read
+   as glass. Layered as an inset highlight so it never replaces --shadow-card. */
+.glass.chart-card,
+.glass.qa-card,
+.kpi-card,
+.modal-card {
+    box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+body.dark-mode .glass.chart-card,
+body.dark-mode .glass.qa-card,
+body.dark-mode .kpi-card,
+body.dark-mode .modal-card {
+    box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────── 6. light sweep across solid buttons ───────────────
+   .btn::after is a static top gradient; ::before is free. A diagonal band
+   glides across on hover — subtle shine, no layout impact. */
+.btn-primary::before,
+.btn-violet::before,
+.btn-emerald::before,
+.btn-amber::before,
+.btn-danger::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 60%;
+    background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-180%) skewX(-18deg);
+    pointer-events: none;
+}
+.btn-primary:hover::before,
+.btn-violet:hover::before,
+.btn-emerald:hover::before,
+.btn-amber:hover::before,
+.btn-danger:hover::before {
+    transform: translateX(320%) skewX(-18deg);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─────────────── 7. crisper badges ───────────────
+   Base badges are flat tints. Add a hairline ring for definition and a tiny
+   hover rise (base already transitions transform). */
+.badge {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.badge:hover { transform: translateY(-1px); }
+
+/* ─────────────── motion guards ───────────────
+   base `body.no-anim *` already zeroes transitions; make the intent explicit
+   and cover reduced-motion for the decorative bits. */
+body.no-anim .glass:hover,
+body.no-anim .badge:hover { transform: none; }
+body.no-anim .btn-primary::before,
+body.no-anim .btn-violet::before,
+body.no-anim .btn-emerald::before,
+body.no-anim .btn-amber::before,
+body.no-anim .btn-danger::before { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .glass:hover, .badge:hover { transform: none; }
+    .btn-primary::before, .btn-violet::before, .btn-emerald::before,
+    .btn-amber::before, .btn-danger::before { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ✦ PERFORMANCE — cut the compositing cost that made the app feel laggy.
+   Measured on the live page: 13 large glass panels are visible at once on the
+   dashboard, each running `backdrop-filter: blur(18px) saturate(1.8)`. blur()
+   combined with saturate() is one of the most expensive things a browser can
+   composite, and it must be redrawn on every scroll, mouse-driven repaint and
+   animation frame — that is the lag. We keep the frosted-glass look but make it
+   much cheaper: a smaller blur radius and no per-layer saturate. enhance11.css
+   loads last, so these win over the base values by source order.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.top-header {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.tab-bar {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+/* Promote the two full-viewport, mouse-tracked atmosphere layers to their own
+   GPU layer so pointer-move repaints stay isolated from the blurred cards.
+   (will-change only — no `contain`, which would collapse these sizeless
+   fixed-position decorative layers.) */
+.fx-spotlight, .fx-aurora { will-change: transform, opacity; }
+

@@ -217,7 +217,9 @@
     if (profileCard) {
       profileCard.addEventListener('click', function () {
         closeDrawer();
-        if (typeof window.openModal === 'function') {
+        if (typeof window.openAuthProfileModal === 'function') {
+          window.openAuthProfileModal();
+        } else if (typeof window.openModal === 'function') {
           window.openModal('heliosAuthModal');
         }
       });
